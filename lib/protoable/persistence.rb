@@ -1,7 +1,11 @@
+require 'protoable/convert'
+require 'protoable/processor'
+
 module Protoable
   module Persistence
     def self.included(klass)
       klass.extend Protoable::Persistence::ClassMethods
+      klass.__send__ :include, Protoable::Convert
       klass.__send__ :include, Protoable::Processor
     end
 
@@ -60,7 +64,7 @@ module Protoable
       end
 
       updateable_hash.dup.each do |key, value|
-        updateable_hash[key] = _protobuf_base_model._protobuf_filter_and_convert(key, value)
+        updateable_hash[key] = _protobuf_base_model._protobuf_filter_and_convert_fields(key, value)
       end
 
       return updateable_hash

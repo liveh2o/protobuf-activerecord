@@ -36,6 +36,10 @@ module Protoable
         return protobuf_value.respond_to?(:to_i) ? Time.at(protobuf_value.to_i) : protobuf_value
       end
 
+      def _convert_datetime_to_int64(value)
+        return value.respond_to?(:to_i) ? value.to_i : value
+      end
+
       def _protobuf_date_column?(key)
         _protobuf_column_types[:date] && _protobuf_column_types[:date].include?(key)
       end
@@ -43,9 +47,27 @@ module Protoable
       def _protobuf_datetime_column?(key)
         _protobuf_column_types[:datetime] && _protobuf_column_types[:datetime].include?(key)
       end
+      
+      def _protobuf_filter_and_convert_columns(key, value)
+        value = case
+                when _protobuf_datetime_column?(key) then
+                  _convert_datetime_to_int64(value)
+                when _protobuf_timestamp_column?(key) then
+                  _convert_datetime_to_int64(value)
+                when _protobuf_time_column?(key) then
+                  _convert_datetime_to_int64(value)
+                when _protobuf_date_column?(key) then
+                  _convert_datetime_to_int64(value)
+                when _protobuf_field_converters.has_key?(key.to_sym) then
+                  _protobuf_field_converters[key.to_sym].call(value)
+                else
+                  value
+                end
 
-      def _protobuf_filter_and_convert(key, value)
-        column = _protobuf_columns[key]
+        return value
+      end
+
+      def _protobuf_filter_and_convert_fields(key, value)
         value = case
                 when _protobuf_datetime_column?(key) then
                   _convert_int64_to_datetime(value)
