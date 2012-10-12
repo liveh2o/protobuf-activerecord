@@ -3,6 +3,7 @@ require 'protoable/fields'
 require 'protoable/persistence'
 require 'protoable/processor'
 require 'protoable/scope'
+require 'protoable/serialization'
 
 module Protoable
   def self.included(klass)
@@ -13,6 +14,7 @@ module Protoable
     klass.__send__(:include, Protoable::Persistence)
     klass.__send__(:include, Protoable::Processor)
     klass.__send__(:include, Protoable::Scope)
+    klass.__send__(:include, Protoable::Serialization)
   end
 
   module ClassMethods
