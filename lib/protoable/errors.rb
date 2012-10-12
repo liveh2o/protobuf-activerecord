@@ -1,7 +1,12 @@
 module Protoable
   module Errors
+    OK = 200
+    BAD_REQUEST = 400
+    NOT_FOUND = 404
+    INTERNAL_SERVER_ERROR = 500
+
     def errors_for_protobuf
-      return [] if valid?
+      return [] if !changed? || valid?
 
       errors.messages.map do |field, error_messages|
         {
@@ -9,11 +14,10 @@ module Protoable
           :messages => error_messages.dup
         }
       end
+    end
 
-      # TODO: Move these status codes to a constant
-      def status_code_for_protobuf
-        return valid? ? 200 : 400
-      end
+    def status_code_for_protobuf
+      return !changed? || valid? ? OK : BAD_REQUEST
     end
   end
 end
