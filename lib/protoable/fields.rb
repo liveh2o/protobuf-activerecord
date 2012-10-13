@@ -10,15 +10,18 @@ module Protoable
 
       klass.class_eval do
         class << self
-          attr_accessor :_protobuf_columns, :_protobuf_column_types, :_protobuf_column_converters
+          attr_accessor :_protobuf_columns, :_protobuf_column_types,
+            :_protobuf_column_converters, :_protobuf_column_transformers
         end
 
         @_protobuf_columns = {}
         @_protobuf_column_types = Hash.new { |h,k| h[k] = [] }
         @_protobuf_column_converters = {}
+        @_protobuf_column_transformers = {}
 
         # NOTE: Make sure each inherited object has the database layout
-        inheritable_attributes :_protobuf_columns, :_protobuf_column_types, :_protobuf_column_converters
+        inheritable_attributes :_protobuf_columns, :_protobuf_column_types,
+          :_protobuf_column_converters, :_protobuf_column_transformers
       end
 
       _protobuf_map_columns(klass)
@@ -73,10 +76,43 @@ module Protoable
           callable = method(callable) if self.respond_to?(callable)
         end
 
-        raise 'Protobuf activerecord casting needs a callable or block!' if callable.nil?
-        raise 'Protobuf activerecord casting callable must respond to :call!' if !callable.respond_to?(:call)
+        if callable.nil? || !callable.respond_to?(:call)
+          raise ColumnConverterError, 'Column converters must be a callable or block!'
+        end
 
         _protobuf_column_converters[field.to_sym] = callable
+      end
+
+      # Define a column transformation from protobuf to db. Accepts a callable,
+      # or Symbol.
+      #
+      # When given a callable, it is directly used to convert the field.
+      #
+      # When a symbol is given, it extracts the method with the same name.
+      #
+      # The callable or method must accept a single parameter, which is the
+      # proto message.
+      #
+      # Examples:
+      #   proto_column_transform :public_key, :extract_public_key_from_proto
+      #   proto_column_transform :public_key, method(:extract_public_key_from_proto)
+      #   proto_column_transform :status, lambda { |proto_field| ... }
+      #
+      def proto_column_transform(field, callable = nil, &blk)
+        callable ||= blk
+
+        if callable.is_a?(Symbol)
+          unless self.respond_to?(callable)
+            raise ColumnTransformerError, "#{callable} is not defined!"
+          end
+          callable = method(callable) if self.respond_to?(callable)
+        end
+
+        if callable.nil? || !callable.respond_to?(:call)
+          raise ColumnTransformerError, 'Protoable casting needs a callable or block!'
+        end
+
+        _protobuf_column_transformers[field.to_sym] = callable
       end
     end
   end
