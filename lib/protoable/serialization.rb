@@ -84,16 +84,8 @@ module Protoable
     def protoable_attributes
       protoable_attributes = protobuf_fields.inject({}) do |hash, field|
         value = respond_to?(field) ? __send__(field) : nil
-        hash[field] = _protobuf_base_model._protobuf_filter_and_convert_columns(field, value)
+        hash[field] = _protobuf_convert_columns(field, value)
         hash
-      end
-
-      if protobuf_fields.include?(:errors)
-        protoable_attributes.merge!(:errors => errors_for_protobuf)
-      end
-
-      if protobuf_fields.include?(:status_code)
-        protoable_attributes.merge!(:status_code => status_code_for_protobuf)
       end
 
       protoable_attributes

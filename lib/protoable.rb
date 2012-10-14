@@ -2,8 +2,6 @@ require 'protoable/convert'
 require 'protoable/errors'
 require 'protoable/fields'
 require 'protoable/persistence'
-require 'protoable/processor'
-require 'protoable/scope'
 require 'protoable/serialization'
 
 module Protoable
@@ -11,11 +9,8 @@ module Protoable
     klass.extend Protoable::ClassMethods
     klass.extend Protoable::Fields
 
-    klass.__send__(:include, Protoable::Errors)
     klass.__send__(:include, Protoable::Convert)
     klass.__send__(:include, Protoable::Persistence)
-    klass.__send__(:include, Protoable::Processor)
-    klass.__send__(:include, Protoable::Scope)
     klass.__send__(:include, Protoable::Serialization)
   end
 
