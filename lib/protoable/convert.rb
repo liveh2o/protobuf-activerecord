@@ -48,7 +48,7 @@ module Protoable
         _protobuf_column_types[:datetime] && _protobuf_column_types[:datetime].include?(key)
       end
       
-      def _protobuf_filter_and_convert_columns(key, value)
+      def _protobuf_convert_columns(key, value)
         value = case
                 when _protobuf_datetime_column?(key) then
                   _convert_datetime_to_int64(value)
@@ -67,7 +67,7 @@ module Protoable
         return value
       end
 
-      def _protobuf_filter_and_convert_fields(key, value)
+      def _protobuf_convert_fields(key, value)
         value = case
                 when _protobuf_datetime_column?(key) then
                   _convert_int64_to_datetime(value)
