@@ -1,11 +1,9 @@
-require 'protoable/convert'
 require 'protoable/processor'
 
 module Protoable
   module Persistence
     def self.included(klass)
       klass.extend Protoable::Persistence::ClassMethods
-      klass.__send__ :include, Protoable::Convert
       klass.__send__ :include, Protoable::Processor
     end
 

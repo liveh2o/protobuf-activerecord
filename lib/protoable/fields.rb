@@ -1,11 +1,9 @@
-require 'protoable/convert'
 require 'protoable/inheritable_class_instance_variables'
 
 module Protoable
   module Fields
     def self.extended(klass)
       klass.extend Protoable::Fields::ClassMethods
-      klass.__send__(:include, Protoable::Convert)
       klass.__send__(:include, Protoable::InheritableClassInstanceVariables)
 
       klass.class_eval do
