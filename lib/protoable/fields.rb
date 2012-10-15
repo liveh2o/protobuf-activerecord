@@ -43,7 +43,7 @@ module Protoable
       #
       # When a Hash is given, :from and :to keys are expected and expand
       # to extracting a class method in the format of
-      # "_convert_#{from}_to_#{to}".
+      # "convert_#{from}_to_#{to}".
       #
       # When a symbol is given, it extracts the method with the same name,
       # if any. When method is not available it is assumed as the "from"
@@ -63,13 +63,13 @@ module Protoable
         callable ||= blk
 
         if callable.is_a?(Hash)
-          callable = :"_convert_#{callable[:from]}_to_#{callable[:to]}"
+          callable = :"convert_#{callable[:from]}_to_#{callable[:to]}"
         end
 
         if callable.is_a?(Symbol)
           unless self.respond_to?(callable)
             column = _protobuf_columns[field.to_sym]
-            callable = :"_convert_#{callable}_to_#{column.try(:type)}"
+            callable = :"convert_#{callable}_to_#{column.try(:type)}"
           end
           callable = method(callable) if self.respond_to?(callable)
         end
