@@ -61,6 +61,18 @@ module Protoable
         _protobuf_column_converters[field.to_sym] = callable
       end
 
+      # Define the protobuf message class that should be used to serialize the
+      # object to protobuf. Accepts a string or symbol.
+      #
+      # When protobuf_message is declared, Protoable automatically extracts the
+      # fields from the message and automatically adds to_proto and to_proto_hash
+      # methods that serialize the object to protobuf.
+      #
+      # Examples:
+      #   protobuf_message :user_message
+      #   protobuf_message "UserMessage"
+      #   protobuf_message "Namespaced::UserMessage"
+      #
       def protobuf_message(message = nil)
         unless message.nil?
           @_protobuf_message = message.to_s.classify.constantize
@@ -83,6 +95,9 @@ module Protoable
       end
     end
 
+    # Extracts attributes that correspond to fields on the specified protobuf
+    # message, performing any necessary column conversions on them.
+    #
     def protoable_attributes
       protoable_attributes = protobuf_fields.inject({}) do |hash, field|
         value = respond_to?(field) ? __send__(field) : nil
