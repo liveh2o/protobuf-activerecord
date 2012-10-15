@@ -32,13 +32,13 @@ module Protoable
       # name of the column.
       #
       # Examples:
-      #   proto_column_convert :created_at, :int64
-      #   proto_column_convert :public_key, :extract_public_key_from_proto
-      #   proto_column_convert :public_key, method(:extract_public_key_from_proto)
-      #   proto_column_convert :status, lambda { |proto_field| ... }
-      #   proto_column_convert :symmetric_key, :from => :base64, :to => :raw_string
+      #   convert_column :created_at, :int64
+      #   convert_column :public_key, :extract_public_key_from_proto
+      #   convert_column :public_key, method(:extract_public_key_from_proto)
+      #   convert_column :status, lambda { |proto_field| ... }
+      #   convert_column :symmetric_key, :from => :base64, :to => :raw_string
       #
-      def proto_column_convert(field, callable = nil, &blk)
+      def convert_column(field, callable = nil, &blk)
         callable ||= blk
 
         if callable.is_a?(Hash)

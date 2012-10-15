@@ -51,15 +51,15 @@ module Protoable
       # name of the column.
       #
       # Examples:
-      #   proto_field_convert :created_at, :int64
-      #   proto_field_convert :public_key, method(:extract_public_key_from_proto)
-      #   proto_field_convert :public_key, :extract_public_key_from_proto
-      #   proto_field_convert :status, lambda { |proto_field| ... }
-      #   proto_field_convert :symmetric_key, :base64
-      #   proto_field_convert :symmetric_key, :from => :base64, :to => :encoded_string
-      #   proto_field_convert :symmetric_key, :from => :base64, :to => :raw_string
+      #   convert_field :created_at, :int64
+      #   convert_field :public_key, method(:extract_public_key_from_proto)
+      #   convert_field :public_key, :extract_public_key_from_proto
+      #   convert_field :status, lambda { |proto_field| ... }
+      #   convert_field :symmetric_key, :base64
+      #   convert_field :symmetric_key, :from => :base64, :to => :encoded_string
+      #   convert_field :symmetric_key, :from => :base64, :to => :raw_string
       #
-      def self.proto_field_convert(field, callable = nil, &blk)
+      def convert_field(field, callable = nil, &blk)
         callable ||= blk
 
         if callable.is_a?(Hash)
