@@ -92,11 +92,11 @@ module Protoable
       # proto message.
       #
       # Examples:
-      #   proto_column_transform :public_key, :extract_public_key_from_proto
-      #   proto_column_transform :public_key, method(:extract_public_key_from_proto)
-      #   proto_column_transform :status, lambda { |proto_field| ... }
+      #   transform_column :public_key, :extract_public_key_from_proto
+      #   transform_column :public_key, method(:extract_public_key_from_proto)
+      #   transform_column :status, lambda { |proto_field| ... }
       #
-      def proto_column_transform(field, callable = nil, &blk)
+      def transform_column(field, callable = nil, &blk)
         callable ||= blk
 
         if callable.is_a?(Symbol)
