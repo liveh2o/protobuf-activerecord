@@ -63,25 +63,23 @@ module Protoable
 
       def protobuf_message(message = nil)
         unless message.nil?
-          klass = message.to_s.classify.constantize
+          @_protobuf_message = message.to_s.classify.constantize
+
+          self.protobuf_fields = @_protobuf_message.fields.values.map do |field|
+            name = field.respond_to?(:setup) ? field.setup.name : field.name
+            name.to_sym
+          end
 
           define_method(:to_proto) do
-            klass.new(self.to_proto_hash)
+            @_protobuf_message.new(self.to_proto_hash)
           end
 
           define_method(:to_proto_hash) do
             protoable_attributes
           end
-
-          self.protobuf_fields = klass.fields.values.map do |field|
-            name = field.respond_to?(:setup) ? field.setup.name : field.name
-            name.to_sym
-          end
-
-          @protobuf_message = klass
         end
 
-        @protobuf_message
+        @_protobuf_message
       end
     end
 
