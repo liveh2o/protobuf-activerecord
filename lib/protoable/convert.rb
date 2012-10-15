@@ -1,5 +1,3 @@
-require 'base64'
-
 module Protoable
   module Convert
     def self.included(klass)
