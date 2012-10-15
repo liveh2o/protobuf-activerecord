@@ -6,10 +6,11 @@ module Protoable
 
       klass.class_eval do
         class << self
-          attr_accessor :protobuf_fields, :_protobuf_column_converters
+          attr_accessor :_protobuf_column_converters, :protobuf_fields
         end
 
         @_protobuf_column_converters = {}
+        @protobuf_fields = []
       end
 
       # NOTE: Make sure each inherited object has the database layout
@@ -97,7 +98,7 @@ module Protoable
   private
 
     def protobuf_fields
-      self.class.protobuf_fields || []
+      self.class.protobuf_fields
     end
   end
 end
