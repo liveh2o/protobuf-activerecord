@@ -47,7 +47,7 @@ module Protoable
           if _protobuf_column_transformers.has_key?(key)
             hash[key] = _protobuf_column_transformers[key].call(proto)
           else
-            hash[key] = _protobuf_convert_fields(key, value)
+            hash[key] = _protobuf_convert_fields_to_columns(key, value)
           end
 
           hash

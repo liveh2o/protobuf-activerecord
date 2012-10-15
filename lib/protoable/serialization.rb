@@ -85,7 +85,7 @@ module Protoable
     def protoable_attributes
       protoable_attributes = protobuf_fields.inject({}) do |hash, field|
         value = respond_to?(field) ? __send__(field) : nil
-        hash[field] = _protobuf_convert_columns(field, value)
+        hash[field] = _protobuf_convert_columns_to_fields(field, value)
         hash
       end
 
