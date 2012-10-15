@@ -15,4 +15,9 @@ module Protoable
   # given is not defined, nil, or not callable.
   class ColumnTransformerError < ProtoableError
   end
+  
+  # Raised by Protoable.protobuf_field_convert when the convert method
+  # given is not defined, nil, or not callable.
+  class FieldConverterError < ProtoableError
+  end
 end

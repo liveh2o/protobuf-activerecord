@@ -51,8 +51,9 @@ module Protoable
           callable = method(callable) if self.respond_to?(callable)
         end
 
-        raise 'Protobuf activerecord casting needs a callable or block!' if callable.nil?
-        raise 'Protobuf activerecord casting callable must respond to :call!' if !callable.respond_to?(:call)
+        if callable.nil? || !callable.respond_to?(:call)
+          raise FieldConverterError, 'Field converters must be a callable or block!'
+        end
 
         _protobuf_field_converters[field.to_sym] = callable
       end
