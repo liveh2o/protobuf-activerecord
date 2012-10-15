@@ -9,17 +9,17 @@ module Protoable
       klass.class_eval do
         class << self
           attr_accessor :_protobuf_columns, :_protobuf_column_types,
-            :_protobuf_column_converters, :_protobuf_column_transformers
+            :_protobuf_column_transformers, :_protobuf_field_converters
         end
 
         @_protobuf_columns = {}
         @_protobuf_column_types = Hash.new { |h,k| h[k] = [] }
-        @_protobuf_column_converters = {}
         @_protobuf_column_transformers = {}
+        @_protobuf_field_converters = {}
 
         # NOTE: Make sure each inherited object has the database layout
         inheritable_attributes :_protobuf_columns, :_protobuf_column_types,
-          :_protobuf_column_converters, :_protobuf_column_transformers
+          :_protobuf_field_converters, :_protobuf_column_transformers
       end
 
       _protobuf_map_columns(klass)
@@ -36,7 +36,7 @@ module Protoable
     end
 
     module ClassMethods
-      # Define a column conversion from protobuf to db. Accepts a callable,
+      # Define a field conversion from protobuf to db. Accepts a callable,
       # Symbol, or Hash.
       #
       # When given a callable, it is directly used to convert the field.
@@ -51,15 +51,15 @@ module Protoable
       # name of the column.
       #
       # Examples:
-      #   proto_column_convert :created_at, :int64
-      #   proto_column_convert :public_key, method(:extract_public_key_from_proto)
-      #   proto_column_convert :public_key, :extract_public_key_from_proto
-      #   proto_column_convert :status, lambda { |proto_field| ... }
-      #   proto_column_convert :symmetric_key, :base64
-      #   proto_column_convert :symmetric_key, :from => :base64, :to => :encoded_string
-      #   proto_column_convert :symmetric_key, :from => :base64, :to => :raw_string
+      #   proto_field_convert :created_at, :int64
+      #   proto_field_convert :public_key, method(:extract_public_key_from_proto)
+      #   proto_field_convert :public_key, :extract_public_key_from_proto
+      #   proto_field_convert :status, lambda { |proto_field| ... }
+      #   proto_field_convert :symmetric_key, :base64
+      #   proto_field_convert :symmetric_key, :from => :base64, :to => :encoded_string
+      #   proto_field_convert :symmetric_key, :from => :base64, :to => :raw_string
       #
-      def self.proto_column_convert(field, callable = nil, &blk)
+      def self.proto_field_convert(field, callable = nil, &blk)
         callable ||= blk
 
         if callable.is_a?(Hash)
@@ -75,10 +75,10 @@ module Protoable
         end
 
         if callable.nil? || !callable.respond_to?(:call)
-          raise ColumnConverterError, 'Column converters must be a callable or block!'
+          raise FieldConverterError, 'Field converters must be a callable or block!'
         end
 
-        _protobuf_column_converters[field.to_sym] = callable
+        _protobuf_field_converters[field.to_sym] = callable
       end
 
       # Define a column transformation from protobuf to db. Accepts a callable,

@@ -2,18 +2,22 @@ module Protoable
   module Serialization
     def self.included(klass)
       klass.extend Protoable::Serialization::ClassMethods
+      klass.__send__(:include, Protoable::InheritableClassInstanceVariables)
 
       klass.class_eval do
         class << self
-          attr_accessor :protobuf_fields, :_protobuf_field_converters
+          attr_accessor :protobuf_fields, :_protobuf_column_converters
         end
 
-        @_protobuf_field_converters = {}
+        @_protobuf_column_converters = {}
       end
+
+      # NOTE: Make sure each inherited object has the database layout
+      inheritable_attributes :protobuf_fields, :_protobuf_column_converters
     end
 
     module ClassMethods
-      # Define a field conversion from db to protobuf. Accepts a callable,
+      # Define a column conversion from db to protobuf. Accepts a callable,
       # Symbol, or Hash.
       #
       # When given a callable, it is directly used to convert the field.
@@ -28,15 +32,13 @@ module Protoable
       # name of the column.
       #
       # Examples:
-      #   proto_field_convert :created_at, :int64
-      #   proto_field_convert :public_key, method(:extract_public_key_from_proto)
-      #   proto_field_convert :public_key, :extract_public_key_from_proto
-      #   proto_field_convert :status, lambda { |proto_field| ... }
-      #   proto_field_convert :symmetric_key, :base64
-      #   proto_field_convert :symmetric_key, :from => :base64, :to => :encoded_string
-      #   proto_field_convert :symmetric_key, :from => :base64, :to => :raw_string
+      #   proto_column_convert :created_at, :int64
+      #   proto_column_convert :public_key, :extract_public_key_from_proto
+      #   proto_column_convert :public_key, method(:extract_public_key_from_proto)
+      #   proto_column_convert :status, lambda { |proto_field| ... }
+      #   proto_column_convert :symmetric_key, :from => :base64, :to => :raw_string
       #
-      def proto_field_convert(field, callable = nil, &blk)
+      def proto_column_convert(field, callable = nil, &blk)
         callable ||= blk
 
         if callable.is_a?(Hash)
@@ -52,10 +54,10 @@ module Protoable
         end
 
         if callable.nil? || !callable.respond_to?(:call)
-          raise FieldConverterError, 'Field converters must be a callable or block!'
+          raise ColumnConverterError, 'Column converters must be a callable or block!'
         end
 
-        _protobuf_field_converters[field.to_sym] = callable
+        _protobuf_column_converters[field.to_sym] = callable
       end
 
       def protobuf_message(message = nil)

@@ -19,8 +19,8 @@ module Protoable
 
       def _protobuf_convert_columns_to_fields(key, value)
         value = case
-                when _protobuf_field_converters.has_key?(key.to_sym) then
-                  _protobuf_field_converters[key.to_sym].call(value)
+                when _protobuf_column_converters.has_key?(key.to_sym) then
+                  _protobuf_column_converters[key.to_sym].call(value)
                 when _protobuf_datetime_column?(key) then
                   value.to_i
                 when _protobuf_timestamp_column?(key) then
@@ -38,8 +38,8 @@ module Protoable
 
       def _protobuf_convert_fields_to_columns(key, value)
         value = case
-                when _protobuf_column_converters.has_key?(key.to_sym) then
-                  _protobuf_column_converters[key.to_sym].call(value)
+                when _protobuf_field_converters.has_key?(key.to_sym) then
+                  _protobuf_field_converters[key.to_sym].call(value)
                 when _protobuf_date_column?(key) then
                   convert_int64_to_date(value)
                 when _protobuf_datetime_column?(key) then
