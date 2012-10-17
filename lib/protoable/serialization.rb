@@ -11,10 +11,10 @@ module Protoable
 
         @_protobuf_column_converters = {}
         @protobuf_fields = []
-      end
 
-      # NOTE: Make sure each inherited object has the database layout
-      inheritable_attributes :protobuf_fields, :_protobuf_column_converters
+        # NOTE: Make sure each inherited object has the database layout
+        inheritable_attributes :protobuf_fields, :_protobuf_column_converters
+      end
     end
 
     module ClassMethods
