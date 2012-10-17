@@ -110,6 +110,10 @@ module Protoable
 
   private
 
+    def _protobuf_convert_columns_to_fields(field, value)
+      self.class._protobuf_convert_columns_to_fields(field, value)
+    end
+
     def protobuf_fields
       self.class.protobuf_fields
     end
