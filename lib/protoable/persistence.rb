@@ -37,7 +37,7 @@ module Protoable
 
       # Creates a hash of attributes from a given protobuf message.
       #
-      # It converts and transforms field values using the column converters and
+      # It converts and transforms field values using the field converters and
       # column transformers, ignoring repeated and nil fields.
       #
       def attributes_from_proto(proto)
