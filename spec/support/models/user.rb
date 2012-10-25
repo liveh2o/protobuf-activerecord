@@ -16,4 +16,8 @@ class User < ActiveRecord::Base
   def self.extract_last_name(proto)
     ""
   end
+  
+  def name
+    "#{first_name} #{last_name}"
+  end
 end
