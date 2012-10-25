@@ -1,13 +1,11 @@
-require 'protobuf/message/message'
-require 'protobuf/message/enum'
-require 'protobuf/message/extend'
+require 'protobuf/message'
 
 module Proto
   class User < ::Protobuf::Message
-    optional :string, :name, 1
-    optional :string, :email, 2
-    optional :base64, :public_key, 3
-    optional :int64, :birthday, 4
-    optional :int64, :notify_me_at, 5
+    optional ::Protobuf::Field::StringField, :name, 1
+    optional ::Protobuf::Field::StringField, :email, 2
+    optional ::Protobuf::Field::BytesField, :public_key, 3
+    optional ::Protobuf::Field::Int64Field, :birthday, 4
+    optional ::Protobuf::Field::Int64Field, :notify_me_at, 5
   end
 end
