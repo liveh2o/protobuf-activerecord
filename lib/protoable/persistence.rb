@@ -19,12 +19,14 @@ module Protoable
       #
       def _filter_attribute_fields(proto)
         fields = proto.to_hash
-        fields.select! { |key, value| proto.has_field?(key) && !proto.get_field(key).repeated? }
+        fields.select! { |key, value| proto.has_field?(key) && !proto.get_field_by_name(key).repeated? }
 
-        attribute_fields = accessible_attributes.inject({}) do |hash, column_name|
+        attributes = self.new.attributes.keys - protected_attributes.to_a
+
+        attribute_fields = attributes.inject({}) do |hash, column_name|
           symbolized_column = column_name.to_sym
 
-          if fields.include?(symbolized_column) ||
+          if fields.has_key?(symbolized_column) ||
             _protobuf_column_transformers.has_key?(symbolized_column)
             hash[symbolized_column] = fields[symbolized_column]
           end
