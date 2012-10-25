@@ -77,9 +77,8 @@ module Protoable
         unless message.nil?
           @_protobuf_message = message.to_s.classify.constantize
 
-          self.protobuf_fields = @_protobuf_message.fields.values.map do |field|
-            name = field.respond_to?(:setup) ? field.setup.name : field.name
-            name.to_sym
+          self.protobuf_fields = @_protobuf_message.fields.compact.map do |field|
+            field.name.to_sym
           end
 
           define_method(:to_proto) do
