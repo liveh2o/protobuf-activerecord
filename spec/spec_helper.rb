@@ -7,3 +7,7 @@ SimpleCov.start do
 end
 
 Bundler.require(:default, :development, :test)
+
+require 'support/db'
+require 'support/models'
+require 'support/protobuf'

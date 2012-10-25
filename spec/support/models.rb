@@ -1,0 +1,1 @@
+require 'support/models/user'
