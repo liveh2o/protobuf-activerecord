@@ -82,7 +82,7 @@ module Protoable
           end
 
           define_method(:to_proto) do
-            @_protobuf_message.new(self.to_proto_hash)
+            self.class.protobuf_message.new(self.to_proto_hash)
           end
 
           define_method(:to_proto_hash) do
