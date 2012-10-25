@@ -14,6 +14,7 @@ ActiveRecord::Schema.define(:version => 1) do
     t.string :first_name
     t.string :last_name
     t.string :email
+    t.integer :account_id
 
     t.timestamps
   end
