@@ -9,14 +9,10 @@ class User < ActiveRecord::Base
     value
   end
 
-  def self.extract_first_name(proto)
-    ""
-  end
+  def self.extract_first_name(proto); end
 
-  def self.extract_last_name(proto)
-    ""
-  end
-  
+  def self.extract_last_name(proto); end
+
   def name
     "#{first_name} #{last_name}"
   end
