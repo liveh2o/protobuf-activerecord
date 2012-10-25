@@ -93,7 +93,6 @@ module Protoable
       #
       # Examples:
       #   transform_column :public_key, :extract_public_key_from_proto
-      #   transform_column :public_key, method(:extract_public_key_from_proto)
       #   transform_column :status, lambda { |proto_field| ... }
       #
       def transform_column(field, callable = nil, &blk)
