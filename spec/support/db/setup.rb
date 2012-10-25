@@ -11,10 +11,12 @@ end
 
 ActiveRecord::Schema.define(:version => 1) do
   create_table :users do |t|
-    t.string    :first_name
-    t.string    :last_name
-    t.date      :birthday
-    t.time      :notify_me_at
+    t.string :first_name
+    t.string :last_name
+    t.string :email
+    t.string :public_key
+    t.date   :birthday
+    t.time   :notify_me_at
 
     t.timestamps
   end
