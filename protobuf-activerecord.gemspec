@@ -21,7 +21,7 @@ Gem::Specification.new do |gem|
   # Dependencies
   #
   gem.add_dependency "activerecord"
-  gem.add_dependency "protobuf"
+  gem.add_dependency "protobuf", ">= 2.0"
 
   ##
   # Development dependencies
