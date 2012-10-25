@@ -63,7 +63,7 @@ describe Protoable::Serialization do
     before { User.protobuf_message(protobuf_message) }
 
     context "given a value" do
-      let(:protobuf_fields) { [ :name, :email ] }
+      let(:protobuf_fields) { [ :name, :email, :tags ] }
 
       it "sets .protobuf_fields" do
         User.protobuf_fields.should =~ protobuf_fields
@@ -97,14 +97,14 @@ describe Protoable::Serialization do
           :email => "foo@test.co"
         }
       }
-      let(:protoable_attributes) { { :name => user.name, :email => user.email } }
+      let(:protoable_attributes) { { :name => user.name, :email => user.email, :tags => nil } }
 
       it "returns a hash of protobuf fields that this object has getters for" do
         user.protoable_attributes.should eq protoable_attributes
       end
 
       it "converts attributes values for protobuf messages" do
-        user.should_receive(:_protobuf_convert_columns_to_fields).twice
+        user.should_receive(:_protobuf_convert_columns_to_fields).any_number_of_times
         user.protoable_attributes
       end
     end
