@@ -1,11 +1,27 @@
 require 'spec_helper'
 
 describe Protoable::Persistence do
+  let(:proto_hash) { { :name => 'foo', :email => 'foo@test.co' } }
+  let(:proto) { Proto::User.new(proto_hash) }
+
   describe "._filter_attribute_fields" do
-    it "filters fields with nil values"
-    it "filters repeated fields"
-    it "filters fields that map to protected attributes"
-    it "includes fields that have column transformers"
+    it "filters repeated fields" do
+      attribute_fields = User._filter_attribute_fields(proto)
+      attribute_fields.has_key?(:tags).should be_false
+    end
+
+    it "filters fields that map to protected attributes" do
+      User.stub(:protected_attributes).and_return([ "email" ])
+      attribute_fields = User._filter_attribute_fields(proto)
+      attribute_fields.has_key?(:email).should be_false
+    end
+
+    it "includes attributes that aren't fields, but have column transformers" do
+      expected = { :first_name => nil, :email => proto_hash[:email] }
+      User.stub(:_protobuf_column_transformers).and_return({ :account_id => :fetch_account_id })
+      attribute_fields = User._filter_attribute_fields(proto)
+      attribute_fields.has_key?(:account_id).should be_true
+    end
   end
 
   describe ".attributes_from_proto" do
