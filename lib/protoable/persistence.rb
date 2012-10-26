@@ -2,13 +2,6 @@ module Protoable
   module Persistence
     def self.included(klass)
       klass.extend Protoable::Persistence::ClassMethods
-
-      klass.class_eval do
-        class << self
-          alias_method :create_hash, :attributes_from_proto
-          alias_method :protobuf_create_hash, :attributes_from_proto
-        end
-      end
     end
 
     module ClassMethods
@@ -78,8 +71,6 @@ module Protoable
     def attributes_from_proto(proto)
       self.class.attributes_from_proto(proto)
     end
-    alias_method :update_hash, :attributes_from_proto
-    alias_method :protobuf_update_hash, :attributes_from_proto
 
     # Destroys the record. Mainly wrapped to provide a consistent API and
     # a convient way to override protobuf-specific destroy behavior.
