@@ -7,8 +7,8 @@ Gem::Specification.new do |gem|
   gem.name          = "protobuf-activerecord"
   gem.version       = Protobuf::ActiveRecord::VERSION
   gem.authors       = ["Adam Hutchison"]
-  gem.email         = ["adam@moneydesktop.com"]
-  gem.homepage      = "http://git.moneydesktop.com/adam-hutchison/protobuf-activerecord"
+  gem.email         = ["liveh2o@gmail.com"]
+  gem.homepage      = "http://github.com/liveh2o/protobuf-activerecord"
   gem.summary       = %q{Google Protocol Buffers integration for Active Record}
   gem.description   = %q{Provides the ability to create Active Record objects from Protocol Buffer messages and vice versa.}
 
