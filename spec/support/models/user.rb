@@ -9,9 +9,26 @@ class User < ActiveRecord::Base
     value
   end
 
-  def self.extract_first_name(proto); end
+  def self.extract_first_name(proto)
+    if proto.has_field?(:name)
+      names = proto.name.split(" ")
+      first_name = names.first
+    end
 
-  def self.extract_last_name(proto); end
+    first_name
+  end
+  transform_column :first_name, :extract_first_name
+
+  def self.extract_last_name(proto)
+    if proto.has_field?(:name)
+      names = proto.name.split(" ")
+      names.shift # Drop the first name
+      last_name = names.join(" ")
+    end
+
+    last_name
+  end
+  transform_column :last_name, :extract_last_name
 
   def name
     "#{first_name} #{last_name}"
