@@ -1,10 +1,17 @@
 require 'spec_helper'
 
 describe Protoable::Persistence do
-  let(:proto_hash) { { :name => 'foo', :email => 'foo@test.co' } }
+  let(:user) { User.new(user_attributes) }
+  let(:user_attributes) { { :first_name => 'foo', :last_name => 'bar', :email => 'foo@test.co' } }
+  let(:proto_hash) { { :name => 'foo bar', :email => 'foo@test.co' } }
   let(:proto) { Proto::User.new(proto_hash) }
 
   describe "._filter_attribute_fields" do
+    it "includes fields that have values" do
+      attribute_fields = User._filter_attribute_fields(proto)
+      attribute_fields[:email].should eq proto_hash[:email]
+    end
+
     it "filters repeated fields" do
       attribute_fields = User._filter_attribute_fields(proto)
       attribute_fields.has_key?(:tags).should be_false
@@ -17,7 +24,6 @@ describe Protoable::Persistence do
     end
 
     it "includes attributes that aren't fields, but have column transformers" do
-      expected = { :first_name => nil, :email => proto_hash[:email] }
       User.stub(:_protobuf_column_transformers).and_return({ :account_id => :fetch_account_id })
       attribute_fields = User._filter_attribute_fields(proto)
       attribute_fields.has_key?(:account_id).should be_true
@@ -26,65 +32,127 @@ describe Protoable::Persistence do
 
   describe ".attributes_from_proto" do
     context "when a column transformer is defined for the field" do
-      it "transforms the field value"
+      it "transforms the field value" do
+        attribute_fields = User.attributes_from_proto(proto)
+        attribute_fields[:first_name].should eq user_attributes[:first_name]
+      end
     end
 
     context "when column transformer is not defined for the field" do
-      it "converts the field value"
-    end
+      before {
+        User.stub(:_protobuf_convert_fields_to_columns) do |key, value|
+          value
+        end
+      }
 
-    it "is aliased as .create_hash"
-    it "is aliased as .protobuf_create_hash"
+      it "converts the field value" do
+        attribute_fields = User.attributes_from_proto(proto)
+        attribute_fields.should eq user_attributes
+      end
+    end
   end
 
   describe ".create_from_proto" do
-    it "initializes a new object with attributes from the given protobuf message"
-
-    context "when a block is given" do
-      it "yields to the block with attributes from the given protobuf message"
+    it "initializes a new object with attributes from the given protobuf message" do
+      user = User.create_from_proto(proto)
+      attributes = user.attributes.slice("first_name", "last_name", "email")
+      attributes.should eq user_attributes.stringify_keys
     end
 
-    context "when the object is valid" do
-      it "saves the record"
+    context "when a block is given" do
+      it "yields to the block with attributes from the given protobuf message" do
+        yielded = nil
 
-      context "when an error occurs while saving" do
-        it "raises an exception"
+        User.create_from_proto(proto) do |attributes|
+          yielded = "boom!"
+        end
+
+        yielded.should eq "boom!"
       end
     end
 
-    it "returns the new object"
+    context "when the object is valid" do
+      it "saves the record" do
+        user = User.create_from_proto(proto)
+        user.persisted?.should be_true
+      end
+
+      context "when an error occurs while saving" do
+        before { User.any_instance.stub(:save!).and_raise(RuntimeError) }
+
+        it "raises an exception" do
+          expect { User.create_from_proto(proto) }.to raise_exception
+        end
+      end
+    end
+
+    context "when the object is not valid" do
+      before { User.any_instance.stub(:valid?).and_return(false) }
+
+      it "returns the new object, unsaved" do
+        user = User.create_from_proto(proto)
+        user.persisted?.should be_false
+      end
+    end
   end
 
   describe "#attributes_from_proto" do
-    it "gets attributes from the given protobuf message"
-    it "is aliased as #update_hash"
-    it "is aliased as #protobuf_update_hash"
+    it "gets attributes from the given protobuf message" do
+      User.should_receive(:attributes_from_proto).with(proto)
+      user.attributes_from_proto(proto)
+    end
   end
 
   describe "#destroy_from_proto" do
-    it "destroys the object"
+    it "destroys the object" do
+      user.should_receive(:destroy)
+      user.destroy_from_proto
+    end
   end
 
   describe "#update_from_proto" do
-    it "updates the object with attributes from the given protobuf message"
+    it "updates the object with attributes from the given protobuf message" do
+      user.should_receive(:assign_attributes).with(user_attributes)
+      user.update_from_proto(proto)
+    end
 
     context "when a block is given" do
-      it "yields to the block with attributes from the given protobuf message"
+      it "yields to the block with attributes from the given protobuf message" do
+        yielded = nil
+
+        user.update_from_proto(proto) do |attributes|
+          yielded = "boom!"
+        end
+
+        yielded.should eq "boom!"
+      end
     end
 
     context "when the object is valid" do
+      before { user.stub(:valid?).and_return(true) }
+
       context "when saving is successful" do
-        it "saves the record"
-        it "returns true"
+        it "returns true" do
+          user.stub(:save!).and_return(true)
+          user.update_from_proto(proto).should be_true
+        end
       end
 
       context "when an error occurs while saving" do
-        it "raises an exception"
+        before { user.stub(:save!).and_raise(RuntimeError) }
+
+        it "raises an exception" do
+          expect { user.update_from_proto }.to raise_exception
+        end
       end
     end
 
     context "when the object is invalid" do
-      it "returns false"
+      before { user.stub(:valid?).and_return(false) }
+
+      it "returns false" do
+        user.update_from_proto(proto).should be_false
+      end
     end
   end
 end
