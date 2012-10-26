@@ -116,12 +116,15 @@ describe Protoable::Fields do
     end
 
     context "when the given transformer is callable" do
-      let(:callable) { lambda { |proto| "" } }
+      let(:callable) { lambda { |proto| nil } }
 
-      before { User.transform_column :last_name, callable }
+      before {
+        User.stub(:_protobuf_column_transformers).and_return(Hash.new)
+        User.transform_column :account_id, callable
+      }
 
       it "adds the given converter to the list of protobuf field transformers" do
-        User._protobuf_column_transformers[:last_name] = callable
+        User._protobuf_column_transformers[:account_id] = callable
       end
     end
   end
