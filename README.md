@@ -1,6 +1,6 @@
-# Protobuf::Activerecord
+# Protobuf ActiveRecord
 
-Protobuf Active Record provides the ability to create Active Record objects from Protocol Buffer messages and vice versa. It adds methods that allow you to create, update, and delete Active Record objects from protobuf messages. It also provides methods to serialize Active Record objects to protobuf messages.
+Protobuf Active Record provides the ability to create Active Record objects from Protocol Buffer messages and vice versa. It adds methods that allow you to create, update, and destroy Active Record objects from protobuf messages. It also provides methods to serialize Active Record objects to protobuf messages.
 
 ## Installation
 
