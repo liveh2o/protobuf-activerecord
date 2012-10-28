@@ -1,6 +1,6 @@
 # Protobuf ActiveRecord
 
-Protobuf Active Record provides the ability to create Active Record objects from Protocol Buffer messages and vice versa. It adds methods that allow you to create, update, and destroy Active Record objects from protobuf messages. It also provides methods to serialize Active Record objects to protobuf messages.
+Protobuf Active Record provides the ability to create and update Active Record objects from protobuf messages and to serialize Active Record objects to protobuf messages.
 
 ## Installation
 
@@ -93,6 +93,8 @@ In addition to mapping protobuf message fields to Active Record objects when cre
 
 ```Ruby
 class User < ActiveRecord::Base
+  include Protoable
+
   # Configures Protoable to use the UserMessage class and adds a :to_proto method.
   protobuf_message :user_message
 end
