@@ -51,19 +51,37 @@ module Protoable
         attributes
       end
 
+      # :nodoc:
+      def create(attributes, options = {}, &block)
+        attributes = attributes_from_proto(proto) if attributes.is_a?(::Protobuf::Message)
+
+        super(attributes, options)
+      end
+
+      # :nodoc:
+      def create!(attributes, options = {}, &block)
+        attributes = attributes_from_proto(proto) if attributes.is_a?(::Protobuf::Message)
+
+        super(attributes, options)
+      end
+
       # Creates an object from the given protobuf message, if it's valid. The
       # newly created object is returned if it was successfully saved or not.
       #
-      def create_from_proto(proto)
+      def create_from_proto(proto, options = {})
         attributes = attributes_from_proto(proto)
 
         yield(attributes) if block_given?
 
-        record = self.new(attributes)
-
-        record.save! if record.valid?
-        return record
+        self.create(attributes, options)
       end
+    end
+
+    # :nodoc:
+    def assign_attributes(attributes, options = {})
+      attributes = attributes_from_proto(proto) if attributes.is_a?(::Protobuf::Message)
+
+      super(attributes, options)
     end
 
     # Calls up to the class version of the method.
@@ -79,16 +97,29 @@ module Protoable
       destroy
     end
 
+    # :nodoc:
+    def update_attributes(attributes, options = {})
+      attributes = attributes_from_proto(proto) if attributes.is_a?(::Protobuf::Message)
+
+      super(attributes, options)
+    end
+
+    # :nodoc:
+    def update_attributes!(attributes, options = {})
+      attributes = attributes_from_proto(proto) if attributes.is_a?(::Protobuf::Message)
+
+      super(attributes, options)
+    end
+
     # Update a record from a proto message. Accepts an optional block.
     # If block is given, yields the attributes that would be updated.
     #
-    def update_from_proto(proto)
+    def update_from_proto(proto, options = {})
       attributes = attributes_from_proto(proto)
 
       yield(attributes) if block_given?
 
-      assign_attributes(attributes)
-      return valid? ? save! : false
+      update_attributes(attributes, options)
     end
   end
 end

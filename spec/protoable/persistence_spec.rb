@@ -78,7 +78,7 @@ describe Protoable::Persistence do
       end
 
       context "when an error occurs while saving" do
-        before { User.any_instance.stub(:save!).and_raise(RuntimeError) }
+        before { User.any_instance.stub(:create).and_raise(RuntimeError) }
 
         it "raises an exception" do
           expect { User.create_from_proto(proto) }.to raise_exception
@@ -112,7 +112,7 @@ describe Protoable::Persistence do
 
   describe "#update_from_proto" do
     it "updates the object with attributes from the given protobuf message" do
-      user.should_receive(:assign_attributes).with(user_attributes)
+      user.should_receive(:assign_attributes).with(user_attributes, {})
       user.update_from_proto(proto)
     end
 
@@ -133,13 +133,13 @@ describe Protoable::Persistence do
 
       context "when saving is successful" do
         it "returns true" do
-          user.stub(:save!).and_return(true)
+          user.stub(:assign_attributes).and_return(true)
           user.update_from_proto(proto).should be_true
         end
       end
 
       context "when an error occurs while saving" do
-        before { user.stub(:save!).and_raise(RuntimeError) }
+        before { user.stub(:assign_attributes).and_raise(RuntimeError) }
 
         it "raises an exception" do
           expect { user.update_from_proto }.to raise_exception
