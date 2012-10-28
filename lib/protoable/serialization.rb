@@ -7,6 +7,8 @@ module Protoable
       klass.class_eval do
         class << self
           attr_accessor :_protobuf_column_converters, :protobuf_fields
+
+          alias_method :convert_column_to_field, :convert_column
         end
 
         @_protobuf_column_converters = {}

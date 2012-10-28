@@ -10,6 +10,9 @@ module Protoable
         class << self
           attr_accessor :_protobuf_columns, :_protobuf_column_types,
             :_protobuf_column_transformers, :_protobuf_field_converters
+
+          alias_method :convert_field_to_column, :convert_field
+          alias_method :transform_column_from_proto, :transform_column
         end
 
         @_protobuf_columns = {}
