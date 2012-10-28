@@ -83,11 +83,11 @@ end
 
 If a model has protected attributes defined, Protoable will skip any fields that map to them. Likewise, if there are accessible attributes defined, only they will be mapped.
 
-### Persistence
+### Creating/Updating
 
 Protoable doesn't alter Active Record's normal persistence methods. It simply adds to ability to pass protobuf messages to them in place of an attributes hash.
 
-### Serialization
+### Serialization to protobuf
 
 In addition to mapping protobuf message fields to Active Record objects when creating or updating records, Protoable also provides the ability to serialize Active Record objects to protobuf messages. Simply tell Protoable the protobuf message that should be used and it will take care of the rest:
 
@@ -95,12 +95,59 @@ In addition to mapping protobuf message fields to Active Record objects when cre
 class User < ActiveRecord::Base
   include Protoable
 
-  # Configures Protoable to use the UserMessage class and adds a :to_proto method.
+  # Configures Protoable to use the UserMessage class and adds :to_proto.
   protobuf_message :user_message
 end
 ```
 
 Once the desired protobuf message has been specified, Protoable adds a `to_proto` method to the model. Calling `to_proto` will automatically convert the model to the specified protobuf message using the same attribute to field mapping it uses to create and update objects from protobuf messages.
+
+### Field & column converters
+
+Protoable will handle regular field conversions out of the box, but for those times when custom conversions are needed, they can be defined with the `convert_field` and `convert_column` methods. Field converters are used when creating or updating objects from a protobuf message and column converters are used when serializing objects to protobuf messages.
+
+`convert_field` and `convert_column` both take the name of the field/column being converted and a method name or callable (lambda or proc). when converting that field, calls the given callable, passing it the value of the field being converted.
+
+**Converting fields**
+
+```Ruby
+class User < ActiveRecord::Base
+  include Protoable
+
+  # Calls :map_status_from_proto when creating/updating objects, passing it the
+  # value of the status field from the protobuf message.
+  def self.map_status_from_proto(field_value)
+    # Some custom mapping
+  end
+  convert_field :status, :map_status_from_proto
+end
+```
+
+**Converting columns**
+
+```Ruby
+class User < ActiveRecord::Base
+  include Protoable
+
+  # Calls the lambda when serializing objects to protobuf messages, passing it
+  # the value of the status column from the database.
+  convert_column :status, lambda { |column_value| column_value_.to_s }
+end
+```
+
+### Column transformers
+
+Protoable handles mapping protobuf message fields to object attributes, but what happens when an attribute doesn't have a matching field? Using the `transform_column` method, you can define custom column transformations. Simply call `transform_column`, passing it the name of the column and a method name or callable (lambda or proc). When creating or updating objects, Protoable will call the transformer, passing it the protobuf message.
+
+```Ruby
+class User < ActiveRecord::Base
+  include Protoable
+
+  # Calls the lambda when creating/updating objects, passing it the protobuf
+  # message.
+  transform_column :account_id, lambda { |protobuf_message| # Some custom transformation... }
+end
+```
 
 ## Contributing
 
