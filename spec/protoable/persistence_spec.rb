@@ -52,6 +52,30 @@ describe Protoable::Persistence do
     end
   end
 
+  describe ".create" do
+    it "accepts a protobuf message" do
+      User.any_instance.should_receive(:save)
+      User.create(proto)
+    end
+
+    it "accepts a hash" do
+      User.any_instance.should_receive(:save)
+      User.create(user_attributes)
+    end
+  end
+
+  describe ".create!" do
+    it "accepts a protobuf message" do
+      User.any_instance.should_receive(:save!)
+      User.create!(proto)
+    end
+
+    it "accepts a hash" do
+      User.any_instance.should_receive(:save!)
+      User.create!(user_attributes)
+    end
+  end
+
   describe ".create_from_proto" do
     it "initializes a new object with attributes from the given protobuf message" do
       user = User.create_from_proto(proto)
@@ -107,6 +131,30 @@ describe Protoable::Persistence do
     it "destroys the object" do
       user.should_receive(:destroy)
       user.destroy_from_proto
+    end
+  end
+
+  describe ".update_attributes" do
+    it "accepts a protobuf message" do
+      User.any_instance.should_receive(:save)
+      user.update_attributes(proto)
+    end
+
+    it "accepts a hash" do
+      User.any_instance.should_receive(:save)
+      user.update_attributes(user_attributes)
+    end
+  end
+
+  describe ".update_attributes!" do
+    it "accepts a protobuf message" do
+      User.any_instance.should_receive(:save!)
+      user.update_attributes!(proto)
+    end
+
+    it "accepts a hash" do
+      User.any_instance.should_receive(:save!)
+      user.update_attributes!(user_attributes)
     end
   end
 

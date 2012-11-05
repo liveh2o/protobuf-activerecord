@@ -53,14 +53,14 @@ module Protoable
 
       # :nodoc:
       def create(attributes, options = {}, &block)
-        attributes = attributes_from_proto(proto) if attributes.is_a?(::Protobuf::Message)
+        attributes = attributes_from_proto(attributes) if attributes.is_a?(::Protobuf::Message)
 
         super(attributes, options)
       end
 
       # :nodoc:
       def create!(attributes, options = {}, &block)
-        attributes = attributes_from_proto(proto) if attributes.is_a?(::Protobuf::Message)
+        attributes = attributes_from_proto(attributes) if attributes.is_a?(::Protobuf::Message)
 
         super(attributes, options)
       end
@@ -99,14 +99,14 @@ module Protoable
 
     # :nodoc:
     def update_attributes(attributes, options = {})
-      attributes = attributes_from_proto(proto) if attributes.is_a?(::Protobuf::Message)
+      attributes = attributes_from_proto(attributes) if attributes.is_a?(::Protobuf::Message)
 
       super(attributes, options)
     end
 
     # :nodoc:
     def update_attributes!(attributes, options = {})
-      attributes = attributes_from_proto(proto) if attributes.is_a?(::Protobuf::Message)
+      attributes = attributes_from_proto(attributes) if attributes.is_a?(::Protobuf::Message)
 
       super(attributes, options)
     end
