@@ -55,29 +55,26 @@ module Protoable
       #
       # Examples:
       #   convert_field :created_at, :int64
-      #   convert_field :public_key, method(:extract_public_key_from_proto)
       #   convert_field :public_key, :extract_public_key_from_proto
       #   convert_field :status, lambda { |proto_field| ... }
-      #   convert_field :symmetric_key, :base64
       #   convert_field :symmetric_key, :from => :base64, :to => :encoded_string
-      #   convert_field :symmetric_key, :from => :base64, :to => :raw_string
       #
-      def convert_field(field, callable = nil, &blk)
-        callable ||= blk
+      def convert_field(field, transformer = nil, &blk)
+        transformer ||= blk
+        transformer = :"convert_#{transformer[:from]}_to_#{transformer[:to]}" if transformer.is_a?(Hash)
 
-        if callable.is_a?(Hash)
-          callable = :"convert_#{callable[:from]}_to_#{callable[:to]}"
-        end
-
-        if callable.is_a?(Symbol)
-          unless self.respond_to?(callable)
-            column = _protobuf_columns[field.to_sym]
-            callable = :"convert_#{callable}_to_#{column.try(:type)}"
+        if transformer.is_a?(Symbol)
+          unless self.respond_to?(transformer, true)
+          column = _protobuf_columns[field.to_sym]
+            transformer = :"convert_#{transformer}_to_#{column.try(:type)}"
           end
-          callable = method(callable) if self.respond_to?(callable)
+
+          callable = lambda { |value| self.__send__(transformer, value) }
+        else
+          callable = transformer
         end
 
-        if callable.nil? || !callable.respond_to?(:call)
+        unless callable.respond_to?(:call)
           raise FieldConverterError, 'Field converters must be a callable or block!'
         end
 
@@ -98,17 +95,16 @@ module Protoable
       #   transform_column :public_key, :extract_public_key_from_proto
       #   transform_column :status, lambda { |proto_field| ... }
       #
-      def transform_column(field, callable = nil, &blk)
-        callable ||= blk
+      def transform_column(field, transformer = nil, &blk)
+        transformer ||= blk
 
-        if callable.is_a?(Symbol)
-          unless self.respond_to?(callable)
-            raise ColumnTransformerError, "#{callable} is not defined!"
-          end
-          callable = method(callable) if self.respond_to?(callable)
+        if transformer.is_a?(Symbol)
+          callable = lambda { |value| self.__send__(transformer, value) }
+        else
+          callable = transformer
         end
 
-        if callable.nil? || !callable.respond_to?(:call)
+        unless callable.respond_to?(:call)
           raise ColumnTransformerError, 'Protoable casting needs a callable or block!'
         end
 

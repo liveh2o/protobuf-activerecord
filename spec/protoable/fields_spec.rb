@@ -30,46 +30,30 @@ describe Protoable::Fields do
 
   describe ".convert_field" do
     context "when the given converter is a hash" do
-      let(:method) { User.method(:convert_base64_to_string) }
+      let(:method) { lambda { User.__send__(:convert_base64_to_string, value) } }
 
       before { User.convert_field :public_key, :from => :base64, :to => :string }
 
       it "determines the method using the hash's :to and :from keys" do
-        User._protobuf_field_converters[:public_key].should eq method
+        User.should_receive(:convert_base64_to_string)
+        User._protobuf_field_converters[:public_key].call(1)
       end
     end
 
     context "when the given converter is a symbol" do
-      context "when the converter is not a defined method" do
-        let(:callable) { User.method(:convert_base64_to_string) }
+      let(:callable) { lambda { User.__send__(:convert_email_to_lowercase, value) } }
 
-        before { User.convert_field :email, :base64 }
+      before { User.convert_field :email, :convert_email_to_lowercase }
 
-        it "determines the method using the converter as the 'from' and the column type as the 'to'" do
-          User._protobuf_field_converters[:email].should eq callable
-        end
-      end
-
-      context "when the converter is a defined method" do
-        let(:callable) { User.method(:convert_email_to_lowercase) }
-
-        before { User.convert_field :email, :convert_email_to_lowercase }
-
-        it "creates a callable method object from the converter" do
-          User._protobuf_field_converters[:email].should eq callable
-        end
-      end
-    end
-
-    context "when the given converter is nil" do
-      it "raises an exception" do
-        expect { User.convert_field :email, nil }.to raise_exception(Protoable::FieldConverterError)
+      it "creates a callable method object from the converter" do
+        User.should_receive(:convert_email_to_lowercase)
+        User._protobuf_field_converters[:email].call(1)
       end
     end
 
     context "when the given converter is not callable" do
       it "raises an exception" do
-        expect { User.convert_field :email, :foo }.to raise_exception(Protoable::FieldConverterError)
+        expect { User.convert_field :email, nil }.to raise_exception(Protoable::FieldConverterError)
       end
     end
 
@@ -86,32 +70,19 @@ describe Protoable::Fields do
 
   describe ".transform_column" do
     context "when the given converter is a symbol" do
-      context "when the converter is not a defined method" do
-        it "raises an exception" do
-          expect { User.transform_column :name, :foo }.to raise_exception(Protoable::ColumnTransformerError)
-        end
-      end
+      let(:callable) { lambda { |value| User.__send__(:extract_first_name) } }
 
-      context "when the converter is a defined method" do
-        let(:callable) { User.method(:extract_first_name) }
+      before { User.transform_column :first_name, :extract_first_name }
 
-        before { User.transform_column :first_name, :extract_first_name }
-
-        it "creates a callable method object from the converter" do
-          User._protobuf_column_transformers[:first_name].should eq callable
-        end
-      end
-    end
-
-    context "when the given converter is nil" do
-      it "raises an exception" do
-        expect { User.transform_column :name, nil }.to raise_exception(Protoable::ColumnTransformerError)
+      it "creates a callable method object from the converter" do
+        User.should_receive(:extract_first_name)
+        User._protobuf_column_transformers[:first_name].call(1)
       end
     end
 
     context "when the given converter is not callable" do
       it "raises an exception" do
-        expect { User.transform_column :name, double(:not_callable) }.to raise_exception(Protoable::ColumnTransformerError)
+        expect { User.transform_column :name, nil }.to raise_exception(Protoable::ColumnTransformerError)
       end
     end
 

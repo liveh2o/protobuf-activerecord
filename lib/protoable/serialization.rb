@@ -41,22 +41,22 @@ module Protoable
       #   convert_column :status, lambda { |proto_field| ... }
       #   convert_column :symmetric_key, :from => :base64, :to => :raw_string
       #
-      def convert_column(field, callable = nil, &blk)
-        callable ||= blk
+      def convert_column(field, converter = nil, &blk)
+        converter ||= blk
+        converter = :"convert_#{converter[:from]}_to_#{converter[:to]}" if converter.is_a?(Hash)
 
-        if callable.is_a?(Hash)
-          callable = :"convert_#{callable[:from]}_to_#{callable[:to]}"
-        end
-
-        if callable.is_a?(Symbol)
-          unless self.respond_to?(callable)
+        if converter.is_a?(Symbol)
+          unless self.respond_to?(converter, true)
             column = _protobuf_columns[field.to_sym]
-            callable = :"convert_#{callable}_to_#{column.try(:type)}"
+            converter = :"convert_#{converter}_to_#{column.try(:type)}"
           end
-          callable = method(callable) if self.respond_to?(callable)
+
+          callable = lambda { |value| __send__(converter, value) }
+        else
+          callable = converter
         end
 
-        if callable.nil? || !callable.respond_to?(:call)
+        unless callable.respond_to?(:call)
           raise ColumnConverterError, 'Column converters must be a callable or block!'
         end
 

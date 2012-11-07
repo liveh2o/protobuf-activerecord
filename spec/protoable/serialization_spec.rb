@@ -5,46 +5,30 @@ describe Protoable::Serialization do
 
   describe ".convert_column" do
     context "when the given converter is a hash" do
-      let(:method) { User.method(:convert_base64_to_string) }
+      let(:method) { lambda { |value| User.__send__(:convert_base64_to_string, value) } }
 
       before { User.convert_column :public_key, :from => :base64, :to => :string }
 
       it "determines the method using the hash's :to and :from keys" do
-        User._protobuf_column_converters[:public_key].should eq method
+        User.should_receive(:convert_base64_to_string)
+        User._protobuf_column_converters[:public_key].call(1)
       end
     end
 
     context "when the given converter is a symbol" do
-      context "when the converter is not a defined method" do
-        let(:callable) { User.method(:convert_base64_to_string) }
+      let(:callable) { lambda { |value| User.__send__(:convert_email_to_lowercase, value) } }
 
-        before { User.convert_column :email, :base64 }
+      before { User.convert_column :email, :convert_email_to_lowercase }
 
-        it "determines the method using the converter as the 'from' and the column type as the 'to'" do
-          User._protobuf_column_converters[:email].should eq callable
-        end
-      end
-
-      context "when the converter is a defined method" do
-        let(:callable) { User.method(:convert_email_to_lowercase) }
-
-        before { User.convert_column :email, :convert_email_to_lowercase }
-
-        it "creates a callable method object from the converter" do
-          User._protobuf_column_converters[:email].should eq callable
-        end
-      end
-    end
-
-    context "when the given converter is nil" do
-      it "raises an exception" do
-        expect { User.convert_column :email, nil }.to raise_exception(Protoable::ColumnConverterError)
+      it "creates a callable method object from the converter" do
+        User.should_receive(:convert_email_to_lowercase)
+        User._protobuf_column_converters[:email].call(1)
       end
     end
 
     context "when the given converter is not callable" do
       it "raises an exception" do
-        expect { User.convert_column :email, :foo }.to raise_exception(Protoable::ColumnConverterError)
+        expect { User.convert_column :email, nil }.to raise_exception(Protoable::ColumnConverterError)
       end
     end
 
