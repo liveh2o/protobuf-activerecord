@@ -14,8 +14,7 @@ module Protoable
         @_protobuf_column_converters = {}
         @protobuf_fields = []
 
-        # NOTE: Make sure each inherited object has the database layout
-        inheritable_attributes :protobuf_fields, :_protobuf_column_converters
+        inheritable_attributes :_protobuf_column_converters, :protobuf_fields, :protobuf_message
       end
     end
 
@@ -77,9 +76,9 @@ module Protoable
       #
       def protobuf_message(message = nil)
         unless message.nil?
-          @_protobuf_message = message.to_s.classify.constantize
+          @protobuf_message = message.to_s.classify.constantize
 
-          self.protobuf_fields = @_protobuf_message.fields.compact.map do |field|
+          self.protobuf_fields = @protobuf_message.fields.compact.map do |field|
             field.name.to_sym
           end
 
@@ -92,7 +91,7 @@ module Protoable
           end
         end
 
-        @_protobuf_message
+        @protobuf_message
       end
     end
 
