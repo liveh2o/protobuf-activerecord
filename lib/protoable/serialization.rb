@@ -1,8 +1,10 @@
+require 'heredity/inheritable_class_instance_variables'
+
 module Protoable
   module Serialization
     def self.included(klass)
       klass.extend Protoable::Serialization::ClassMethods
-      klass.__send__(:include, Protoable::InheritableClassInstanceVariables)
+      klass.__send__(:include, ::Heredity::InheritableClassInstanceVariables)
 
       klass.class_eval do
         class << self

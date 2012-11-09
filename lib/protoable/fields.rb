@@ -1,10 +1,10 @@
-require 'protoable/inheritable_class_instance_variables'
+require 'heredity/inheritable_class_instance_variables'
 
 module Protoable
   module Fields
     def self.extended(klass)
       klass.extend Protoable::Fields::ClassMethods
-      klass.__send__(:include, Protoable::InheritableClassInstanceVariables)
+      klass.__send__(:include, ::Heredity::InheritableClassInstanceVariables)
 
       klass.class_eval do
         class << self
