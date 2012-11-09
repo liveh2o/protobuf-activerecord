@@ -13,6 +13,7 @@ module Protoable
 
           alias_method :convert_field_to_column, :convert_field
           alias_method :transform_column_from_proto, :transform_column
+          alias_method :attribute_from_proto, :transform_column
         end
 
         @_protobuf_columns = {}

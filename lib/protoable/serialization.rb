@@ -11,6 +11,7 @@ module Protoable
           attr_accessor :_protobuf_column_converters, :protobuf_fields
 
           alias_method :convert_column_to_field, :convert_column
+          alias_method :protoable_attribute, :convert_column
         end
 
         @_protobuf_column_converters = {}
