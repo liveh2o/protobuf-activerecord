@@ -17,10 +17,10 @@ module Protoable
         convert_int64_to_time(int64).to_datetime
       end
 
-      def _protobuf_convert_columns_to_fields(key, value)
+      def _protobuf_convert_attributes_to_fields(key, value)
         value = case
-                when _protobuf_column_converters.has_key?(key.to_sym) then
-                  _protobuf_column_converters[key.to_sym].call(value)
+                when _protobuf_attribute_converters.has_key?(key.to_sym) then
+                  _protobuf_attribute_converters[key.to_sym].call(value)
                 when _protobuf_date_column?(key) then
                   value.to_time.to_i
                 when _protobuf_datetime_column?(key) then

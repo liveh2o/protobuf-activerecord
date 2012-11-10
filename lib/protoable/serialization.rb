@@ -8,61 +8,51 @@ module Protoable
 
       klass.class_eval do
         class << self
-          attr_accessor :_protobuf_column_converters, :protobuf_fields
-
-          alias_method :convert_column_to_field, :convert_column
-          alias_method :protoable_attribute, :convert_column
+          attr_accessor :_protobuf_attribute_converters, :protobuf_fields
         end
 
-        @_protobuf_column_converters = {}
+        @_protobuf_attribute_converters = {}
         @protobuf_fields = []
 
-        inheritable_attributes :_protobuf_column_converters, :protobuf_fields, :protobuf_message
+        inheritable_attributes :_protobuf_attribute_converters, :protobuf_fields, :protobuf_message
       end
     end
 
     module ClassMethods
-      # Define a column conversion from db to protobuf. Accepts a callable,
-      # Symbol, or Hash.
+      # Define a custom attribute conversion for serialization to protobuf.
+      # Accepts a Symbol, Hash, callable or block.
       #
-      # When given a callable, it is directly used to convert the field.
+      # When given a callable or block, it is directly used to convert the field.
       #
       # When a Hash is given, :from and :to keys are expected and expand
       # to extracting a class method in the format of
       # "convert_#{from}_to_#{to}".
       #
-      # When a symbol is given, it extracts the method with the same name,
-      # if any. When method is not available it is assumed as the "from"
-      # data type, and the "to" value is extracted based on the
-      # name of the column.
+      # When a symbol is given, it extracts the method with the same name.
       #
       # Examples:
-      #   convert_column :created_at, :int64
-      #   convert_column :public_key, :extract_public_key_from_proto
-      #   convert_column :public_key, method(:extract_public_key_from_proto)
-      #   convert_column :status, lambda { |proto_field| ... }
-      #   convert_column :symmetric_key, :from => :base64, :to => :raw_string
+      #   protoable_attribute :public_key, :extract_public_key_from_proto
+      #   protoable_attribute :symmetric_key, :from => :base64, :to => :raw_string
+      #   protoable_attribute :status, lambda { |proto_field| # Do stuff... }
+      #   protoable_attribute :status do |proto_field|
+      #     # Do some blocky stuff...
+      #   end
       #
-      def convert_column(field, converter = nil, &blk)
+      def protoable_attribute(field, converter = nil, &blk)
         converter ||= blk
         converter = :"convert_#{converter[:from]}_to_#{converter[:to]}" if converter.is_a?(Hash)
 
         if converter.is_a?(Symbol)
-          unless self.respond_to?(converter, true)
-            column = _protobuf_columns[field.to_sym]
-            converter = :"convert_#{converter}_to_#{column.try(:type)}"
-          end
-
           callable = lambda { |value| __send__(converter, value) }
         else
           callable = converter
         end
 
         unless callable.respond_to?(:call)
-          raise ColumnConverterError, 'Column converters must be a callable or block!'
+          raise AttributeConverterError, 'Attribute converters must be a callable or block!'
         end
 
-        _protobuf_column_converters[field.to_sym] = callable
+        _protobuf_attribute_converters[field.to_sym] = callable
       end
 
       # Define the protobuf message class that should be used to serialize the
@@ -104,7 +94,7 @@ module Protoable
     def protoable_attributes
       protoable_attributes = protobuf_fields.inject({}) do |hash, field|
         value = respond_to?(field) ? __send__(field) : nil
-        hash[field] = _protobuf_convert_columns_to_fields(field, value)
+        hash[field] = _protobuf_convert_attributes_to_fields(field, value)
         hash
       end
 
@@ -113,8 +103,8 @@ module Protoable
 
   private
 
-    def _protobuf_convert_columns_to_fields(field, value)
-      self.class._protobuf_convert_columns_to_fields(field, value)
+    def _protobuf_convert_attributes_to_fields(field, value)
+      self.class._protobuf_convert_attributes_to_fields(field, value)
     end
 
     def protobuf_fields

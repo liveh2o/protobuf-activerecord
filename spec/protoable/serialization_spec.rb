@@ -3,42 +3,42 @@ require 'spec_helper'
 describe Protoable::Serialization do
   let(:protobuf_message) { ::Proto::User }
 
-  describe ".convert_column" do
+  describe ".protoable_attribute" do
     context "when the given converter is a hash" do
       let(:method) { lambda { |value| User.__send__(:convert_base64_to_string, value) } }
 
-      before { User.convert_column :public_key, :from => :base64, :to => :string }
+      before { User.protoable_attribute :public_key, :from => :base64, :to => :string }
 
       it "determines the method using the hash's :to and :from keys" do
         User.should_receive(:convert_base64_to_string)
-        User._protobuf_column_converters[:public_key].call(1)
+        User._protobuf_attribute_converters[:public_key].call(1)
       end
     end
 
     context "when the given converter is a symbol" do
       let(:callable) { lambda { |value| User.__send__(:convert_email_to_lowercase, value) } }
 
-      before { User.convert_column :email, :convert_email_to_lowercase }
+      before { User.protoable_attribute :email, :convert_email_to_lowercase }
 
       it "creates a callable method object from the converter" do
         User.should_receive(:convert_email_to_lowercase)
-        User._protobuf_column_converters[:email].call(1)
+        User._protobuf_attribute_converters[:email].call(1)
       end
     end
 
     context "when the given converter is not callable" do
       it "raises an exception" do
-        expect { User.convert_column :email, nil }.to raise_exception(Protoable::ColumnConverterError)
+        expect { User.protoable_attribute :email, nil }.to raise_exception(Protoable::AttributeConverterError)
       end
     end
 
     context "when the given converter is callable" do
       let(:callable) { lambda { |value| value } }
 
-      before { User.convert_column :email, callable }
+      before { User.protoable_attribute :email, callable }
 
-      it "adds the given converter to list of column converters" do
-        User._protobuf_column_converters[:email].should eq callable
+      it "adds the given converter to list of attribute converters" do
+        User._protobuf_attribute_converters[:email].should eq callable
       end
     end
   end
@@ -88,7 +88,7 @@ describe Protoable::Serialization do
       end
 
       it "converts attributes values for protobuf messages" do
-        user.should_receive(:_protobuf_convert_columns_to_fields).any_number_of_times
+        user.should_receive(:_protobuf_convert_attributes_to_fields).any_number_of_times
         user.protoable_attributes
       end
     end
