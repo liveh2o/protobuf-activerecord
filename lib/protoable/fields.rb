@@ -104,6 +104,10 @@ module Protoable
 
         _protobuf_attribute_transformers[field.to_sym] = callable
       end
+
+      def transform_column(field, transformer = nil, &blk)
+        warn "[DEPRECATION] `transform_column` is deprecated and will be removed in v1.2.  Please use `attribute_from_proto` instead."
+        attribute_from_proto(field, transformer, &blk)
       end
     end
   end

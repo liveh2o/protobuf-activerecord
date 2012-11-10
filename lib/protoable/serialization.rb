@@ -19,6 +19,11 @@ module Protoable
     end
 
     module ClassMethods
+      def convert_column(field, converter = nil, &blk)
+        warn "[DEPRECATION] `convert_column` is deprecated and will be removed in v1.2.  Please use `protoable_attribute` instead."
+        protoable_attribute(field, converter, &blk)
+      end
+
       # Define a custom attribute conversion for serialization to protobuf.
       # Accepts a Symbol, Hash, callable or block.
       #
