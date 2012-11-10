@@ -1,0 +1,10 @@
+message UserMessage {
+  optional string guid        = 1;
+  optional string name        = 2;
+  optional string email       = 3;
+}
+
+message UserSearchMessage {
+  repeated string guid = 1;
+  repeated string email = 2;
+}
