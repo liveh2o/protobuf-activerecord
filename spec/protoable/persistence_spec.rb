@@ -4,7 +4,7 @@ describe Protoable::Persistence do
   let(:user) { User.new(user_attributes) }
   let(:user_attributes) { { :first_name => 'foo', :last_name => 'bar', :email => 'foo@test.co' } }
   let(:proto_hash) { { :name => 'foo bar', :email => 'foo@test.co' } }
-  let(:proto) { Proto::User.new(proto_hash) }
+  let(:proto) { UserMessage.new(proto_hash) }
 
   describe "._filter_attribute_fields" do
     it "includes fields that have values" do

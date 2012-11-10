@@ -1,7 +1,7 @@
 require 'spec_helper'
 
 describe Protoable::Serialization do
-  let(:protobuf_message) { ::Proto::User }
+  let(:protobuf_message) { UserMessage }
 
   describe ".protoable_attribute" do
     context "when the given converter is a hash" do
@@ -47,7 +47,7 @@ describe Protoable::Serialization do
     before { User.protobuf_message(protobuf_message) }
 
     context "given a value" do
-      let(:protobuf_fields) { [ :name, :email, :tags ] }
+      let(:protobuf_fields) { [ :guid, :name, :email ] }
 
       it "sets .protobuf_fields" do
         User.protobuf_fields.should =~ protobuf_fields
@@ -76,12 +76,13 @@ describe Protoable::Serialization do
     describe "#protoable_attributes" do
       let(:attributes) {
         {
-          :first_name => "foo",
-          :last_name => "bar",
+          :guid => "foo",
+          :first_name => "bar",
+          :last_name => "baz",
           :email => "foo@test.co"
         }
       }
-      let(:protoable_attributes) { { :name => user.name, :email => user.email, :tags => nil } }
+      let(:protoable_attributes) { { :guid => user.guid, :name => user.name, :email => user.email } }
 
       it "returns a hash of protobuf fields that this object has getters for" do
         user.protoable_attributes.should eq protoable_attributes

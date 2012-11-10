@@ -1,9 +1,26 @@
+##
+# This file is auto-generated. DO NOT EDIT!
+#
 require 'protobuf/message'
 
-module Proto
-  class User < ::Protobuf::Message
-    optional ::Protobuf::Field::StringField, :name, 1
-    optional ::Protobuf::Field::StringField, :email, 2
-    repeated ::Protobuf::Field::StringField, :tags, 3
-  end
+
+##
+# Message Classes
+#
+class UserMessage < ::Protobuf::Message; end
+class UserSearchMessage < ::Protobuf::Message; end
+
+##
+# Message Fields
+#
+class UserMessage
+  optional ::Protobuf::Field::StringField, :guid, 1
+  optional ::Protobuf::Field::StringField, :name, 2
+  optional ::Protobuf::Field::StringField, :email, 3
 end
+
+class UserSearchMessage
+  repeated ::Protobuf::Field::StringField, :guid, 1
+  repeated ::Protobuf::Field::StringField, :email, 2
+end
+
