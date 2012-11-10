@@ -16,8 +16,12 @@ module Protoable
   class AttributeTransformerError < ProtoableError
   end
 
-  # Raised by Protoable.protobuf_field_convert when the convert method
-  # given is not defined, nil, or not callable.
+  # Raised by Protoable.convert_field when the convert method
+  # given not callable.
   class FieldConverterError < ProtoableError
+  end
+
+  # Raised by Protoable.field_scope when given scope is not defined.
+  class SearchScopeError < ProtoableError
   end
 end
