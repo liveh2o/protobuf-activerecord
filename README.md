@@ -102,11 +102,11 @@ end
 
 Once the desired protobuf message has been specified, Protoable adds a `to_proto` method to the model. Calling `to_proto` will automatically convert the model to the specified protobuf message using the same attribute to field mapping it uses to create and update objects from protobuf messages.
 
-### Field & column converters
+### Field & attribute converters
 
-Protoable will handle regular field conversions out of the box, but for those times when custom conversions are needed, they can be defined with the `convert_field` and `convert_column` methods. Field converters are used when creating or updating objects from a protobuf message and column converters are used when serializing objects to protobuf messages.
+Protoable will handle regular field conversions out of the box, but for those times when custom conversions are needed, they can be defined with the `convert_field` and `protoable_attribute` methods. Field converters are used when creating or updating objects from a protobuf message and attribute converters are used when serializing objects to protobuf messages.
 
-`convert_field` and `convert_column` both take the name of the field/column being converted and a method name or callable (lambda or proc). when converting that field, calls the given callable, passing it the value of the field being converted.
+`convert_field` and `protoable_attribute` both take the name of the field/attribute being converted and a method name or callable (lambda or proc). when converting that field, calls the given callable, passing it the value of the field being converted.
 
 **Converting fields**
 
@@ -123,21 +123,21 @@ class User < ActiveRecord::Base
 end
 ```
 
-**Converting columns**
+**Converting attributes**
 
 ```Ruby
 class User < ActiveRecord::Base
   include Protoable
 
   # Calls the lambda when serializing objects to protobuf messages, passing it
-  # the value of the status column from the database.
-  convert_column :status, lambda { |column_value| column_value_.to_s }
+  # the value of the status attribute.
+  protoable_attribute :status, lambda { |attribute_value| attribute_value_.to_s }
 end
 ```
 
-### Column transformers
+### Attribute transformers
 
-Protoable handles mapping protobuf message fields to object attributes, but what happens when an attribute doesn't have a matching field? Using the `transform_column` method, you can define custom column transformations. Simply call `transform_column`, passing it the name of the column and a method name or callable (lambda or proc). When creating or updating objects, Protoable will call the transformer, passing it the protobuf message.
+Protoable handles mapping protobuf message fields to object attributes, but what happens when an attribute doesn't have a matching field? Using the `attribute_from_proto` method, you can define custom attribute transformations. Simply call `attribute_from_prot`, passing it the name of the attribute and a method name or callable (lambda or proc). When creating or updating objects, Protoable will call the transformer, passing it the protobuf message.
 
 ```Ruby
 class User < ActiveRecord::Base
@@ -145,9 +145,54 @@ class User < ActiveRecord::Base
 
   # Calls the lambda when creating/updating objects, passing it the protobuf
   # message.
-  transform_column :account_id, lambda { |protobuf_message| # Some custom transformation... }
+  attribute_from_proto :account_id, lambda { |protobuf_message| # Some custom transformation... }
 end
 ```
+#### Searching
+
+Protoable's `search_scope` method takes the protobuf message and builds ARel scopes from it.
+
+Before you can use `search_scope`, you'll need to tell Protoable which fields should be searchable and what scope should be used to search with that field.
+
+Consider this protobuf message:
+
+```
+message UserSearchRequest {
+  repeated string guid = 1;
+  repeated string name = 2;
+  repeated string email = 3;
+}
+```
+
+To make the `name` field searchable, use the `field_scope` method:
+
+```Ruby
+class User < ActiveRecord::Base
+  include Protoable
+
+  scope :by_name, lambda { |*values| where(:name => values) }
+
+  field_scope :name, :by_name
+end
+```
+
+This tells Protoable that the name field should be searchable and that the scope with the given name should be used to build the search scope.
+
+Now that your class is configured with some searchable fields, you can use the `search_scope` method to build ARel scopes from a protobuf message.
+
+`search_scope` is chainable just like regular ARel scopes. It takes a protobuf messages and will build search scopes from any searchable fields that have values.
+
+Picking up our User class again:
+
+```Ruby
+# Build a search scope from the given protobuf message
+User.search_scope(request)
+
+# It's chainable too
+User.limit(10).search_scope(request)
+```
+
+Protoable also provides some aliases for the `search_scope` method in the event that you'd like something a little more descriptive. `by_fields`, `from_proto`, and `scope_from_proto` are all aliases of `search_scope`.
 
 ## Contributing
 
