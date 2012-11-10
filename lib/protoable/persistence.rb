@@ -6,7 +6,7 @@ module Protoable
 
     module ClassMethods
       # Filters accessible attributes that exist in the given protobuf message's
-      # fields or have column transformers defined for them.
+      # fields or have attribute transformers defined for them.
       #
       # Returns a hash of attribute fields with their respective values.
       #
@@ -20,7 +20,7 @@ module Protoable
           symbolized_column = column_name.to_sym
 
           if fields.has_key?(symbolized_column) ||
-            _protobuf_column_transformers.has_key?(symbolized_column)
+            _protobuf_attribute_transformers.has_key?(symbolized_column)
             hash[symbolized_column] = fields[symbolized_column]
           end
 
@@ -33,14 +33,14 @@ module Protoable
       # Creates a hash of attributes from a given protobuf message.
       #
       # It converts and transforms field values using the field converters and
-      # column transformers, ignoring repeated and nil fields.
+      # attribute transformers, ignoring repeated and nil fields.
       #
       def attributes_from_proto(proto)
         attribute_fields = _filter_attribute_fields(proto)
 
         attributes = attribute_fields.inject({}) do |hash, (key, value)|
-          if _protobuf_column_transformers.has_key?(key)
-            hash[key] = _protobuf_column_transformers[key].call(proto)
+          if _protobuf_attribute_transformers.has_key?(key)
+            hash[key] = _protobuf_attribute_transformers[key].call(proto)
           else
             hash[key] = _protobuf_convert_fields_to_columns(key, value)
           end

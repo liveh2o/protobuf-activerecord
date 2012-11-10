@@ -11,9 +11,9 @@ module Protoable
   class AttributeConverterError < ProtoableError
   end
 
-  # Raised by Protoable.protobuf_column_transform when the transformer method
-  # given is not defined, nil, or not callable.
-  class ColumnTransformerError < ProtoableError
+  # Raised by Protoable.attribute_from_proto when the transformer method
+  # given is not callable.
+  class AttributeTransformerError < ProtoableError
   end
 
   # Raised by Protoable.protobuf_field_convert when the convert method

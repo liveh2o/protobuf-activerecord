@@ -23,22 +23,22 @@ describe Protoable::Persistence do
       attribute_fields.has_key?(:email).should be_false
     end
 
-    it "includes attributes that aren't fields, but have column transformers" do
-      User.stub(:_protobuf_column_transformers).and_return({ :account_id => :fetch_account_id })
+    it "includes attributes that aren't fields, but have attribute transformers" do
+      User.stub(:_protobuf_attribute_transformers).and_return({ :account_id => :fetch_account_id })
       attribute_fields = User._filter_attribute_fields(proto)
       attribute_fields.has_key?(:account_id).should be_true
     end
   end
 
   describe ".attributes_from_proto" do
-    context "when a column transformer is defined for the field" do
+    context "when a attribute transformer is defined for the field" do
       it "transforms the field value" do
         attribute_fields = User.attributes_from_proto(proto)
         attribute_fields[:first_name].should eq user_attributes[:first_name]
       end
     end
 
-    context "when column transformer is not defined for the field" do
+    context "when attribute transformer is not defined for the field" do
       before {
         User.stub(:_protobuf_convert_fields_to_columns) do |key, value|
           value

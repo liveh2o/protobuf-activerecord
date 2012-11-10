@@ -1,6 +1,9 @@
 class User < ActiveRecord::Base
   include Protoable
 
+  attribute_from_proto :first_name, :extract_first_name
+  attribute_from_proto :last_name, :extract_last_name
+
   def self.convert_base64_to_string(value)
     value
   end
@@ -17,7 +20,6 @@ class User < ActiveRecord::Base
 
     first_name
   end
-  transform_column :first_name, :extract_first_name
 
   def self.extract_last_name(proto)
     if proto.has_field?(:name)
@@ -28,7 +30,6 @@ class User < ActiveRecord::Base
 
     last_name
   end
-  transform_column :last_name, :extract_last_name
 
   def name
     "#{first_name} #{last_name}"

@@ -68,21 +68,21 @@ describe Protoable::Fields do
     end
   end
 
-  describe ".transform_column" do
+  describe ".attribute_from_proto" do
     context "when the given converter is a symbol" do
       let(:callable) { lambda { |value| User.__send__(:extract_first_name) } }
 
-      before { User.transform_column :first_name, :extract_first_name }
+      before { User.attribute_from_proto :first_name, :extract_first_name }
 
       it "creates a callable method object from the converter" do
         User.should_receive(:extract_first_name)
-        User._protobuf_column_transformers[:first_name].call(1)
+        User._protobuf_attribute_transformers[:first_name].call(1)
       end
     end
 
     context "when the given converter is not callable" do
       it "raises an exception" do
-        expect { User.transform_column :name, nil }.to raise_exception(Protoable::ColumnTransformerError)
+        expect { User.attribute_from_proto :name, nil }.to raise_exception(Protoable::AttributeTransformerError)
       end
     end
 
@@ -90,12 +90,12 @@ describe Protoable::Fields do
       let(:callable) { lambda { |proto| nil } }
 
       before {
-        User.stub(:_protobuf_column_transformers).and_return(Hash.new)
-        User.transform_column :account_id, callable
+        User.stub(:_protobuf_attribute_transformers).and_return(Hash.new)
+        User.attribute_from_proto :account_id, callable
       }
 
       it "adds the given converter to the list of protobuf field transformers" do
-        User._protobuf_column_transformers[:account_id] = callable
+        User._protobuf_attribute_transformers[:account_id] = callable
       end
     end
   end

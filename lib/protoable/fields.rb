@@ -9,21 +9,17 @@ module Protoable
       klass.class_eval do
         class << self
           attr_accessor :_protobuf_columns, :_protobuf_column_types,
-            :_protobuf_column_transformers, :_protobuf_field_converters
-
-          alias_method :convert_field_to_column, :convert_field
-          alias_method :transform_column_from_proto, :transform_column
-          alias_method :attribute_from_proto, :transform_column
+            :_protobuf_attribute_transformers, :_protobuf_field_converters
         end
 
+        @_protobuf_attribute_transformers = {}
         @_protobuf_columns = {}
         @_protobuf_column_types = Hash.new { |h,k| h[k] = [] }
-        @_protobuf_column_transformers = {}
         @_protobuf_field_converters = {}
 
         # NOTE: Make sure each inherited object has the database layout
-        inheritable_attributes :_protobuf_columns, :_protobuf_column_types,
-          :_protobuf_field_converters, :_protobuf_column_transformers
+        inheritable_attributes :_protobuf_attribute_transformers, :_protobuf_columns,
+          :_protobuf_column_types, :_protobuf_field_converters
       end
 
       _protobuf_map_columns(klass)
@@ -40,39 +36,33 @@ module Protoable
     end
 
     module ClassMethods
-      # Define a field conversion from protobuf to db. Accepts a callable,
-      # Symbol, or Hash.
+      # Define a field conversion from protobuf to db. Accepts a Symbol,
+      # Hash, callable or block.
       #
-      # When given a callable, it is directly used to convert the field.
+      # When given a callable or block, it is directly used to convert the field.
       #
       # When a Hash is given, :from and :to keys are expected and expand
       # to extracting a class method in the format of
       # "convert_#{from}_to_#{to}".
       #
-      # When a symbol is given, it extracts the method with the same name,
-      # if any. When method is not available it is assumed as the "from"
-      # data type, and the "to" value is extracted based on the
-      # name of the column.
+      # When a symbol is given, it extracts the method with the same name.
       #
       # Examples:
-      #   convert_field :created_at, :int64
       #   convert_field :public_key, :extract_public_key_from_proto
-      #   convert_field :status, lambda { |proto_field| ... }
       #   convert_field :symmetric_key, :from => :base64, :to => :encoded_string
+      #   convert_field :status, lambda { |proto_field| # Do some stuff... }
+      #   convert_field :status do |proto_field|
+      #     # Do some blocky stuff...
+      #   end
       #
-      def convert_field(field, transformer = nil, &blk)
-        transformer ||= blk
-        transformer = :"convert_#{transformer[:from]}_to_#{transformer[:to]}" if transformer.is_a?(Hash)
+      def convert_field(field, converter = nil, &blk)
+        converter ||= blk
+        converter = :"convert_#{converter[:from]}_to_#{converter[:to]}" if converter.is_a?(Hash)
 
-        if transformer.is_a?(Symbol)
-          unless self.respond_to?(transformer, true)
-          column = _protobuf_columns[field.to_sym]
-            transformer = :"convert_#{transformer}_to_#{column.try(:type)}"
-          end
-
-          callable = lambda { |value| self.__send__(transformer, value) }
+        if converter.is_a?(Symbol)
+          callable = lambda { |value| self.__send__(converter, value) }
         else
-          callable = transformer
+          callable = converter
         end
 
         unless callable.respond_to?(:call)
@@ -82,10 +72,10 @@ module Protoable
         _protobuf_field_converters[field.to_sym] = callable
       end
 
-      # Define a column transformation from protobuf to db. Accepts a callable,
-      # or Symbol.
+      # Define an attribute transformation from protobuf. Accepts a Symbol,
+      # callable, or block.
       #
-      # When given a callable, it is directly used to convert the field.
+      # When given a callable or block, it is directly used to convert the field.
       #
       # When a symbol is given, it extracts the method with the same name.
       #
@@ -93,10 +83,13 @@ module Protoable
       # proto message.
       #
       # Examples:
-      #   transform_column :public_key, :extract_public_key_from_proto
-      #   transform_column :status, lambda { |proto_field| ... }
+      #   attribute_from_proto :public_key, :extract_public_key_from_proto
+      #   attribute_from_proto :status, lambda { |proto_field| # Do some stuff... }
+      #   attribute_from_proto :status do |proto_field|
+      #     # Do some blocky stuff...
+      #   end
       #
-      def transform_column(field, transformer = nil, &blk)
+      def attribute_from_proto(field, transformer = nil, &blk)
         transformer ||= blk
 
         if transformer.is_a?(Symbol)
@@ -106,10 +99,11 @@ module Protoable
         end
 
         unless callable.respond_to?(:call)
-          raise ColumnTransformerError, 'Protoable casting needs a callable or block!'
+          raise AttributeTransformerError, 'Attribute transformers need a callable or block!'
         end
 
-        _protobuf_column_transformers[field.to_sym] = callable
+        _protobuf_attribute_transformers[field.to_sym] = callable
+      end
       end
     end
   end
