@@ -84,12 +84,12 @@ module Protoable
       #
       # Examples:
       #   attribute_from_proto :public_key, :extract_public_key_from_proto
-      #   attribute_from_proto :status, lambda { |proto_field| # Do some stuff... }
-      #   attribute_from_proto :status do |proto_field|
+      #   attribute_from_proto :status, lambda { |proto| # Do some stuff... }
+      #   attribute_from_proto :status do |proto|
       #     # Do some blocky stuff...
       #   end
       #
-      def attribute_from_proto(field, transformer = nil, &blk)
+      def attribute_from_proto(attribute, transformer = nil, &blk)
         transformer ||= blk
 
         if transformer.is_a?(Symbol)
@@ -102,7 +102,7 @@ module Protoable
           raise AttributeTransformerError, 'Attribute transformers need a callable or block!'
         end
 
-        _protobuf_attribute_transformers[field.to_sym] = callable
+        _protobuf_attribute_transformers[attribute.to_sym] = callable
       end
     end
   end
