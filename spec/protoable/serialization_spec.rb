@@ -79,7 +79,7 @@ describe Protoable::Serialization do
     before { User.protobuf_message(protobuf_message) }
 
     context "given a value" do
-      let(:protobuf_fields) { [ :guid, :name, :email ] }
+      let(:protobuf_fields) { [ :guid, :name, :email, :email_domain ] }
 
       it "sets .protobuf_fields" do
         User.protobuf_fields.should =~ protobuf_fields
@@ -106,23 +106,46 @@ describe Protoable::Serialization do
     before { User.protobuf_message(protobuf_message) }
 
     describe "#protoable_attributes" do
-      let(:attributes) {
-        {
-          :guid => "foo",
-          :first_name => "bar",
-          :last_name => "baz",
-          :email => "foo@test.co"
+      context "when a transformer is defined for the field" do
+        let(:attributes) {
+          {
+            :guid => "foo",
+            :first_name => "bar",
+            :last_name => "baz",
+            :email => "foo@test.co"
+          }
         }
-      }
-      let(:protoable_attributes) { { :guid => user.guid, :name => user.name, :email => user.email } }
+        let(:protoable_attributes) { { :guid => user.guid, :name => user.name, :email => user.email, :email_domain => 'test.co' } }
+        let(:transformer) { { :email_domain => lambda { |record| record.email.split('@').last } } }
 
-      it "returns a hash of protobuf fields that this object has getters for" do
-        user.protoable_attributes.should eq protoable_attributes
+        before {
+          User.stub(:_protobuf_field_transformers).and_return(transformer)
+        }
+
+        it "gets the field from the transformer" do
+          user.protoable_attributes.should eq protoable_attributes
+        end
       end
 
-      it "converts attributes values for protobuf messages" do
-        user.should_receive(:_protobuf_convert_attributes_to_fields).any_number_of_times
-        user.protoable_attributes
+      context "when a transformer is not defined for the field" do
+        let(:attributes) {
+          {
+            :guid => "foo",
+            :first_name => "bar",
+            :last_name => "baz",
+            :email => "foo@test.co"
+          }
+        }
+        let(:protoable_attributes) { { :guid => user.guid, :name => user.name, :email => user.email, :email_domain => nil } }
+
+        it "returns a hash of protobuf fields that this object has getters for" do
+          user.protoable_attributes.should eq protoable_attributes
+        end
+
+        it "converts attributes values for protobuf messages" do
+          user.should_receive(:_protobuf_convert_attributes_to_fields).any_number_of_times
+          user.protoable_attributes
+        end
       end
     end
 
