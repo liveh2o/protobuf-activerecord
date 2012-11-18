@@ -3,6 +3,38 @@ require 'spec_helper'
 describe Protoable::Serialization do
   let(:protobuf_message) { UserMessage }
 
+  describe ".field_from_record" do
+    context "when the given converter is a symbol" do
+      let(:callable) { lambda { |value| User.__send__(:extract_first_name) } }
+
+      before { User.field_from_record :first_name, :extract_first_name }
+
+      it "creates a callable method object from the converter" do
+        User.should_receive(:extract_first_name)
+        User._protobuf_field_transformers[:first_name].call(1)
+      end
+    end
+
+    context "when the given converter is not callable" do
+      it "raises an exception" do
+        expect { User.field_from_record :name, nil }.to raise_exception(Protoable::FieldTransformerError)
+      end
+    end
+
+    context "when the given transformer is callable" do
+      let(:callable) { lambda { |proto| nil } }
+
+      before {
+        User.stub(:_protobuf_field_transformers).and_return(Hash.new)
+        User.field_from_record :account_id, callable
+      }
+
+      it "adds the given converter to the list of protobuf field transformers" do
+        User._protobuf_field_transformers[:account_id] = callable
+      end
+    end
+  end
+
   describe ".protoable_attribute" do
     context "when the given converter is a hash" do
       let(:method) { lambda { |value| User.__send__(:convert_base64_to_string, value) } }

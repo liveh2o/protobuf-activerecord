@@ -8,17 +8,53 @@ module Protoable
 
       klass.class_eval do
         class << self
-          attr_accessor :_protobuf_attribute_converters, :protobuf_fields
+          attr_accessor :_protobuf_attribute_converters,
+            :_protobuf_field_transformers, :protobuf_fields
         end
 
         @_protobuf_attribute_converters = {}
+        @_protobuf_field_transformers = {}
         @protobuf_fields = []
 
-        inheritable_attributes :_protobuf_attribute_converters, :protobuf_fields, :protobuf_message
+        inheritable_attributes :_protobuf_attribute_converters,
+          :_protobuf_field_transformers, :protobuf_fields, :protobuf_message
       end
     end
 
     module ClassMethods
+      # Define a field transformation from a record. Accepts a Symbol,
+      # callable, or block that is called with the record being serialized.
+      #
+      # When given a callable or block, it is directly used to convert the field.
+      #
+      # When a symbol is given, it extracts the method with the same name.
+      #
+      # The callable or method must accept a single parameter, which is the
+      # proto message.
+      #
+      # Examples:
+      #   field_from_record :public_key, :convert_public_key_to_proto
+      #   field_from_record :status, lambda { |record| # Do some stuff... }
+      #   field_from_record :status do |record|
+      #     # Do some blocky stuff...
+      #   end
+      #
+      def field_from_record(field, transformer = nil, &blk)
+        transformer ||= blk
+
+        if transformer.is_a?(Symbol)
+          callable = lambda { |value| self.__send__(transformer, value) }
+        else
+          callable = transformer
+        end
+
+        unless callable.respond_to?(:call)
+          raise FieldTransformerError, 'Attribute transformers need a callable or block!'
+        end
+
+        _protobuf_field_transformers[field.to_sym] = callable
+      end
+
       # Define a custom attribute conversion for serialization to protobuf.
       # Accepts a Symbol, Hash, callable or block.
       #
