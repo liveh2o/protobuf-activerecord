@@ -9,7 +9,7 @@ module Protoable
         # is defined in ActiveRecord::Base.
         # :noapi:
         def initialize(*args)
-          args.first = attributes_from_proto(args.first) if args.first.is_a?(::Protobuf::Message)
+          args[0] = attributes_from_proto(args.first) if args.first.is_a?(::Protobuf::Message)
 
           super(*args)
         end
