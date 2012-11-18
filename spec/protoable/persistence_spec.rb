@@ -31,14 +31,14 @@ describe Protoable::Persistence do
   end
 
   describe ".attributes_from_proto" do
-    context "when a attribute transformer is defined for the field" do
+    context "when a transformer is defined for the attribute" do
       it "transforms the field value" do
         attribute_fields = User.attributes_from_proto(proto)
         attribute_fields[:first_name].should eq user_attributes[:first_name]
       end
     end
 
-    context "when attribute transformer is not defined for the field" do
+    context "when a transformer is not defined for the attribute" do
       before {
         User.stub(:_protobuf_convert_fields_to_columns) do |key, value|
           value
