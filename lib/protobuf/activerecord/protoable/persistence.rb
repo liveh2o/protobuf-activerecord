@@ -52,7 +52,8 @@ module Protoable
 
         attributes = attribute_fields.inject({}) do |hash, (key, value)|
           if _protobuf_attribute_transformers.has_key?(key)
-            hash[key] = _protobuf_attribute_transformers[key].call(proto)
+            attribute = _protobuf_attribute_transformers[key].call(proto)
+            hash[key] = attribute unless attribute.nil? 
           else
             hash[key] = _protobuf_convert_fields_to_columns(key, value)
           end

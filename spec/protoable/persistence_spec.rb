@@ -38,6 +38,34 @@ describe Protoable::Persistence do
       end
     end
 
+    context "when a transformer is a callable that returns nil" do
+      before do
+        transformers = User._protobuf_attribute_transformers
+        User.stub(:_protobuf_attribute_transformers).and_return(
+          {:account_id => lambda { |proto| nil }}.merge(transformers)
+        )
+      end
+
+      it "does not set the attribute" do
+        attribute_fields = User.attributes_from_proto(proto)
+        attribute_fields.should eq user_attributes
+      end
+    end
+
+    context "when a transformer is a callable that returns a value" do
+      before do
+        transformers = User._protobuf_attribute_transformers
+        User.stub(:_protobuf_attribute_transformers).and_return(
+          {:account_id => lambda { |proto| 1 }}.merge(transformers)
+        )
+      end
+
+      it "sets the attribute" do
+        attribute_fields = User.attributes_from_proto(proto)
+        attribute_fields.should eq user_attributes.merge(:account_id => 1)
+      end
+    end
+
     context "when a transformer is not defined for the attribute" do
       before {
         User.stub(:_protobuf_convert_fields_to_columns) do |key, value|
