@@ -18,6 +18,8 @@ module Protoable
       end
 
       def _protobuf_convert_attributes_to_fields(key, value)
+        return value if value.nil?
+
         value = case
                 when _protobuf_attribute_converters.has_key?(key.to_sym) then
                   _protobuf_attribute_converters[key.to_sym].call(value)
@@ -37,6 +39,8 @@ module Protoable
       end
 
       def _protobuf_convert_fields_to_columns(key, value)
+        return value if value.nil?
+
         value = case
                 when _protobuf_field_converters.has_key?(key.to_sym) then
                   _protobuf_field_converters[key.to_sym].call(value)
