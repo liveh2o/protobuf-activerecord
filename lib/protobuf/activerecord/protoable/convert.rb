@@ -10,7 +10,7 @@ module Protoable
       end
 
       def convert_int64_to_date(int64)
-        convert_int64_to_time(int64).to_date
+        convert_int64_to_time(int64).utc.to_date
       end
 
       def convert_int64_to_datetime(int64)
