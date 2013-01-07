@@ -26,9 +26,7 @@ module Protoable
         fields = proto.to_hash
         fields.select! { |key, value| proto.has_field?(key) && !proto.get_field_by_name(key).repeated? }
 
-        attributes = self.new.attributes.keys - protected_attributes.to_a
-
-        attribute_fields = attributes.inject({}) do |hash, column_name|
+        attribute_fields = _filtered_attributes.inject({}) do |hash, column_name|
           symbolized_column = column_name.to_sym
 
           if fields.has_key?(symbolized_column) ||
@@ -42,6 +40,17 @@ module Protoable
         attribute_fields
       end
 
+      # Filters protected attributes from the available attributes list. When
+      # set through accessible attributes, returns the accessible attributes.
+      # When set through protected attributes, returns the attributes minus any
+      # protected attributes.
+      #
+      def _filtered_attributes
+        return accessible_attributes.to_a if accessible_attributes.present?
+
+        return self.new.attributes.keys - protected_attributes.to_a
+      end
+
       # Creates a hash of attributes from a given protobuf message.
       #
       # It converts and transforms field values using the field converters and
@@ -53,7 +62,7 @@ module Protoable
         attributes = attribute_fields.inject({}) do |hash, (key, value)|
           if _protobuf_attribute_transformers.has_key?(key)
             attribute = _protobuf_attribute_transformers[key].call(proto)
-            hash[key] = attribute unless attribute.nil? 
+            hash[key] = attribute unless attribute.nil?
           else
             hash[key] = _protobuf_convert_fields_to_columns(key, value)
           end
