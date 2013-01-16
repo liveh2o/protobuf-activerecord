@@ -21,17 +21,20 @@ describe Protoable::Scope do
         User.search_scope(request).should eq User.by_email("foo@test.co")
       end
     end
+
+    context "when a searchable field uses a non-existant scope" do
+      let(:request) { UserSearchMessage.new(:email => ["foo@test.co"]) }
+
+      it "raises an exception" do
+        User.stub(:searchable_fields).and_return({ :email =>  :by_hullabaloo })
+        expect { User.search_scope(request) }.to raise_exception(/Undefined scope :by_hullabaloo/)
+      end
+    end
   end
 
   describe ".field_scope" do
     before { @fields = User.instance_variable_get("@_searchable_fields") }
     after { User.instance_variable_set("@_searchable_fields", @fields) }
-
-    context "when given a search scope that is not defined" do
-      it "raises an exception" do
-        expect { User.field_scope :name, :foo }.to raise_exception(/Undefined scope :foo/)
-      end
-    end
 
     it "stores the search scope in the searchable fields hash using the field as the key" do
       User.field_scope :guid, :by_guid
