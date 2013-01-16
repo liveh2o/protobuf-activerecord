@@ -22,10 +22,6 @@ module Protoable
     #   end
     #
     def field_scope(field, scope_name)
-      unless self.respond_to?(scope_name)
-        raise Protoable::SearchScopeError, "Undefined scope :#{scope_name}. :#{scope_name} must be defined before it can be used as a field scope."
-      end
-
       searchable_fields[field] = scope_name
     end
 
@@ -46,6 +42,10 @@ module Protoable
 
       searchable_fields.each do |field, scope_name|
         next unless proto.respond_to_and_has_and_present?(field)
+
+        unless self.respond_to?(scope_name)
+          raise Protoable::SearchScopeError, "Undefined scope :#{scope_name}."
+        end
 
         values = [ proto.__send__(field) ].flatten
         values.map!(&:to_i) if proto.get_field_by_name(field).enum?
