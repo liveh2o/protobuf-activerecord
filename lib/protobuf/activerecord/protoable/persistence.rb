@@ -48,7 +48,7 @@ module Protoable
       def _filtered_attributes
         return accessible_attributes.to_a if accessible_attributes.present?
 
-        return self.new.attributes.keys - protected_attributes.to_a
+        return self.attribute_names - protected_attributes.to_a
       end
 
       # Creates a hash of attributes from a given protobuf message.
