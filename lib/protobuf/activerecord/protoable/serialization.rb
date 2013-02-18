@@ -74,42 +74,6 @@ module Protoable
         _protobuf_field_transformers[field.to_sym] = callable
       end
 
-      # Define a custom attribute conversion for serialization to protobuf.
-      # Accepts a Symbol, Hash, callable or block.
-      #
-      # When given a callable or block, it is directly used to convert the field.
-      #
-      # When a Hash is given, :from and :to keys are expected and expand
-      # to extracting a class method in the format of
-      # "convert_#{from}_to_#{to}".
-      #
-      # When a symbol is given, it extracts the method with the same name.
-      #
-      # Examples:
-      #   protoable_attribute :public_key, :extract_public_key_from_proto
-      #   protoable_attribute :symmetric_key, :from => :base64, :to => :raw_string
-      #   protoable_attribute :status, lambda { |proto_field| # Do stuff... }
-      #   protoable_attribute :status do |proto_field|
-      #     # Do some blocky stuff...
-      #   end
-      #
-      def protoable_attribute(field, converter = nil, &block)
-        converter ||= block
-        converter = :"convert_#{converter[:from]}_to_#{converter[:to]}" if converter.is_a?(Hash)
-
-        if converter.is_a?(Symbol)
-          callable = lambda { |value| __send__(converter, value) }
-        else
-          callable = converter
-        end
-
-        unless callable.respond_to?(:call)
-          raise AttributeConverterError, 'Attribute converters must be a callable or block!'
-        end
-
-        _protobuf_attribute_converters[field.to_sym] = callable
-      end
-
       # Define the protobuf message class that should be used to serialize the
       # object to protobuf. Accepts a string or symbol and an options hash.
       #
