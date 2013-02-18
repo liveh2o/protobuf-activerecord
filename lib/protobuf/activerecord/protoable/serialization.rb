@@ -108,7 +108,7 @@ module Protoable
           end
 
           define_method(:to_proto_hash) do
-            protoable_attributes
+            fields_from_record
           end
         end
 
@@ -119,8 +119,8 @@ module Protoable
     # Extracts attributes that correspond to fields on the specified protobuf
     # message, performing any necessary column conversions on them.
     #
-    def protoable_attributes
-      protoable_attributes = protobuf_fields.inject({}) do |hash, field|
+    def fields_from_record
+      field_attributes = protobuf_fields.inject({}) do |hash, field|
         if _protobuf_field_transformers.has_key?(field)
           hash[field] = _protobuf_field_transformers[field].call(self)
         else
@@ -130,7 +130,7 @@ module Protoable
         hash
       end
 
-      protoable_attributes
+      field_attributes
     end
 
   private

@@ -65,7 +65,7 @@ describe Protoable::Serialization do
 
     before { User.protobuf_message(protobuf_message) }
 
-    describe "#protoable_attributes" do
+    describe "#fields_from_record" do
       context "when a transformer is defined for the field" do
         let(:attributes) {
           {
@@ -75,7 +75,7 @@ describe Protoable::Serialization do
             :email => "foo@test.co"
           }
         }
-        let(:protoable_attributes) { { :guid => user.guid, :name => user.name, :email => user.email, :email_domain => 'test.co' } }
+        let(:fields_from_record) { { :guid => user.guid, :name => user.name, :email => user.email, :email_domain => 'test.co' } }
         let(:transformer) { { :email_domain => lambda { |record| record.email.split('@').last } } }
 
         before {
@@ -83,7 +83,7 @@ describe Protoable::Serialization do
         }
 
         it "gets the field from the transformer" do
-          user.protoable_attributes.should eq protoable_attributes
+          user.fields_from_record.should eq fields_from_record
         end
       end
 
@@ -96,15 +96,15 @@ describe Protoable::Serialization do
             :email => "foo@test.co"
           }
         }
-        let(:protoable_attributes) { { :guid => user.guid, :name => user.name, :email => user.email, :email_domain => nil } }
+        let(:fields_from_record) { { :guid => user.guid, :name => user.name, :email => user.email, :email_domain => nil } }
 
         it "returns a hash of protobuf fields that this object has getters for" do
-          user.protoable_attributes.should eq protoable_attributes
+          user.fields_from_record.should eq fields_from_record
         end
 
         it "converts attributes values for protobuf messages" do
           user.should_receive(:_protobuf_convert_attributes_to_fields).any_number_of_times
-          user.protoable_attributes
+          user.fields_from_record
         end
       end
     end
@@ -123,9 +123,9 @@ describe Protoable::Serialization do
     describe "#to_proto_hash" do
       let(:proto_hash) { { :name => "foo" } }
 
-      before { user.stub(:protoable_attributes).and_return(proto_hash) }
+      before { user.stub(:fields_from_record).and_return(proto_hash) }
 
-      it "returns #protoable_attributes" do
+      it "returns #fields_from_record" do
         user.to_proto_hash.should eq proto_hash
       end
     end
