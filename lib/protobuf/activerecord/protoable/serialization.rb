@@ -8,16 +8,13 @@ module Protoable
 
       klass.class_eval do
         class << self
-          attr_accessor :_protobuf_attribute_converters,
-            :_protobuf_field_transformers, :protobuf_fields
+          attr_accessor :_protobuf_field_transformers, :protobuf_fields
         end
 
-        @_protobuf_attribute_converters = {}
         @_protobuf_field_transformers = {}
         @protobuf_fields = []
 
-        inheritable_attributes :_protobuf_attribute_converters,
-          :_protobuf_field_transformers, :protobuf_fields, :protobuf_message
+        inheritable_attributes :_protobuf_field_transformers, :protobuf_fields, :protobuf_message
       end
     end
 
