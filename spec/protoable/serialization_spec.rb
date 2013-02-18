@@ -3,6 +3,60 @@ require 'spec_helper'
 describe Protoable::Serialization do
   let(:protobuf_message) { UserMessage }
 
+  describe "._protobuf_convert_attributes_to_fields" do
+    context "when the column type is :date" do
+      let(:date) { Date.current }
+      let(:integer) { date.to_time.to_i }
+
+      before { User.stub(:_protobuf_date_column?).and_return(true) }
+
+      it "converts the given value to an integer" do
+        User._protobuf_convert_attributes_to_fields(:foo_date, date).should eq integer
+      end
+    end
+
+    context "when the column type is :datetime" do
+      let(:datetime) { DateTime.current }
+      let(:integer) { datetime.to_time.to_i }
+
+      before { User.stub(:_protobuf_datetime_column?).and_return(true) }
+
+      it "converts the given value to an integer" do
+        User._protobuf_convert_attributes_to_fields(:foo_datetime, datetime).should eq integer
+      end
+    end
+
+    context "when the column type is :time" do
+      let(:time) { Time.current }
+      let(:integer) { time.to_time.to_i }
+
+      before { User.stub(:_protobuf_time_column?).and_return(true) }
+
+      it "converts the given value to an integer" do
+        User._protobuf_convert_attributes_to_fields(:foo_time, time).should eq integer
+      end
+    end
+
+    context "when the column type is :timestamp" do
+      let(:timestamp) { Time.current }
+      let(:integer) { timestamp.to_time.to_i }
+
+      before { User.stub(:_protobuf_timestamp_column?).and_return(true) }
+
+      it "converts the given value to an integer" do
+        User._protobuf_convert_attributes_to_fields(:foo_timestamp, timestamp).should eq integer
+      end
+    end
+
+    context "when no conversion is necessary" do
+      let(:value) { "Foo" }
+
+      it "returns the given value" do
+        User._protobuf_convert_attributes_to_fields(:foo, value).should eq value
+      end
+    end
+  end
+
   describe ".field_from_record" do
     context "when the given converter is a symbol" do
       let(:callable) { lambda { |value| User.__send__(:extract_first_name) } }

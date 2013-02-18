@@ -38,6 +38,26 @@ module Protoable
         self.protobuf_fields = fields
       end
 
+      # :nodoc:      
+      def _protobuf_convert_attributes_to_fields(key, value)
+        return value if value.nil?
+
+        value = case
+                when _protobuf_date_column?(key) then
+                  value.to_time.to_i
+                when _protobuf_datetime_column?(key) then
+                  value.to_i
+                when _protobuf_time_column?(key) then
+                  value.to_i
+                when _protobuf_timestamp_column?(key) then
+                  value.to_i
+                else
+                  value
+                end
+
+        return value
+      end
+
       # Define a field transformation from a record. Accepts a Symbol,
       # callable, or block that is called with the record being serialized.
       #
