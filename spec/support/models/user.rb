@@ -7,14 +7,6 @@ class User < ActiveRecord::Base
   attribute_from_proto :first_name, :extract_first_name
   attribute_from_proto :last_name, :extract_last_name
 
-  def self.convert_base64_to_string(value)
-    value
-  end
-
-  def self.convert_email_to_lowercase(value)
-    value
-  end
-
   def self.extract_first_name(proto)
     if proto.has_field?(:name)
       names = proto.name.split(" ")
