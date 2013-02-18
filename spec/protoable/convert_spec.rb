@@ -89,25 +89,6 @@ describe Protoable::Convert do
   end
 
   describe "._protobuf_convert_fields_to_columns" do
-    let(:email_value) { "foo@test.co" }
-    let(:email_converter) { lambda { |value| value } }
-
-    before { User.stub(:_protobuf_field_converters).and_return({ :email => email_converter }) }
-
-    it "calls the field converter with the given value" do
-      email_converter.should_receive(:call).with(email_value)
-      User._protobuf_convert_fields_to_columns(:email, email_value)
-    end
-
-    context "and it's corresponding column type has a default converter" do
-      before { User.stub(:_protobuf_date_column?).and_return(true) }
-
-      it "calls the field converter with the given value" do
-        email_converter.should_receive(:call).with(email_value)
-        User._protobuf_convert_fields_to_columns(:email, email_value)
-      end
-    end
-
     context "when the given field's corresponding column type is :date" do
       let(:date) { Date.current }
       let(:value) { date.to_time.to_i }

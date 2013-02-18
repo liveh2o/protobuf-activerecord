@@ -40,8 +40,6 @@ module Protoable
         return value if value.nil?
 
         value = case
-                when _protobuf_field_converters.has_key?(key.to_sym) then
-                  _protobuf_field_converters[key.to_sym].call(value)
                 when _protobuf_date_column?(key) then
                   convert_int64_to_date(value)
                 when _protobuf_datetime_column?(key) then
