@@ -8,37 +8,19 @@ module Protoable
 
       klass.class_eval do
         class << self
-          attr_accessor :_protobuf_field_transformers, :protobuf_fields
+          attr_accessor :_protobuf_field_transformers, :_protobuf_field_options
         end
 
         @_protobuf_field_transformers = {}
-        @protobuf_fields = []
+        @_protobuf_field_options = {}
 
-        inheritable_attributes :_protobuf_field_transformers, :protobuf_fields, :protobuf_message
+        inheritable_attributes :_protobuf_field_transformers, :_protobuf_field_options,
+          :protobuf_message
       end
     end
 
     module ClassMethods
       # :nodoc:
-      def _initialize_protobuf_fields(options = {})
-        options ||= {}
-
-        exclude_deprecated = ! options.fetch(:deprecated, true)
-
-        fields = @protobuf_message.fields.map do |field|
-          next if field.nil?
-          next if exclude_deprecated && field.deprecated?
-          field.name.to_sym
-        end
-        fields.compact!
-
-        fields &= [ options[:only] ].flatten if options.has_key?(:only)
-        fields -= [ options[:except] ].flatten if options.has_key?(:except)
-
-        self.protobuf_fields = fields
-      end
-
-      # :nodoc:      
       def _protobuf_convert_attributes_to_fields(key, value)
         return value if value.nil?
 
@@ -118,10 +100,10 @@ module Protoable
         unless message.nil?
           @protobuf_message = message.to_s.classify.constantize
 
-          _initialize_protobuf_fields(options)
+          self._protobuf_field_options = options
 
-          define_method(:to_proto) do
-            self.class.protobuf_message.new(self.fields_from_record)
+          define_method(:to_proto) do |options = {}|
+            self.class.protobuf_message.new(self.fields_from_record(options))
           end
         end
 
@@ -129,11 +111,47 @@ module Protoable
       end
     end
 
+    # :nodoc:
+    def _filter_field_attributes(options = {})
+      options = _normalize_options(options)
+
+      fields = _filtered_fields(options)
+      fields &= [ options[:only] ].flatten if options[:only].present?
+      fields -= [ options[:except] ].flatten if options[:except].present?
+
+      fields
+    end
+
+    # :nodoc:
+    def _filtered_fields(options = {})
+      exclude_deprecated = ! options.fetch(:deprecated, true)
+
+      fields = self.class.protobuf_message.fields.map do |field|
+        next if field.nil?
+        next if exclude_deprecated && field.deprecated?
+        field.name.to_sym
+      end
+      fields.compact!
+
+      fields
+    end
+
+    # :nodoc:
+    def _normalize_options(options)
+      options ||= {}
+      options[:only] ||= [] if options.fetch(:except, false)
+      options[:except] ||= [] if options.fetch(:only, false)
+
+      self.class._protobuf_field_options.merge(options)
+    end
+
     # Extracts attributes that correspond to fields on the specified protobuf
     # message, performing any necessary column conversions on them.
     #
-    def fields_from_record
-      field_attributes = protobuf_fields.inject({}) do |hash, field|
+    def fields_from_record(options = {})
+      field_attributes = _filter_field_attributes(options)
+
+      field_attributes = field_attributes.inject({}) do |hash, field|
         if _protobuf_field_transformers.has_key?(field)
           hash[field] = _protobuf_field_transformers[field].call(self)
         else
@@ -154,10 +172,6 @@ module Protoable
 
     def _protobuf_field_transformers
       self.class._protobuf_field_transformers
-    end
-
-    def protobuf_fields
-      self.class.protobuf_fields
     end
   end
 end

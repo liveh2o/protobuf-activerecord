@@ -90,17 +90,20 @@ describe Protoable::Serialization do
   end
 
   describe ".protobuf_message" do
-    before { User.protobuf_message(protobuf_message) }
+    let(:options) { { :only => [] } }
+
+    before { User.protobuf_message(protobuf_message, options) }
+    after { User.protobuf_message(protobuf_message, {}) }
 
     context "given a value" do
-      let(:protobuf_fields) { [ :guid, :name, :email, :email_domain ] }
-
-      it "sets .protobuf_fields" do
-        User.protobuf_fields.should =~ protobuf_fields
-      end
-
       it "defines #to_proto" do
         User.allocate.should respond_to :to_proto
+      end
+    end
+
+    context "given options" do
+      it "merges them with protobuf field options" do
+        User._protobuf_field_options.should eq options
       end
     end
 
@@ -114,6 +117,76 @@ describe Protoable::Serialization do
     let(:user) { User.new(attributes) }
 
     before { User.protobuf_message(protobuf_message) }
+
+    describe "#_filter_field_attributes" do
+      context "when options has :only" do
+        it "only returns the given field(s)" do
+          fields = user._filter_field_attributes(:only => :name).should
+          fields.should eq [ :name ]
+        end
+      end
+
+      context "when options has :except" do
+        it "returns all except the given field(s)" do
+          fields = user._filter_field_attributes(:except => :name).should
+          fields.should eq [ :guid, :email, :email_domain ]
+        end
+      end
+    end
+
+    describe "#_filtered_fields" do
+      it "returns protobuf fields" do
+        user._filtered_fields.should eq [ :guid, :name, :email, :email_domain ]
+      end
+
+      context "given :deprecated => false" do
+        it "filters all deprecated fields" do
+          fields = user._filtered_fields(:deprecated => false).should
+          fields.should eq [ :guid, :name, :email ]
+        end
+      end
+    end
+
+    describe "#_normalize_options" do
+      let(:options) { { :only => [ :name ] } }
+
+      context "given empty options" do
+        before { User.protobuf_message(protobuf_message, options) }
+
+        it "returns the class's protobuf field options" do
+          User.allocate._normalize_options({}).should eq options
+        end
+      end
+
+      context "given options" do
+        before { User.protobuf_message(protobuf_message, {}) }
+
+        it "merges them with the class's protobuf field options" do
+          normalized_options = User.allocate._normalize_options(options)
+          normalized_options[:only].should eq options[:only]
+        end
+      end
+
+      context "given options with :only" do
+        before { User.protobuf_message(protobuf_message, {}) }
+
+        it "ensures that :except exists" do
+          normalized_options = User.allocate._normalize_options(options)
+          normalized_options[:except].should eq []
+        end
+      end
+
+      context "given options with :except" do
+        let(:options) { { :except => [ :name ] } }
+
+        before { User.protobuf_message(protobuf_message, {}) }
+
+        it "ensures that :only exists" do
+          normalized_options = User.allocate._normalize_options(options)
+          normalized_options[:only].should eq []
+        end
+      end
+    end
 
     describe "#fields_from_record" do
       context "when a transformer is defined for the field" do
