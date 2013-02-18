@@ -78,8 +78,8 @@ module Protoable
       # object to protobuf. Accepts a string or symbol and an options hash.
       #
       # When protobuf_message is declared, Protoable automatically extracts the
-      # fields from the message and automatically adds to_proto and to_proto_hash
-      # methods that serialize the object to protobuf.
+      # fields from the message and automatically adds a to_proto method that
+      # serializes the object to protobuf.
       #
       # The fields that will be automatically serialized can be configured by
       # passing :only or :except in the options hash. If :only is specified, only
@@ -104,11 +104,7 @@ module Protoable
           _initialize_protobuf_fields(options)
 
           define_method(:to_proto) do
-            self.class.protobuf_message.new(self.to_proto_hash)
-          end
-
-          define_method(:to_proto_hash) do
-            fields_from_record
+            self.class.protobuf_message.new(self.fields_from_record)
           end
         end
 

@@ -48,10 +48,6 @@ describe Protoable::Serialization do
       it "defines #to_proto" do
         User.allocate.should respond_to :to_proto
       end
-
-      it "defines #to_proto_hash" do
-        User.allocate.should respond_to :to_proto_hash
-      end
     end
 
     it "returns the protobuf message for this object" do
@@ -113,20 +109,10 @@ describe Protoable::Serialization do
       let(:proto) { protobuf_message.new(proto_hash) }
       let(:proto_hash) { { :name => "foo" } }
 
-      before { user.stub(:to_proto_hash).and_return(proto_hash) }
+      before { user.stub(:fields_from_record).and_return(proto_hash) }
 
       it "intializes a new protobuf message with attributes from #to_proto_hash" do
         user.to_proto.should eq proto
-      end
-    end
-
-    describe "#to_proto_hash" do
-      let(:proto_hash) { { :name => "foo" } }
-
-      before { user.stub(:fields_from_record).and_return(proto_hash) }
-
-      it "returns #fields_from_record" do
-        user.to_proto_hash.should eq proto_hash
       end
     end
   end
