@@ -17,7 +17,7 @@ class UserMessage
   optional ::Protobuf::Field::StringField, :guid, 1
   optional ::Protobuf::Field::StringField, :name, 2
   optional ::Protobuf::Field::StringField, :email, 3
-  optional ::Protobuf::Field::StringField, :email_domain, 4
+  optional ::Protobuf::Field::StringField, :email_domain, 4, :deprecated => true
 end
 
 class UserSearchMessage
