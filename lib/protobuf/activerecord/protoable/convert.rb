@@ -54,22 +54,6 @@ module Protoable
 
         return value
       end
-
-      def _protobuf_date_column?(key)
-        _protobuf_column_types.fetch(:date, false) && _protobuf_column_types[:date].include?(key)
-      end
-
-      def _protobuf_datetime_column?(key)
-        _protobuf_column_types.fetch(:datetime, false) && _protobuf_column_types[:datetime].include?(key)
-      end
-
-      def _protobuf_time_column?(key)
-        _protobuf_column_types.fetch(:time, false) && _protobuf_column_types[:time].include?(key)
-      end
-
-      def _protobuf_timestamp_column?(key)
-        _protobuf_column_types.fetch(:timestamp, false) && _protobuf_column_types[:timestamp].include?(key)
-      end
     end
   end
 end
