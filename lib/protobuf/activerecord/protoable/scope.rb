@@ -4,7 +4,6 @@ module Protoable
       klass.class_eval do
         class << self
           alias_method :by_fields, :search_scope
-          alias_method :from_proto, :search_scope
           alias_method :scope_from_proto, :search_scope
         end
       end
@@ -34,7 +33,6 @@ module Protoable
     #   # Search starting with the default scope and searchable fields
     #   User.search_scope(request)
     #   User.by_fields(request)
-    #   User.from_proto(request)
     #   User.scope_from_proto(request)
     #
     def search_scope(proto)
