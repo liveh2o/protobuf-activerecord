@@ -22,6 +22,25 @@ module Protoable
     end
 
     module ClassMethods
+      # :nodoc:
+      def _initialize_protobuf_fields(options = {})
+        options ||= {}
+
+        exclude_deprecated = ! options.fetch(:deprecated, true)
+
+        fields = @protobuf_message.fields.map do |field|
+          next if field.nil?
+          next if exclude_deprecated && field.deprecated?
+          field.name.to_sym
+        end
+        fields.compact!
+
+        fields &= [ options[:only] ].flatten if options.has_key?(:only)
+        fields -= [ options[:except] ].flatten if options.has_key?(:except)
+
+        self.protobuf_fields = fields
+      end
+
       # Define a field transformation from a record. Accepts a Symbol,
       # callable, or block that is called with the record being serialized.
       #
@@ -39,8 +58,8 @@ module Protoable
       #     # Do some blocky stuff...
       #   end
       #
-      def field_from_record(field, transformer = nil, &blk)
-        transformer ||= blk
+      def field_from_record(field, transformer = nil, &block)
+        transformer ||= block
 
         if transformer.is_a?(Symbol)
           callable = lambda { |value| self.__send__(transformer, value) }
@@ -74,8 +93,8 @@ module Protoable
       #     # Do some blocky stuff...
       #   end
       #
-      def protoable_attribute(field, converter = nil, &blk)
-        converter ||= blk
+      def protoable_attribute(field, converter = nil, &block)
+        converter ||= block
         converter = :"convert_#{converter[:from]}_to_#{converter[:to]}" if converter.is_a?(Hash)
 
         if converter.is_a?(Symbol)
@@ -92,24 +111,33 @@ module Protoable
       end
 
       # Define the protobuf message class that should be used to serialize the
-      # object to protobuf. Accepts a string or symbol.
+      # object to protobuf. Accepts a string or symbol and an options hash.
       #
       # When protobuf_message is declared, Protoable automatically extracts the
       # fields from the message and automatically adds to_proto and to_proto_hash
       # methods that serialize the object to protobuf.
       #
+      # The fields that will be automatically serialized can be configured by
+      # passing :only or :except in the options hash. If :only is specified, only
+      # the specified fields will be serialized. If :except is specified, all
+      # field except the specified fields will be serialized.
+      #
+      # By default, deprecated fields will be serialized. To exclude deprecated
+      # fields, pass :deprecated => false in the options hash.
+      #
       # Examples:
       #   protobuf_message :user_message
       #   protobuf_message "UserMessage"
       #   protobuf_message "Namespaced::UserMessage"
+      #   protobuf_message :user_message, :only => :guid, :name
+      #   protobuf_message :user_message, :except => :email_domain
+      #   protobuf_message :user_message, :except => :email_domain, :deprecated => false
       #
-      def protobuf_message(message = nil)
+      def protobuf_message(message = nil, options = {})
         unless message.nil?
           @protobuf_message = message.to_s.classify.constantize
 
-          self.protobuf_fields = @protobuf_message.fields.compact.map do |field|
-            field.name.to_sym
-          end
+          _initialize_protobuf_fields(options)
 
           define_method(:to_proto) do
             self.class.protobuf_message.new(self.to_proto_hash)
