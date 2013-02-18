@@ -17,62 +17,6 @@ module Protoable
     end
 
     module ClassMethods
-      # Filters accessible attributes that exist in the given protobuf message's
-      # fields or have attribute transformers defined for them.
-      #
-      # Returns a hash of attribute fields with their respective values.
-      #
-      def _filter_attribute_fields(proto)
-        fields = proto.to_hash
-        fields.select! { |key, value| proto.has_field?(key) && !proto.get_field_by_name(key).repeated? }
-
-        attribute_fields = _filtered_attributes.inject({}) do |hash, column_name|
-          symbolized_column = column_name.to_sym
-
-          if fields.has_key?(symbolized_column) ||
-            _protobuf_attribute_transformers.has_key?(symbolized_column)
-            hash[symbolized_column] = fields[symbolized_column]
-          end
-
-          hash
-        end
-
-        attribute_fields
-      end
-
-      # Filters protected attributes from the available attributes list. When
-      # set through accessible attributes, returns the accessible attributes.
-      # When set through protected attributes, returns the attributes minus any
-      # protected attributes.
-      #
-      def _filtered_attributes
-        return accessible_attributes.to_a if accessible_attributes.present?
-
-        return self.attribute_names - protected_attributes.to_a
-      end
-
-      # Creates a hash of attributes from a given protobuf message.
-      #
-      # It converts and transforms field values using the field converters and
-      # attribute transformers, ignoring repeated and nil fields.
-      #
-      def attributes_from_proto(proto)
-        attribute_fields = _filter_attribute_fields(proto)
-
-        attributes = attribute_fields.inject({}) do |hash, (key, value)|
-          if _protobuf_attribute_transformers.has_key?(key)
-            attribute = _protobuf_attribute_transformers[key].call(proto)
-            hash[key] = attribute unless attribute.nil?
-          else
-            hash[key] = _protobuf_convert_fields_to_columns(key, value)
-          end
-
-          hash
-        end
-
-        attributes
-      end
-
       # :nodoc:
       def create(attributes, options = {}, &block)
         attributes = attributes_from_proto(attributes) if attributes.is_a?(::Protobuf::Message)
@@ -104,12 +48,6 @@ module Protoable
       attributes = attributes_from_proto(proto) if attributes.is_a?(::Protobuf::Message)
 
       super(attributes, options)
-    end
-
-    # Calls up to the class version of the method.
-    #
-    def attributes_from_proto(proto)
-      self.class.attributes_from_proto(proto)
     end
 
     # Destroys the record. Mainly wrapped to provide a consistent API and
