@@ -150,6 +150,10 @@ module Protoable
     #
     def fields_from_record(options = {})
       field_attributes = _filter_field_attributes(options)
+      field_attributes += [ options.fetch(:include, []) ]
+      field_attributes.flatten!
+      field_attributes.compact
+      field_attributes.uniq!
 
       field_attributes = field_attributes.inject({}) do |hash, field|
         if _protobuf_field_transformers.has_key?(field)

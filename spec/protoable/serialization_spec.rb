@@ -189,15 +189,16 @@ describe Protoable::Serialization do
     end
 
     describe "#fields_from_record" do
-      context "when a transformer is defined for the field" do
-        let(:attributes) {
-          {
-            :guid => "foo",
-            :first_name => "bar",
-            :last_name => "baz",
-            :email => "foo@test.co"
-          }
+      let(:attributes) {
+        {
+          :guid => "foo",
+          :first_name => "bar",
+          :last_name => "baz",
+          :email => "foo@test.co"
         }
+      }
+
+      context "when a transformer is defined for the field" do
         let(:fields_from_record) { { :guid => user.guid, :name => user.name, :email => user.email, :email_domain => 'test.co' } }
         let(:transformer) { { :email_domain => lambda { |record| record.email.split('@').last } } }
 
@@ -211,14 +212,6 @@ describe Protoable::Serialization do
       end
 
       context "when a transformer is not defined for the field" do
-        let(:attributes) {
-          {
-            :guid => "foo",
-            :first_name => "bar",
-            :last_name => "baz",
-            :email => "foo@test.co"
-          }
-        }
         let(:fields_from_record) { { :guid => user.guid, :name => user.name, :email => user.email, :email_domain => nil } }
 
         it "returns a hash of protobuf fields that this object has getters for" do
@@ -228,6 +221,13 @@ describe Protoable::Serialization do
         it "converts attributes values for protobuf messages" do
           user.should_receive(:_protobuf_convert_attributes_to_fields).any_number_of_times
           user.fields_from_record
+        end
+      end
+
+      context "given options with :include" do
+        it "adds the given field to the list of serialized fields" do
+          fields = user.fields_from_record(:include => :token)
+          fields.include?(:token).should be_true
         end
       end
     end
