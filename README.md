@@ -126,6 +126,14 @@ end
 
 This does pretty much the same thing, but from a different perspective.
 
+`to_proto` also accepts these options, so you can override the class-level serializable fields on a per-instance basis:
+
+```Ruby
+user.to_proto(:only => :email) # Only the email
+user.to_proto(:except => :email) # Everthing except the email
+user.to_proto(:include => :email) # Start with the class-level settings, but add email
+```
+
 ### Serializing deprecated fields
 
 By default, Protoaable includes deprecated fields when mapping protobuf message to Active Record objects. To exclude deprecated fields, simply pass the `:deprecated` option:
