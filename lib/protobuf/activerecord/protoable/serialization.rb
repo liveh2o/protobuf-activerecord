@@ -159,7 +159,7 @@ module Protoable
       field_attributes = _filter_field_attributes(options)
       field_attributes += [ options.fetch(:include, []) ]
       field_attributes.flatten!
-      field_attributes.compact
+      field_attributes.compact!
       field_attributes.uniq!
 
       field_attributes = field_attributes.inject({}) do |hash, field|
