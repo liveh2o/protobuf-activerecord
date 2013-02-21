@@ -118,14 +118,17 @@ module Protoable
         attributes
       end
 
+      # :nodoc:
       def convert_int64_to_time(int64)
         Time.at(int64.to_i)
       end
 
+      # :nodoc:
       def convert_int64_to_date(int64)
         convert_int64_to_time(int64).utc.to_date
       end
 
+      # :nodoc:
       def convert_int64_to_datetime(int64)
         convert_int64_to_time(int64).to_datetime
       end
