@@ -79,10 +79,6 @@ class UserMessage < ::Protobuf::Message
 end
 ```
 
-**Mass-assignment**
-
-If a model has protected attributes defined, Protoable will skip any fields that map to them. Likewise, if there are accessible attributes defined, only they will be mapped.
-
 ### Creating/Updating
 
 Protoable doesn't alter Active Record's normal persistence methods. It simply adds to ability to pass protobuf messages to them in place of an attributes hash.
@@ -102,26 +98,52 @@ end
 
 Once the desired protobuf message has been specified, Protoable adds a `to_proto` method to the model. Calling `to_proto` will automatically convert the model to the specified protobuf message using the same attribute to field mapping it uses to create and update objects from protobuf messages.
 
-### Field & attribute converters
+### Choosing serializable fields
 
-Protoable will handle regular field conversions out of the box, but for those times when custom conversions are needed, they can be defined with the `convert_field` and `protoable_attribute` methods. Field converters are used when creating or updating objects from a protobuf message and attribute converters are used when serializing objects to protobuf messages.
-
-`convert_field` and `protoable_attribute` both take the name of the field/attribute being converted and a method name or callable (lambda or proc). when converting that field, calls the given callable, passing it the value of the field being converted.
-
-**Converting fields**
+Protoable also provides a mechanism for choosing which fields should be included when serializing objects to protobuf messages by passing additional options to `protobuf_message`:
 
 ```Ruby
 class User < ActiveRecord::Base
   include Protoable
 
-  # Calls :map_status_from_proto when creating/updating objects, passing it the
-  # value of the status field from the protobuf message.
-  def self.map_status_from_proto(field_value)
-    # Some custom mapping
-  end
-  convert_field :status, :map_status_from_proto
+  # Configures Protoable to use the UserMessage class and adds :to_proto.
+  protobuf_message :user_message, :only => [ :first_name, :last_name, :email ]
 end
 ```
+
+This will only include the first_name, last_name, and email fields.
+
+Conversely, the `:except` option allows the fields that should be excluded to be specified.
+
+```Ruby
+class User < ActiveRecord::Base
+  include Protoable
+
+  # Configures Protoable to use the UserMessage class and adds :to_proto.
+  protobuf_message :user_message, :except => [ :account_id, :created_at ]
+end
+```
+
+This does pretty much the same thing, but from a different perspective.
+
+### Serializing deprecated fields
+
+By default, Protoaable includes deprecated fields when mapping protobuf message to Active Record objects. To exclude deprecated fields, simply pass the `:deprecated` option:
+
+```Ruby
+class User < ActiveRecord::Base
+  include Protoable
+
+  # Configures Protoable to use the UserMessage class and adds :to_proto.
+  protobuf_message :user_message, :deprecated => false
+end
+```
+
+### Field transformers
+
+Field transformers are used when serializing objects to protobuf messages. Protoable will handle regular field mapping and conversions out of the box, but for those times when fields don't map directly to attributes or custom behavior is needed, Protoable provides the `field_from_record` method.
+
+`field_from_record` takes the name of the field being transformed and a method name or callable (lambda or proc). When transforming that field, it calls the given callable, passing it the object being serialized.
 
 **Converting attributes**
 
@@ -130,8 +152,8 @@ class User < ActiveRecord::Base
   include Protoable
 
   # Calls the lambda when serializing objects to protobuf messages, passing it
-  # the value of the status attribute.
-  protoable_attribute :status, lambda { |attribute_value| attribute_value_.to_s }
+  # the object being serialized.
+  field_from_record :status, lambda { |object_being_serlialized| # Some custom behavior }
 end
 ```
 
@@ -192,7 +214,7 @@ User.search_scope(request)
 User.limit(10).search_scope(request)
 ```
 
-Protoable also provides some aliases for the `search_scope` method in the event that you'd like something a little more descriptive. `by_fields`, `from_proto`, and `scope_from_proto` are all aliases of `search_scope`.
+Protoable also provides some aliases for the `search_scope` method in the event that you'd like something a little more descriptive: `by_fields` and `scope_from_proto` are all aliases of `search_scope`.
 
 ## Contributing
 
