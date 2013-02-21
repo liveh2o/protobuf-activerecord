@@ -177,10 +177,12 @@ module Protoable
 
   private
 
+    # :nodoc:
     def _protobuf_convert_attributes_to_fields(field, value)
       self.class._protobuf_convert_attributes_to_fields(field, value)
     end
 
+    # :nodoc:
     def _protobuf_field_transformers
       self.class._protobuf_field_transformers
     end
