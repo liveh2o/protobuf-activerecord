@@ -106,7 +106,7 @@ Protoable also provides a mechanism for choosing which fields should be included
 class User < ActiveRecord::Base
   include Protoable
 
-  # Configures Protoable to use the UserMessage class and adds :to_proto.
+  # Passing :only => ... configures Protoable to only serialize the given fields
   protobuf_message :user_message, :only => [ :first_name, :last_name, :email ]
 end
 ```
@@ -119,7 +119,7 @@ Conversely, the `:except` option allows the fields that should be excluded to be
 class User < ActiveRecord::Base
   include Protoable
 
-  # Configures Protoable to use the UserMessage class and adds :to_proto.
+  # Passing :except => ... configures Protoable to serialize everything except the given fields
   protobuf_message :user_message, :except => [ :account_id, :created_at ]
 end
 ```
@@ -134,7 +134,7 @@ By default, Protoaable includes deprecated fields when mapping protobuf message 
 class User < ActiveRecord::Base
   include Protoable
 
-  # Configures Protoable to use the UserMessage class and adds :to_proto.
+  # Passing :deprecated => false configures Protoable to exclude deprecated fields.
   protobuf_message :user_message, :deprecated => false
 end
 ```
