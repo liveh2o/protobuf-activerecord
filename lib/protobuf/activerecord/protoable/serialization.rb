@@ -92,7 +92,7 @@ module Protoable
       #   protobuf_message :user_message
       #   protobuf_message "UserMessage"
       #   protobuf_message "Namespaced::UserMessage"
-      #   protobuf_message :user_message, :only => :guid, :name
+      #   protobuf_message :user_message, :only => [ :guid, :name ]
       #   protobuf_message :user_message, :except => :email_domain
       #   protobuf_message :user_message, :except => :email_domain, :deprecated => false
       #
@@ -146,7 +146,14 @@ module Protoable
     end
 
     # Extracts attributes that correspond to fields on the specified protobuf
-    # message, performing any necessary column conversions on them.
+    # message, performing any necessary column conversions on them. Accepts a
+    # hash of options for specifying which fields should be serialized.
+    #
+    # Examples:
+    #   fields_from_record(:only => [ :guid, :name ])
+    #   fields_from_record(:except => :email_domain)
+    #   fields_from_record(:include => :email_domain)
+    #   fields_from_record(:except => :email_domain, :deprecated => false)
     #
     def fields_from_record(options = {})
       field_attributes = _filter_field_attributes(options)
