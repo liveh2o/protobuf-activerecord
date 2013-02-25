@@ -28,7 +28,7 @@ module Protoable
         fields = proto.to_hash
         fields.select! { |key, value| proto.has_field?(key) && !proto.get_field_by_name(key).repeated? }
 
-        attribute_fields = attribute_names.inject({}) do |hash, column_name|
+        attribute_fields = _filtered_attributes.inject({}) do |hash, column_name|
           symbolized_column = column_name.to_sym
 
           if fields.has_key?(symbolized_column) ||
@@ -40,6 +40,18 @@ module Protoable
         end
 
         attribute_fields
+      end
+
+      # Filters protected attributes from the available attributes list. When
+      # set through accessible attributes, returns the accessible attributes.
+      # When set through protected attributes, returns the attributes minus any
+      # protected attributes.
+      #
+      # :nodoc:
+      def _filtered_attributes
+        return accessible_attributes.to_a if accessible_attributes.present?
+
+        return self.attribute_names - protected_attributes.to_a
       end
 
       # :nodoc:
