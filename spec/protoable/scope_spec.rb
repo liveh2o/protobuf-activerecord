@@ -4,6 +4,10 @@ describe Protoable::Scope do
   describe ".search_scope" do
     let(:request) { UserSearchMessage.new(:guid => ["foo"], :email => ["foo@test.co"]) }
 
+    before {
+      User.stub(:searchable_field_parsers).and_return({ :email => proc { |val| val } })
+    }
+
     it "builds scopes for searchable fields" do
       User.stub(:searchable_fields).and_return({ :email =>  :by_email })
       User.search_scope(request).should eq User.by_email("foo@test.co")
