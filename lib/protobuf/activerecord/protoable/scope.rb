@@ -10,7 +10,9 @@ module Protoable
     end
 
     # Define fields that should be searchable via `search_scope`. Accepts a
-    # protobuf field and an already defined scope.
+    # protobuf field and an already defined scope. If no scope is specified,
+    # the scope will be the field name, prefixed with `by_` (e.g. when the
+    # field is :guid, the scope will be :by_guid).
     #
     # Optionally, a parser can be provided that will be called, passing the
     # field value as an argument. This allows custom data parsers to be used
@@ -21,14 +23,20 @@ module Protoable
     #
     #   class User < ActiveRecord::Base
     #     scope :by_guid, lambda { |*guids| where(:guid => guids) }
+    #     scope :custom_guid_scope, lambda { |*guids| where(:guid => guids) }
     #
-    #     field_scope :guid, :by_guid
+    #     # Equivalent to `field_scope :guid, :by_guid`
+    #     field_scope :guid
     #
-    #     # Custom parser that converts the value to an integer
+    #     # With a custom scope
+    #     field_scope :guid, :custom_guid_scope
+    #
+    #     # With a custom parser that converts the value to an integer
     #     field_scope :guid, :by_guid, lambda { |value| value.to_i }
     #   end
     #
-    def field_scope(field, scope_name, parser = nil)
+    def field_scope(field, scope_name = nil, parser = nil)
+      scope_name ||= :"by_#{field}"
       searchable_fields[field] = scope_name
 
       # When no parser is defined, define one that simply returns the value
