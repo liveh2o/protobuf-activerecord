@@ -16,8 +16,6 @@ module Protoable
     #
     # Optionally, a parser can be provided that will be called, passing the
     # field value as an argument. This allows custom data parsers to be used
-    # so that they don't have to be handled by scopes. Parsers must respond
-    # to `call` and accept a single parameter.
     # so that they don't have to be handled by scopes. Parsers can be procs,
     # lambdas, or symbolized method names and must accept the value of the
     # field as a parameter.
@@ -65,7 +63,16 @@ module Protoable
     # :noapi:
     def parse_search_values(proto, field)
       value = proto.__send__(field)
-      value = searchable_field_parsers[field].call(value)
+
+      if searchable_field_parsers[field]
+        parser = searchable_field_parsers[field]
+
+        if parser.respond_to?(:to_sym)
+          value = self.__send__(parser.to_sym, value)
+        else
+          value = parser.call(value)
+        end
+      end
 
       values = [ value ].flatten
       values.map!(&:to_i) if proto.get_field_by_name(field).enum?
