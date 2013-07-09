@@ -78,4 +78,22 @@ describe Protoable::Scope do
       end
     end
   end
+
+  describe ".parse_search_values" do
+    it "converts single values to collections"
+
+    context "when a field parser is defined" do
+      context "and the parser responds to :to_sym" do
+        it "calls `send`, passing it the parser and value"
+      end
+
+      context "and the parser does not respond to :to_sym" do
+        it "calls the parser, passing it the value"
+      end
+    end
+
+    context "when the field is an enum" do
+      it "maps values to integers"
+    end
+  end
 end
