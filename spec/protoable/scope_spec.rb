@@ -40,9 +40,42 @@ describe Protoable::Scope do
     before { @fields = User.instance_variable_get("@_searchable_fields") }
     after { User.instance_variable_set("@_searchable_fields", @fields) }
 
-    it "stores the search scope in the searchable fields hash using the field as the key" do
-      User.field_scope :guid, :by_guid
-      User.searchable_fields[:guid].should eq :by_guid
+    context "when scope is passed in the old style" do
+      it "defines the given field as searchable using the given scope" do
+        User.field_scope :guid, :by_guid
+        User.searchable_fields[:guid].should eq :by_guid
+      end
+    end
+
+    context "when :scope is not defined" do
+      it "defines the given field as searchable using the `by_[:field]` as the scope" do
+        User.field_scope :guid
+        User.searchable_fields[:guid].should eq :by_guid
+      end
+    end
+
+    context "when :scope is defined" do
+      it "defines the given field as searchable using the given :scope" do
+        User.field_scope :guid, :scope => :custom_scope
+        User.searchable_fields[:guid].should eq :custom_scope
+      end
+    end
+
+    context "when :parser is not defined" do
+      it "doesn't define the given field as parseable" do
+        User.field_scope :guid
+        User.searchable_field_parsers[:guid].should eq nil
+      end
+    end
+
+    context "when :parser is defined" do
+      before { @field_parsers = User.instance_variable_get("@_searchable_field_parsers") }
+      after { User.instance_variable_set("@_searchable_field_parsers", @field_parsers) }
+
+      it "defines the given field as parseable using the given :parser" do
+        User.field_scope :guid, :parser => :parser
+        User.searchable_field_parsers[:guid].should eq :parser
+      end
     end
   end
 end

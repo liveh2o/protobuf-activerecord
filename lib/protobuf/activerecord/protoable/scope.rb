@@ -18,6 +18,15 @@ module Protoable
     # field value as an argument. This allows custom data parsers to be used
     # so that they don't have to be handled by scopes. Parsers must respond
     # to `call` and accept a single parameter.
+    # so that they don't have to be handled by scopes. Parsers can be procs,
+    # lambdas, or symbolized method names and must accept the value of the
+    # field as a parameter.
+    #
+    # > **Deprecated usage**: Previous versions required the scope to be passed
+    #   as a second argument. This has been replaced with the new hash-style
+    #   options or simply relying on the defaults. While it will still work
+    #   until v3.0 is released, it has been deprecated.
+    #
     #
     # Examples:
     #
@@ -29,18 +38,28 @@ module Protoable
     #     field_scope :guid
     #
     #     # With a custom scope
-    #     field_scope :guid, :custom_guid_scope
+    #     field_scope :guid, :scope => :custom_guid_scope
     #
     #     # With a custom parser that converts the value to an integer
-    #     field_scope :guid, :by_guid, lambda { |value| value.to_i }
+    #     field_scope :guid, :scope => :custom_guid_scope, :parser => lambda { |value| value.to_i }
     #   end
     #
-    def field_scope(field, scope_name = nil, parser = nil)
-      scope_name ||= :"by_#{field}"
+    def field_scope(field, *args)
+      # TODO: For backwards compatibility. Remove this in the next major release.
+      options = args.extract_options!
+
+      scope_name = case
+                   when args.present? then
+                     args.first
+                   when options.include?(:scope) then
+                     options[:scope]
+                   else
+                     # When no scope is defined, assume the scope is the field, prefixed with `by_`
+                     :"by_#{field}"
+                   end
       searchable_fields[field] = scope_name
 
-      # When no parser is defined, define one that simply returns the value
-      searchable_field_parsers[field] = parser || proc { |value| value }
+      searchable_field_parsers[field] = options[:parser] if options[:parser]
     end
 
     # :noapi:
