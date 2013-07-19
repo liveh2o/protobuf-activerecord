@@ -126,7 +126,7 @@ module Protoable
     def _filtered_fields(options = {})
       exclude_deprecated = ! options.fetch(:deprecated, true)
 
-      fields = self.class.protobuf_message.fields.map do |field|
+      fields = self.class.protobuf_message.all_fields.map do |field|
         next if field.nil?
         next if exclude_deprecated && field.deprecated?
         field.name.to_sym
