@@ -21,6 +21,7 @@ Gem::Specification.new do |gem|
   # Dependencies
   #
   gem.add_dependency "activerecord"
+  gem.add_dependency "activesupport"
   gem.add_dependency "heredity"
   gem.add_dependency "protobuf", ">= 2.1.3"
 
