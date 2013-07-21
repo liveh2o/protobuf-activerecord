@@ -30,6 +30,20 @@ describe Protoable::Persistence do
     end
   end
 
+  describe "#assign_attributes" do
+    let(:user) { ::User.new }
+
+    it "accepts a protobuf message" do
+      user.assign_attributes(proto)
+      user.changed?.should be_true
+    end
+
+    it "accepts a hash" do
+      user.assign_attributes(user_attributes)
+      user.changed?.should be_true
+    end
+  end
+
   describe "#update_attributes" do
     it "accepts a protobuf message" do
       User.any_instance.should_receive(:save)

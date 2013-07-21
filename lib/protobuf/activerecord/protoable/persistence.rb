@@ -34,7 +34,7 @@ module Protoable
 
     # :nodoc:
     def assign_attributes(attributes, options = {})
-      attributes = attributes_from_proto(proto) if attributes.is_a?(::Protobuf::Message)
+      attributes = attributes_from_proto(attributes) if attributes.is_a?(::Protobuf::Message)
 
       super(attributes, options)
     end
