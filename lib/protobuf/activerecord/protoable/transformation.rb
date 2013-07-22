@@ -26,7 +26,10 @@ module Protoable
       # :nodoc:
       def _filter_attribute_fields(proto)
         fields = proto.to_hash
-        fields.select! { |key, value| proto.has_field?(key) && !proto.get_field_by_name(key).repeated? }
+        fields.select! do |key, value|
+          field = proto.get_field_by_name(key) || proto.get_ext_field_by_name(key)
+          proto.has_field?(key) && !field.repeated?
+        end
 
         attribute_fields = _filtered_attributes.inject({}) do |hash, column_name|
           symbolized_column = column_name.to_sym
