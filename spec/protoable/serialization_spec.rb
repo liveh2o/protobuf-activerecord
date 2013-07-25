@@ -219,7 +219,7 @@ describe Protoable::Serialization do
         end
 
         it "converts attributes values for protobuf messages" do
-          user.should_receive(:_protobuf_convert_attributes_to_fields).any_number_of_times
+          user.stub(:_protobuf_convert_attributes_to_fields)
           user.fields_from_record
         end
       end
