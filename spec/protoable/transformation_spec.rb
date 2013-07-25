@@ -185,11 +185,13 @@ describe Protoable::Transformation do
 
   describe ".convert_int64_to_datetime" do
     let(:datetime) { DateTime.current }
-    let(:int64) { datetime.to_time.to_i }
+    let(:int64) { datetime.to_i }
 
     it "initializes a new DateTime object from the value" do
       Timecop.freeze(DateTime.current) do
-        User.convert_int64_to_datetime(int64).should eq datetime
+        expected_datetime = Time.at(datetime.to_i)
+        converted_datetime = User.convert_int64_to_datetime(int64)
+        converted_datetime.should eq expected_datetime
       end
     end
   end
