@@ -48,6 +48,7 @@ module Protoable
 
       scope_name = case
                    when args.present? then
+                     warn "WARNING: Passing scopes directly to field_scope is deprecated and will be removed in 3.0. Use :scope => xxx instead."
                      args.first
                    when options.include?(:scope) then
                      options[:scope]
