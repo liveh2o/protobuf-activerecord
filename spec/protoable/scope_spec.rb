@@ -1,6 +1,17 @@
 require 'spec_helper'
 
 describe Protoable::Scope do
+  before do
+    @field_parsers = User.instance_variable_get("@_searchable_field_parsers")
+    @fields = User.instance_variable_get("@_searchable_fields")
+  end
+
+  after do
+    User.instance_variable_set("@_searchable_field_parsers", @field_parsers)
+    User.instance_variable_set("@_searchable_fields", @fields)
+  end
+
+
   describe ".search_scope" do
     let(:request) { UserSearchMessage.new(:guid => ["foo"], :email => ["foo@test.co"]) }
 
@@ -37,9 +48,6 @@ describe Protoable::Scope do
   end
 
   describe ".field_scope" do
-    before { @fields = User.instance_variable_get("@_searchable_fields") }
-    after { User.instance_variable_set("@_searchable_fields", @fields) }
-
     context "when scope is passed in the old style" do
       it "defines the given field as searchable using the given scope" do
         User.field_scope :guid, :by_guid
@@ -69,9 +77,6 @@ describe Protoable::Scope do
     end
 
     context "when :parser is defined" do
-      before { @field_parsers = User.instance_variable_get("@_searchable_field_parsers") }
-      after { User.instance_variable_set("@_searchable_field_parsers", @field_parsers) }
-
       it "defines the given field as parseable using the given :parser" do
         User.field_scope :guid, :parser => :parser
         User.searchable_field_parsers[:guid].should eq :parser
@@ -80,20 +85,51 @@ describe Protoable::Scope do
   end
 
   describe ".parse_search_values" do
-    it "converts single values to collections"
+
+    it "converts single values to collections" do
+      proto = UserMessage.new(:email => "the.email@test.in")
+
+      User.field_scope :email
+      User.parse_search_values(proto, :email).should eq ["the.email@test.in"]
+    end
 
     context "when a field parser is defined" do
+      before { User.field_scope :guid, :parser => parser }
+
+      let(:proto) { UserSearchMessage.new(:guid => ["foo"]) }
+
       context "and the parser responds to :to_sym" do
-        it "calls `send`, passing it the parser and value"
+        let(:parser) { double('parser', :to_sym => :parser_to_sym) }
+
+        it "passes the value to the parser" do
+          User.should_receive(:parser_to_sym).with([ "foo" ])
+          User.parse_search_values(proto, :guid)
+        end
       end
 
       context "and the parser does not respond to :to_sym" do
-        it "calls the parser, passing it the value"
+        let(:parser) { double('parser') }
+
+        it "passes the value to the parser" do
+          parser.should_receive(:call).with(["foo"])
+          User.parse_search_values(proto, :guid)
+        end
       end
     end
 
     context "when the field is an enum" do
-      it "maps values to integers"
+      it "maps values to integers" do
+        TheEnum = Class.new(::Protobuf::Enum) do
+          define :VALUE, 1
+        end
+
+        TheMessage = Class.new(::Protobuf::Message) do
+          optional TheEnum, :the_enum_value, 1
+        end
+
+        proto = TheMessage.new(:the_enum_value => TheEnum::VALUE)
+        User.parse_search_values(proto, :the_enum_value)[0].should be 1
+      end
     end
   end
 end
