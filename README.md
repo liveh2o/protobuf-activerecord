@@ -202,11 +202,25 @@ class User < ActiveRecord::Base
 
   scope :by_name, lambda { |*values| where(:name => values) }
 
-  field_scope :name, :by_name
+  field_scope :name, :scope => :by_name
 end
 ```
 
-This tells Protoable that the name field should be searchable and that the scope with the given name should be used to build the search scope.
+This tells Protoable that the name field should be searchable and that the :scope with the given name should be used to build the search scope.
+
+`field_scope` can also be called with just a field name:
+
+```Ruby
+class User < ActiveRecord::Base
+  include Protoable
+
+  scope :by_name, lambda { |*values| where(:name => values) }
+
+  field_scope :name
+end
+```
+
+If no scope is given, Protoable assumes that a scope matching the given field prefixed with `by_`, in this case `by_name`.
 
 Now that your class is configured with some searchable fields, you can use the `search_scope` method to build ARel scopes from a protobuf message.
 
