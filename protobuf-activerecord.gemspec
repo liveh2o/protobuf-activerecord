@@ -23,7 +23,7 @@ Gem::Specification.new do |gem|
   gem.add_dependency "activerecord", ">= 4.0.0"
   gem.add_dependency "activesupport", ">= 4.0.0"
   gem.add_dependency "heredity"
-  gem.add_dependency "protobuf", ">= 2.1.3"
+  gem.add_dependency "protobuf", ">= 2.2.0"
 
   ##
   # Development dependencies
