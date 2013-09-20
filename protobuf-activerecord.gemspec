@@ -29,7 +29,6 @@ Gem::Specification.new do |gem|
   # Development dependencies
   #
   gem.add_development_dependency "rake"
-  gem.add_development_dependency "geminabox"
   gem.add_development_dependency "rspec"
   gem.add_development_dependency "rspec-pride"
   gem.add_development_dependency "pry-nav"
