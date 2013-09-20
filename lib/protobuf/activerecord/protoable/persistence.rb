@@ -8,49 +8,49 @@ module Protoable
         # message as it's attributes. Need to do it in class_eval block since initialize
         # is defined in ActiveRecord::Base.
         # :noapi:
-        def initialize(*args)
+        def initialize(*args, &block)
           args[0] = attributes_from_proto(args.first) if args.first.is_a?(::Protobuf::Message)
 
-          super(*args)
+          super(*args, &block)
         end
       end
     end
 
     module ClassMethods
       # :nodoc:
-      def create(attributes, options = {}, &block)
+      def create(attributes = {}, &block)
         attributes = attributes_from_proto(attributes) if attributes.is_a?(::Protobuf::Message)
 
-        super(attributes, options)
+        super(attributes, &block)
       end
 
       # :nodoc:
-      def create!(attributes, options = {}, &block)
+      def create!(attributes = {}, &block)
         attributes = attributes_from_proto(attributes) if attributes.is_a?(::Protobuf::Message)
 
-        super(attributes, options)
+        super(attributes, &block)
       end
     end
 
     # :nodoc:
-    def assign_attributes(attributes, options = {})
+    def assign_attributes(attributes)
       attributes = attributes_from_proto(attributes) if attributes.is_a?(::Protobuf::Message)
 
-      super(attributes, options)
+      super(attributes)
     end
 
     # :nodoc:
-    def update_attributes(attributes, options = {})
+    def update_attributes(attributes)
       attributes = attributes_from_proto(attributes) if attributes.is_a?(::Protobuf::Message)
 
-      super(attributes, options)
+      super(attributes)
     end
 
     # :nodoc:
-    def update_attributes!(attributes, options = {})
+    def update_attributes!(attributes)
       attributes = attributes_from_proto(attributes) if attributes.is_a?(::Protobuf::Message)
 
-      super(attributes, options)
+      super(attributes)
     end
   end
 end
