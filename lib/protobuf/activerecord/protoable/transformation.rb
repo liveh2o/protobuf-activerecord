@@ -52,9 +52,13 @@ module Protoable
       #
       # :nodoc:
       def _filtered_attributes
-        return accessible_attributes.to_a if accessible_attributes.present?
+        return self.attribute_names unless defined?(ActiveModel::MassAssignmentSecurity)
 
-        return self.attribute_names - protected_attributes.to_a
+        if accessible_attributes.present?
+          accessible_attributes.to_a
+        else
+          self.attribute_names - protected_attributes.to_a
+        end
       end
 
       # :nodoc:
