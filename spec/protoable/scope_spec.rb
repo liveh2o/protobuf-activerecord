@@ -48,13 +48,6 @@ describe Protoable::Scope do
   end
 
   describe ".field_scope" do
-    context "when scope is passed in the old style" do
-      it "defines the given field as searchable using the given scope" do
-        User.field_scope :guid, :by_guid
-        User.searchable_fields[:guid].should eq :by_guid
-      end
-    end
-
     context "when :scope is not defined" do
       it "defines the given field as searchable using the `by_[:field]` as the scope" do
         User.field_scope :guid

@@ -20,12 +20,6 @@ module Protoable
     # lambdas, or symbolized method names and must accept the value of the
     # field as a parameter.
     #
-    # > **Deprecated usage**: Previous versions required the scope to be passed
-    #   as a second argument. This has been replaced with the new hash-style
-    #   options or simply relying on the defaults. While it will still work
-    #   until v3.0 is released, it has been deprecated.
-    #
-    #
     # Examples:
     #
     #   class User < ActiveRecord::Base
@@ -42,15 +36,8 @@ module Protoable
     #     field_scope :guid, :scope => :custom_guid_scope, :parser => lambda { |value| value.to_i }
     #   end
     #
-    def field_scope(field, *args)
-      # TODO: For backwards compatibility. Remove this in the next major release.
-      options = args.extract_options!
-
-      scope_name = case
-                   when args.present? then
-                     warn "WARNING: Passing scopes directly to field_scope is deprecated and will be removed in 3.0. Use :scope => xxx instead."
-                     args.first
-                   when options.include?(:scope) then
+    def field_scope(field, options = {})
+      scope_name = if options.include?(:scope)
                      options[:scope]
                    else
                      # When no scope is defined, assume the scope is the field, prefixed with `by_`
