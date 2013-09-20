@@ -79,7 +79,7 @@ module Protoable
     #   User.scope_from_proto(request)
     #
     def search_scope(proto)
-      relation = scoped # Get an ARel relation to build off of
+      relation = all # Get an ARel relation to build off of
 
       searchable_fields.each do |field, scope_name|
         next unless proto.respond_to_and_has_and_present?(field)
