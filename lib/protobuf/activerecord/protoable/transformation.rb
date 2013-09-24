@@ -45,20 +45,11 @@ module Protoable
         attribute_fields
       end
 
-      # Filters protected attributes from the available attributes list. When
-      # set through accessible attributes, returns the accessible attributes.
-      # When set through protected attributes, returns the attributes minus any
-      # protected attributes.
+      # Overidden by mass assignment security when protected attributes is loaded.
       #
       # :nodoc:
       def _filtered_attributes
-        return self.attribute_names unless defined?(ActiveModel::MassAssignmentSecurity)
-
-        if accessible_attributes.present?
-          accessible_attributes.to_a
-        else
-          self.attribute_names - protected_attributes.to_a
-        end
+        return self.attribute_names
       end
 
       # :nodoc:
