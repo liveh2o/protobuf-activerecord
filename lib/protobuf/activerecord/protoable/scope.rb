@@ -51,6 +51,13 @@ module Protoable
         searchable_field_parsers[field] = options[:parser] if options[:parser]
       end
 
+      # Get an ARel relation to build off of. If we respond to `load`, we're in
+      # Rails 4 and need to use `all` instead of `scoped`.
+      # :noapi:
+      def model_scope
+        respond_to?(:load) ? all : scoped
+      end
+
       # :noapi:
       def parse_search_values(proto, field)
         value = proto.__send__(field)
@@ -82,9 +89,7 @@ module Protoable
       #   User.scope_from_proto(request)
       #
       def search_scope(proto)
-        # Get an ARel relation to build off of. If we respond to `load`, we're in
-        # Rails 4 and need to use `all` instead of `scoped`.
-        search_relation = respond_to?(:load) ? all : scoped
+        search_relation = model_scope
 
         searchable_fields.each do |field, scope_name|
           next unless proto.respond_to_and_has_and_present?(field)
