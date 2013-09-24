@@ -79,7 +79,9 @@ module Protoable
     #   User.scope_from_proto(request)
     #
     def search_scope(proto)
-      relation = all # Get an ARel relation to build off of
+      # Get an ARel relation to build off of. If we respond to `load`, we're in
+      # Rails 4 and need to use `all` instead of `scoped`.
+      search_relation = respond_to?(:load) ? all : scoped
 
       searchable_fields.each do |field, scope_name|
         next unless proto.respond_to_and_has_and_present?(field)
@@ -89,10 +91,10 @@ module Protoable
         end
 
         search_values = parse_search_values(proto, field)
-        relation = relation.__send__(scope_name, *search_values)
+        search_relation = search_relation.__send__(scope_name, *search_values)
       end
 
-      return relation
+      return searchrelation
     end
 
     # :noapi:
