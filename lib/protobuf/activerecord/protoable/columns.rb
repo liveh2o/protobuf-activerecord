@@ -1,27 +1,34 @@
 require 'active_support/concern'
-require 'heredity/inheritable_class_instance_variables'
 
 module Protoable
   module Columns
     extend ::ActiveSupport::Concern
 
     included do
-      include ::Heredity::InheritableClassInstanceVariables
+      include ::Heredity
 
-      class << self
-        attr_accessor :_protobuf_columns, :_protobuf_column_types
-      end
+      attr_accessor :_protobuf_columns,
+                    :_protobuf_column_types,
+                    :_protobuf_mapped_columns
 
-      @_protobuf_columns = {}
-      @_protobuf_column_types = Hash.new { |h,k| h[k] = [] }
-
-      # NOTE: Make sure each inherited object has the database layout
-      inheritable_attributes :_protobuf_columns, :_protobuf_column_types
-
-      _protobuf_map_columns
+      inheritable_attributes :_protobuf_columns,
+                             :_protobuf_column_types,
+                             :_protobuf_mapped_columns
     end
 
     module ClassMethods
+      def _protobuf_columns
+        _protobuf_map_columns unless _protobuf_mapped_columns?
+
+        @_protobuf_columns
+      end
+
+      def _protobuf_column_types
+        _protobuf_map_columns unless _protobuf_mapped_columns?
+
+        @_protobuf_column_types
+      end
+
       # :nodoc:
       def _protobuf_date_column?(key)
         _protobuf_column_types.fetch(:date, false) && _protobuf_column_types[:date].include?(key)
@@ -36,10 +43,23 @@ module Protoable
       # :nodoc:
       def _protobuf_map_columns
         return unless table_exists?
+
+        protobuf_columns = {}
+        protobuf_column_types = Hash.new { |h,k| h[k] = [] }
+
         columns.map do |column|
-          _protobuf_columns[column.name.to_sym] = column
-          _protobuf_column_types[column.type.to_sym] << column.name.to_sym
+          protobuf_columns[column.name.to_sym] = column
+          protobuf_column_types[column.type.to_sym] << column.name.to_sym
         end
+
+        self._protobuf_columns = protobuf_columns
+        self._protobuf_column_types = protobuf_column_types
+
+        self._protobuf_mapped_columns = true
+      end
+
+      def _protobuf_mapped_columns?
+        _protobuf_mapped_columns
       end
 
       # :nodoc:
