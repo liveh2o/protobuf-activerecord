@@ -24,7 +24,7 @@ describe Protoable::Transformation do
     end
   end
   
-  describe "._protobuf_convert_fields_to_columns" do
+  describe "._protobuf_convert_fields_to_attributes" do
     context "when the given field's corresponding column type is :date" do
       let(:date) { Date.current }
       let(:value) { date.to_time.to_i }
@@ -32,7 +32,7 @@ describe Protoable::Transformation do
       before { User.stub(:_protobuf_date_column?).and_return(true) }
 
       it "converts the given value to a Date object" do
-        User._protobuf_convert_fields_to_columns(:foo_date, value).should eq date
+        User._protobuf_convert_fields_to_attributes(:foo_date, value).should eq date
       end
     end
 
@@ -43,11 +43,11 @@ describe Protoable::Transformation do
       before { User.stub(:_protobuf_datetime_column?).and_return(true) }
 
       it "converts the given value to a DateTime object" do
-        User._protobuf_convert_fields_to_columns(:foo_datetime, value).should be_a(DateTime)
+        User._protobuf_convert_fields_to_attributes(:foo_datetime, value).should be_a(DateTime)
       end
 
       it "converts the given value to a DateTime object of the same value" do
-        User._protobuf_convert_fields_to_columns(:foo_datetime, value).should be_within(1).of(datetime)
+        User._protobuf_convert_fields_to_attributes(:foo_datetime, value).should be_within(1).of(datetime)
       end
     end
 
@@ -58,11 +58,11 @@ describe Protoable::Transformation do
       before { User.stub(:_protobuf_time_column?).and_return(true) }
 
       it "converts the given value to a Time object" do
-        User._protobuf_convert_fields_to_columns(:foo_time, value).should be_a(Time)
+        User._protobuf_convert_fields_to_attributes(:foo_time, value).should be_a(Time)
       end
 
       it "converts the given value to a Time object of the same value" do
-        User._protobuf_convert_fields_to_columns(:foo_time, value).should be_within(1).of(time)
+        User._protobuf_convert_fields_to_attributes(:foo_time, value).should be_within(1).of(time)
       end
     end
 
@@ -73,11 +73,11 @@ describe Protoable::Transformation do
       before { User.stub(:_protobuf_timestamp_column?).and_return(true) }
 
       it "converts the given value to a Time object" do
-        User._protobuf_convert_fields_to_columns(:foo_time, value).should be_a(Time)
+        User._protobuf_convert_fields_to_attributes(:foo_time, value).should be_a(Time)
       end
 
       it "converts the given value to a Time object of the same value" do
-        User._protobuf_convert_fields_to_columns(:foo_timestamp, value).should be_within(1).of(time)
+        User._protobuf_convert_fields_to_attributes(:foo_timestamp, value).should be_within(1).of(time)
       end
     end
 
@@ -85,7 +85,7 @@ describe Protoable::Transformation do
       let(:value) { "Foo" }
 
       it "returns the given value" do
-        User._protobuf_convert_fields_to_columns(:foo, value).should eq value
+        User._protobuf_convert_fields_to_attributes(:foo, value).should eq value
       end
     end
   end
@@ -128,7 +128,7 @@ describe Protoable::Transformation do
 
     context "when a transformer is not defined for the attribute" do
       before {
-        User.stub(:_protobuf_convert_fields_to_columns) do |key, value|
+        User.stub(:_protobuf_convert_fields_to_attributes) do |key, value|
           value
         end
       }

@@ -53,7 +53,7 @@ module Protoable
       end
 
       # :nodoc:
-      def _protobuf_convert_fields_to_columns(key, value)
+      def _protobuf_convert_fields_to_attributes(key, value)
         return value if value.nil?
 
         value = case
@@ -119,7 +119,7 @@ module Protoable
             attribute = _protobuf_attribute_transformers[key].call(proto)
             hash[key] = attribute unless attribute.nil?
           else
-            hash[key] = _protobuf_convert_fields_to_columns(key, value)
+            hash[key] = _protobuf_convert_fields_to_attributes(key, value)
           end
 
           hash
