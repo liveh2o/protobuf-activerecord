@@ -7,10 +7,6 @@ module Protoable
     included do
       include ::Heredity
 
-      attr_accessor :_protobuf_columns,
-                    :_protobuf_column_types,
-                    :_protobuf_mapped_columns
-
       inheritable_attributes :_protobuf_columns,
                              :_protobuf_column_types,
                              :_protobuf_mapped_columns
@@ -41,25 +37,25 @@ module Protoable
 
       # Map out the columns for future reference on type conversion
       # :nodoc:
-      def _protobuf_map_columns
+      def _protobuf_map_columns(force = false)
         return unless table_exists?
 
-        protobuf_columns = {}
-        protobuf_column_types = Hash.new { |h,k| h[k] = [] }
+        @_protobuf_mapped_columns = false if force
+        return if _protobuf_mapped_columns?
+
+        @_protobuf_columns = {}
+        @_protobuf_column_types = Hash.new { |h,k| h[k] = [] }
 
         columns.map do |column|
-          protobuf_columns[column.name.to_sym] = column
-          protobuf_column_types[column.type.to_sym] << column.name.to_sym
+          @_protobuf_columns[column.name.to_sym] = column
+          @_protobuf_column_types[column.type.to_sym] << column.name.to_sym
         end
 
-        self._protobuf_columns = protobuf_columns
-        self._protobuf_column_types = protobuf_column_types
-
-        self._protobuf_mapped_columns = true
+        @_protobuf_mapped_columns = true
       end
 
       def _protobuf_mapped_columns?
-        _protobuf_mapped_columns
+        @_protobuf_mapped_columns
       end
 
       # :nodoc:
