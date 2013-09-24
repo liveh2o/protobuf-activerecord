@@ -1,5 +1,4 @@
 module Protoable
-
   # = Protoable errors
   #
   # Generic Protoable exception class

@@ -1,3 +1,5 @@
+require 'active_support/concern'
+
 module Protoable
   module Validations
     extend ::ActiveSupport::Concern

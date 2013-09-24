@@ -1,22 +1,26 @@
+require 'active_support/concern'
 require 'heredity/inheritable_class_instance_variables'
 
 module Protoable
   module Serialization
-    def self.included(klass)
-      klass.extend Protoable::Serialization::ClassMethods
-      klass.__send__(:include, ::Heredity::InheritableClassInstanceVariables)
+    extend ::ActiveSupport::Concern
 
-      klass.class_eval do
-        class << self
-          attr_accessor :_protobuf_field_transformers, :_protobuf_field_options
-        end
+    included do
+      include ::Heredity::InheritableClassInstanceVariables
 
-        @_protobuf_field_transformers = {}
-        @_protobuf_field_options = {}
-
-        inheritable_attributes :_protobuf_field_transformers, :_protobuf_field_options,
-          :protobuf_message
+      class << self
+        attr_accessor :_protobuf_field_transformers, :_protobuf_field_options
       end
+
+      @_protobuf_field_transformers = {}
+      @_protobuf_field_options = {}
+
+      inheritable_attributes :_protobuf_field_transformers,
+                             :_protobuf_field_options,
+                             :protobuf_message
+
+      private :_protobuf_convert_attributes_to_fields
+      private :_protobuf_field_transformers
     end
 
     module ClassMethods
@@ -174,8 +178,6 @@ module Protoable
 
       field_attributes
     end
-
-  private
 
     # :nodoc:
     def _protobuf_convert_attributes_to_fields(field, value)

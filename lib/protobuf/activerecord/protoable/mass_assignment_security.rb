@@ -1,3 +1,4 @@
+require 'active_support/concern'
 require 'protobuf/activerecord/protoable/mass_assignment_security/persistence'
 require 'protobuf/activerecord/protoable/mass_assignment_security/transformation'
 

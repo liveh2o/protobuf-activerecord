@@ -1,34 +1,24 @@
+require 'active_support/concern'
 require 'heredity/inheritable_class_instance_variables'
 
 module Protoable
   module Columns
-    def self.included(klass)
-      klass.extend Protoable::Columns::ClassMethods
-      klass.__send__(:include, ::Heredity::InheritableClassInstanceVariables)
+    extend ::ActiveSupport::Concern
 
-      klass.class_eval do
-        class << self
-          attr_accessor :_protobuf_columns, :_protobuf_column_types
-        end
+    included do
+      include ::Heredity::InheritableClassInstanceVariables
 
-        @_protobuf_columns = {}
-        @_protobuf_column_types = Hash.new { |h,k| h[k] = [] }
-
-        # NOTE: Make sure each inherited object has the database layout
-        inheritable_attributes :_protobuf_columns, :_protobuf_column_types
+      class << self
+        attr_accessor :_protobuf_columns, :_protobuf_column_types
       end
 
-      _protobuf_map_columns(klass)
-    end
+      @_protobuf_columns = {}
+      @_protobuf_column_types = Hash.new { |h,k| h[k] = [] }
 
-    # Map out the columns for future reference on type conversion
-    #
-    def self._protobuf_map_columns(klass)
-      return unless klass.table_exists?
-      klass.columns.map do |column|
-        klass._protobuf_columns[column.name.to_sym] = column
-        klass._protobuf_column_types[column.type.to_sym] << column.name.to_sym
-      end
+      # NOTE: Make sure each inherited object has the database layout
+      inheritable_attributes :_protobuf_columns, :_protobuf_column_types
+
+      _protobuf_map_columns
     end
 
     module ClassMethods
@@ -40,6 +30,16 @@ module Protoable
       # :nodoc:
       def _protobuf_datetime_column?(key)
         _protobuf_column_types.fetch(:datetime, false) && _protobuf_column_types[:datetime].include?(key)
+      end
+
+      # Map out the columns for future reference on type conversion
+      # :nodoc:
+      def _protobuf_map_columns
+        return unless table_exists?
+        columns.map do |column|
+          _protobuf_columns[column.name.to_sym] = column
+          _protobuf_column_types[column.type.to_sym] << column.name.to_sym
+        end
       end
 
       # :nodoc:

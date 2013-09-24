@@ -11,11 +11,10 @@ module Protoable
   extend ::ActiveSupport::Concern
 
   included do
-    extend Protoable::Scope
-
     include Protoable::Columns
     include Protoable::Serialization
     include Protoable::Persistence
+    include Protoable::Scope
     include Protoable::Transformation
     include Protoable::Validations
 

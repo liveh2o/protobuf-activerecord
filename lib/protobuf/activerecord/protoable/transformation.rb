@@ -1,20 +1,20 @@
+require 'active_support/concern'
 require 'heredity/inheritable_class_instance_variables'
 
 module Protoable
   module Transformation
-    def self.included(klass)
-      klass.extend Protoable::Transformation::ClassMethods
-      klass.__send__(:include, ::Heredity::InheritableClassInstanceVariables)
+    extend ::ActiveSupport::Concern
 
-      klass.class_eval do
-        class << self
-          attr_accessor :_protobuf_attribute_transformers
-        end
+    included do
+      include ::Heredity::InheritableClassInstanceVariables
 
-        @_protobuf_attribute_transformers = {}
-
-        inheritable_attributes :_protobuf_attribute_transformers
+      class << self
+        attr_accessor :_protobuf_attribute_transformers
       end
+
+      @_protobuf_attribute_transformers = {}
+
+      inheritable_attributes :_protobuf_attribute_transformers
     end
 
     module ClassMethods
