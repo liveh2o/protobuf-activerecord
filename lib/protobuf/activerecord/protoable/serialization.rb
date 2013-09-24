@@ -6,7 +6,7 @@ module Protoable
     extend ::ActiveSupport::Concern
 
     included do
-      include ::Heredity::InheritableClassInstanceVariables
+      include ::Heredity
 
       class << self
         attr_accessor :_protobuf_field_transformers, :_protobuf_field_options
