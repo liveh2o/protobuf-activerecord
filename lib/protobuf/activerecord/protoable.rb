@@ -22,4 +22,14 @@ module Protoable
       include Protoable::MassAssignmentSecurity
     end
   end
+
+  module ActiveRecordLoadHooks
+    def inherited(klass)
+      super
+
+      klass.class_eval do
+        include ::Protoable
+      end
+    end
+  end
 end
