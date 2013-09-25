@@ -1,5 +1,5 @@
 class User < ActiveRecord::Base
-  include Protoable
+  include Protobuf::ActiveRecord::Model
 
   scope :by_guid, lambda { |*guids| where(:guid => guids) }
   scope :by_email, lambda { |*emails| where(:email => emails) }

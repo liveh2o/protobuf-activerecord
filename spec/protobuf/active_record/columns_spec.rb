@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-describe Protoable::Columns do
+describe Protobuf::ActiveRecord::Columns do
   describe "._protobuf_map_columns" do
     context "when the class has a table" do
       let(:expected_column_names) {
@@ -27,7 +27,7 @@ describe Protoable::Columns do
       end
     end
   end
-  
+
   context "column type predicates" do
     before { User.stub(:_protobuf_column_types).and_return(Hash.new) }
     after { User.unstub(:_protobuf_column_types) }

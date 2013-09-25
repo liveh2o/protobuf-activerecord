@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-describe Protoable::Serialization do
+describe Protobuf::ActiveRecord::Serialization do
   let(:protobuf_message) { UserMessage }
 
   describe "._protobuf_convert_attributes_to_fields" do
@@ -71,7 +71,7 @@ describe Protoable::Serialization do
 
     context "when the given converter is not callable" do
       it "raises an exception" do
-        expect { User.field_from_record :name, nil }.to raise_exception(Protoable::FieldTransformerError)
+        expect { User.field_from_record :name, nil }.to raise_exception(Protobuf::ActiveRecord::FieldTransformerError)
       end
     end
 

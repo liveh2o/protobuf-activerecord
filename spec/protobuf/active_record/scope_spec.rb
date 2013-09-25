@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-describe Protoable::Scope do
+describe Protobuf::ActiveRecord::Scope do
   before do
     @field_parsers = User.instance_variable_get("@_searchable_field_parsers")
     @fields = User.instance_variable_get("@_searchable_fields")

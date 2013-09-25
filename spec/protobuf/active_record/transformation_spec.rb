@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-describe Protoable::Transformation do
+describe Protobuf::ActiveRecord::Transformation do
   let(:user) { User.new(user_attributes) }
   let(:user_attributes) { { :first_name => 'foo', :last_name => 'bar', :email => 'foo@test.co' } }
   let(:proto_hash) { { :name => 'foo bar', :email => 'foo@test.co' } }
@@ -154,7 +154,7 @@ describe Protoable::Transformation do
 
     context "when the given transformer is not callable" do
       it "raises an exception" do
-        expect { User.attribute_from_proto :name, nil }.to raise_exception(Protoable::AttributeTransformerError)
+        expect { User.attribute_from_proto :name, nil }.to raise_exception(Protobuf::ActiveRecord::AttributeTransformerError)
       end
     end
 
