@@ -1,5 +1,5 @@
-require 'active_support/concern'
-require 'heredity/inheritable_class_instance_variables'
+'active_support/concerns'
+'heredity'
 
 module Protoable
   module Serialization
