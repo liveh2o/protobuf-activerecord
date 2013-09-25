@@ -1,3 +1,4 @@
+require 'protobuf/active_record/attribute_methods'
 require 'protobuf/active_record/columns'
 require 'protobuf/active_record/errors'
 require 'protobuf/active_record/mass_assignment_security'
@@ -13,6 +14,7 @@ module Protobuf
       extend ::ActiveSupport::Concern
 
       included do
+        include Protobuf::ActiveRecord::AttributeMethods
         include Protobuf::ActiveRecord::Columns
         include Protobuf::ActiveRecord::Serialization
         include Protobuf::ActiveRecord::Persistence
