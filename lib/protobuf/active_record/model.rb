@@ -17,13 +17,14 @@ module Protobuf
         include Protobuf::ActiveRecord::AttributeMethods
         include Protobuf::ActiveRecord::Columns
         include Protobuf::ActiveRecord::Serialization
-        include Protobuf::ActiveRecord::Persistence
         include Protobuf::ActiveRecord::Scope
         include Protobuf::ActiveRecord::Transformation
         include Protobuf::ActiveRecord::Validations
 
-        if defined?(::ActiveRecord::MassAssignmentSecurity)
+        if defined?(::ActiveModel::MassAssignmentSecurity)
           include Protobuf::ActiveRecord::MassAssignmentSecurity
+        else
+          include Protobuf::ActiveRecord::Persistence
         end
       end
     end
