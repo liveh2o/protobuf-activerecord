@@ -10,18 +10,19 @@ module Protobuf
         include ::Heredity
 
         class << self
-          attr_accessor :_protobuf_field_transformers, :_protobuf_field_options
+          attr_accessor :_protobuf_field_transformers, :protobuf_field_options
         end
 
         @_protobuf_field_transformers = {}
-        @_protobuf_field_options = {}
+        @protobuf_field_options = {}
 
         inheritable_attributes :_protobuf_field_transformers,
-                               :_protobuf_field_options,
+                               :protobuf_field_options,
                                :protobuf_message
 
         private :_protobuf_convert_attributes_to_fields
         private :_protobuf_field_transformers
+        private :_protobuf_message
       end
 
       module ClassMethods
@@ -104,12 +105,7 @@ module Protobuf
         def protobuf_message(message = nil, options = {})
           unless message.nil?
             @protobuf_message = message.to_s.classify.constantize
-
-            self._protobuf_field_options = options
-
-            define_method(:to_proto) do |options = {}|
-              self.class.protobuf_message.new(self.fields_from_record(options))
-            end
+            self.protobuf_field_options = options
           end
 
           @protobuf_message
@@ -147,7 +143,7 @@ module Protobuf
         options[:only] ||= [] if options.fetch(:except, false)
         options[:except] ||= [] if options.fetch(:only, false)
 
-        self.class._protobuf_field_options.merge(options)
+        self.class.protobuf_field_options.merge(options)
       end
 
       # Extracts attributes that correspond to fields on the specified protobuf
@@ -188,6 +184,19 @@ module Protobuf
       # :nodoc:
       def _protobuf_field_transformers
         self.class._protobuf_field_transformers
+      end
+
+      # :nodoc:
+      def _protobuf_message
+        self.class.protobuf_message
+      end
+
+      # :nodoc:
+      def to_proto(options = {})
+        raise MessageNotDefined.new(self.class) if _protobuf_message.nil?
+
+        fields = self.fields_from_record(options)
+        _protobuf_message.new(fields)
       end
     end
   end

@@ -16,6 +16,19 @@ module Protobuf
     class FieldTransformerError < ProtobufActiveRecordError
     end
 
+    # Raised by `to_proto` when no protobuf message is defined.
+    class MessageNotDefined < ProtobufActiveRecordError
+      attr_reader :class_name
+
+      def initialize(klass)
+        @class_name = klass.name
+      end
+
+      def message
+        "#{class_name} does not define a protobuf message"
+      end
+    end
+
     # Raised by `field_scope` when given scope is not defined.
     class SearchScopeError < ProtobufActiveRecordError
     end

@@ -1,5 +1,10 @@
 require 'spec_helper'
 
+# Used to test calling #to_proto when no protobuf message is configured.
+class UnconfiguredUser
+  include Protobuf::ActiveRecord::Model
+end
+
 describe Protobuf::ActiveRecord::Serialization do
   let(:protobuf_message) { UserMessage }
 
@@ -103,7 +108,7 @@ describe Protobuf::ActiveRecord::Serialization do
 
     context "given options" do
       it "merges them with protobuf field options" do
-        User._protobuf_field_options.should eq options
+        User.protobuf_field_options.should eq options
       end
     end
 
@@ -233,13 +238,23 @@ describe Protobuf::ActiveRecord::Serialization do
     end
 
     describe "#to_proto" do
-      let(:proto) { protobuf_message.new(proto_hash) }
-      let(:proto_hash) { { :name => "foo" } }
+      context "when a protobuf message is configured" do
+        let(:proto) { protobuf_message.new(proto_hash) }
+        let(:proto_hash) { { :name => "foo" } }
 
-      before { user.stub(:fields_from_record).and_return(proto_hash) }
+        before { user.stub(:fields_from_record).and_return(proto_hash) }
 
-      it "intializes a new protobuf message with attributes from #to_proto_hash" do
-        user.to_proto.should eq proto
+        it "intializes a new protobuf message with attributes from #to_proto_hash" do
+          user.to_proto.should eq proto
+        end
+      end
+
+      context "when a protobuf message is not configured" do
+        let(:user) { UnconfiguredUser.new }
+
+        it "raises an exception" do
+          expect { user.to_proto }.to raise_exception(Protobuf::ActiveRecord::MessageNotDefined)
+        end
       end
     end
   end
