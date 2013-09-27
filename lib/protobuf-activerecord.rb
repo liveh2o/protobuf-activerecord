@@ -7,8 +7,6 @@ require 'protobuf/active_record/config'
 require 'protobuf/active_record/model'
 require 'protobuf/active_record/version'
 
-require 'protobuf/active_record/railtie' if defined?(Rails)
-
 module Protobuf
   module ActiveRecord
     module LoadHooks
@@ -29,3 +27,5 @@ module Protobuf
     config
   end
 end
+
+require 'protobuf/active_record/railtie' if defined?(Rails)
