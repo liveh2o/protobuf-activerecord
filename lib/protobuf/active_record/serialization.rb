@@ -73,7 +73,7 @@ module Protobuf
           end
 
           unless callable.respond_to?(:call)
-            raise FieldTransformerError, 'Attribute transformers need a callable or block!'
+            raise FieldTransformerError
           end
 
           _protobuf_field_transformers[field.to_sym] = callable

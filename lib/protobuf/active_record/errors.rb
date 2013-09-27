@@ -9,11 +9,17 @@ module Protobuf
     # Raised by `attribute_from_proto` when the transformer method
     # given is not callable.
     class AttributeTransformerError < ProtobufActiveRecordError
+      def message
+        "Attribute transformers must be called with a callable or block!"
+      end
     end
 
     # Raised by `field_from_record` when the convert method
     # given not callable.
     class FieldTransformerError < ProtobufActiveRecordError
+      def message
+        "Field transformers must be called with a callable or block!"
+      end
     end
 
     # Raised by `to_proto` when no protobuf message is defined.
