@@ -108,7 +108,7 @@ describe Protobuf::ActiveRecord::Serialization do
 
     context "given options" do
       it "merges them with protobuf field options" do
-        User.protobuf_field_options.should eq options
+        User._protobuf_field_options.should eq options
       end
     end
 

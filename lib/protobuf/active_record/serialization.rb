@@ -9,16 +9,12 @@ module Protobuf
       included do
         include ::Heredity
 
-        class << self
-          attr_accessor :_protobuf_field_transformers, :protobuf_field_options
-        end
+        inheritable_attributes :_protobuf_field_transformers,
+                               :_protobuf_field_options,
+                               :protobuf_message
 
         @_protobuf_field_transformers = {}
-        @protobuf_field_options = {}
-
-        inheritable_attributes :_protobuf_field_transformers,
-                               :protobuf_field_options,
-                               :protobuf_message
+        @_protobuf_field_options = {}
 
         private :_protobuf_convert_attributes_to_fields
         private :_protobuf_field_transformers
@@ -79,6 +75,27 @@ module Protobuf
           _protobuf_field_transformers[field.to_sym] = callable
         end
 
+        # Define the protobuf fields that will be automatically serialized (by default,
+        # all fields will be serialized). Accepts any number of field names and is
+        # equivalent to passing the :only option to `protobuf_message`.
+        #
+        # If :except is specified, all fields except the specified fields will be serialized.
+        #
+        # By default, deprecated fields will be serialized. To exclude deprecated
+        # fields, pass :deprecated => false in the options hash.
+        #
+        # Examples:
+        #   protobuf_fields :guid, :name
+        #   protobuf_fields :except => :email_domain
+        #   protobuf_fields :except => :email_domain, :deprecated => false
+        #
+        def protobuf_fields(*fields)
+          options = fields.extract_options!
+          options[:only] = fields
+
+          self._protobuf_field_options = options
+        end
+
         # Define the protobuf message class that should be used to serialize the
         # object to protobuf. Accepts a string or symbol and an options hash.
         #
@@ -105,7 +122,7 @@ module Protobuf
         def protobuf_message(message = nil, options = {})
           unless message.nil?
             @protobuf_message = message.to_s.classify.constantize
-            self.protobuf_field_options = options
+            self._protobuf_field_options = options
           end
 
           @protobuf_message
@@ -143,7 +160,7 @@ module Protobuf
         options[:only] ||= [] if options.fetch(:except, false)
         options[:except] ||= [] if options.fetch(:only, false)
 
-        self.class.protobuf_field_options.merge(options)
+        self.class._protobuf_field_options.merge(options)
       end
 
       # Extracts attributes that correspond to fields on the specified protobuf
