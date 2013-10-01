@@ -9,16 +9,6 @@ require 'protobuf/active_record/version'
 
 module Protobuf
   module ActiveRecord
-    module LoadHooks
-      def inherited(klass)
-        super
-
-        klass.class_eval do
-          include Protobuf::ActiveRecord::Model
-        end
-      end
-    end
-
     def self.config
       @config ||= Protobuf::ActiveRecord::Config.new
     end

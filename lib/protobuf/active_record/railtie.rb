@@ -4,7 +4,11 @@ module Protobuf
       config.protobuf_active_record = Protobuf::ActiveRecord.config
 
       ActiveSupport.on_load(:active_record) do
-        extend Protobuf::ActiveRecord::LoadHooks if Protobuf::ActiveRecord.config.autoload
+        if Protobuf::ActiveRecord.config.autoload
+          on_inherit do
+            include Protobuf::ActiveRecord::Model
+          end
+        end
       end
     end
   end
