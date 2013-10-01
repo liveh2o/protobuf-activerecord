@@ -1,5 +1,4 @@
 'active_support/concerns'
-'heredity'
 
 module Protobuf
   module ActiveRecord
@@ -7,14 +6,11 @@ module Protobuf
       extend ::ActiveSupport::Concern
 
       included do
-        include ::Heredity
-
-        inheritable_attributes :_protobuf_field_transformers,
-                               :_protobuf_field_options,
-                               :protobuf_message
-
-        @_protobuf_field_transformers = {}
-        @_protobuf_field_options = {}
+        class << self
+          attr_writer :_protobuf_field_transformers,
+                      :_protobuf_field_options,
+                      :protobuf_message
+        end
 
         private :_protobuf_convert_attributes_to_fields
         private :_protobuf_field_transformers
@@ -40,6 +36,14 @@ module Protobuf
                   end
 
           return value
+        end
+
+        def _protobuf_field_options
+          @_protobuf_field_options ||= {}
+        end
+
+        def _protobuf_field_transformers
+          @_protobuf_field_transformers ||= {}
         end
 
         # Define a field transformation from a record. Accepts a Symbol,
@@ -91,7 +95,7 @@ module Protobuf
         #
         def protobuf_fields(*fields)
           options = fields.extract_options!
-          options[:only] = fields
+          options[:only] = fields if fields.present?
 
           self._protobuf_field_options = options
         end
