@@ -32,7 +32,9 @@ module Protobuf
             proto.has_field?(key) && !field.repeated?
           end
 
-          attribute_fields = _filtered_attributes.inject({}) do |hash, column_name|
+          filtered_attributes = _filtered_attributes + _protobuf_nested_attributes
+
+          attribute_fields = filtered_attributes.inject({}) do |hash, column_name|
             symbolized_column = column_name.to_sym
 
             if fields.has_key?(symbolized_column) ||

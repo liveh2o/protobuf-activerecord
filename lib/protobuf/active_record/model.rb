@@ -2,6 +2,7 @@ require 'protobuf/active_record/attribute_methods'
 require 'protobuf/active_record/columns'
 require 'protobuf/active_record/errors'
 require 'protobuf/active_record/mass_assignment_security'
+require 'protobuf/active_record/nested_attributes'
 require 'protobuf/active_record/persistence'
 require 'protobuf/active_record/scope'
 require 'protobuf/active_record/serialization'
@@ -16,6 +17,7 @@ module Protobuf
       included do
         include Protobuf::ActiveRecord::AttributeMethods
         include Protobuf::ActiveRecord::Columns
+        include Protobuf::ActiveRecord::NestedAttributes
         include Protobuf::ActiveRecord::Serialization
         include Protobuf::ActiveRecord::Scope
         include Protobuf::ActiveRecord::Transformation
