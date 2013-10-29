@@ -33,6 +33,7 @@ module Protobuf
           end
 
           filtered_attributes = _filtered_attributes + _protobuf_nested_attributes
+          filtered_attributes += _protobuf_attribute_transformers.keys
 
           attribute_fields = filtered_attributes.inject({}) do |hash, column_name|
             symbolized_column = column_name.to_sym
