@@ -134,20 +134,20 @@ describe Protobuf::ActiveRecord::Serialization do
       context "when options has :except" do
         it "returns all except the given field(s)" do
           fields = user._filter_field_attributes(:except => :name).should
-          fields.should eq [ :guid, :email, :email_domain ]
+          fields.should eq [ :guid, :email, :email_domain, :password ]
         end
       end
     end
 
     describe "#_filtered_fields" do
       it "returns protobuf fields" do
-        user._filtered_fields.should eq [ :guid, :name, :email, :email_domain ]
+        user._filtered_fields.should eq [ :guid, :name, :email, :email_domain, :password ]
       end
 
       context "given :deprecated => false" do
         it "filters all deprecated fields" do
           fields = user._filtered_fields(:deprecated => false).should
-          fields.should eq [ :guid, :name, :email ]
+          fields.should eq [ :guid, :name, :email, :password ]
         end
       end
     end
@@ -204,7 +204,7 @@ describe Protobuf::ActiveRecord::Serialization do
       }
 
       context "when a transformer is defined for the field" do
-        let(:fields_from_record) { { :guid => user.guid, :name => user.name, :email => user.email, :email_domain => 'test.co' } }
+        let(:fields_from_record) { { :guid => user.guid, :name => user.name, :email => user.email, :email_domain => 'test.co', :password => nil } }
         let(:transformer) { { :email_domain => lambda { |record| record.email.split('@').last } } }
 
         before {
@@ -217,7 +217,7 @@ describe Protobuf::ActiveRecord::Serialization do
       end
 
       context "when a transformer is not defined for the field" do
-        let(:fields_from_record) { { :guid => user.guid, :name => user.name, :email => user.email, :email_domain => nil } }
+        let(:fields_from_record) { { :guid => user.guid, :name => user.name, :email => user.email, :email_domain => nil, :password => nil } }
 
         it "returns a hash of protobuf fields that this object has getters for" do
           user.fields_from_record.should eq fields_from_record

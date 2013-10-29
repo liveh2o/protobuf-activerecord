@@ -22,8 +22,13 @@ describe Protobuf::ActiveRecord::Transformation do
       attribute_fields = User._filter_attribute_fields(proto)
       attribute_fields.has_key?(:account_id).should be_true
     end
+
+    it "includes fields that aren't attributes, but have attribute transformers" do
+      attribute_fields = User._filter_attribute_fields(proto)
+      attribute_fields.has_key?(:password).should be_true
+    end
   end
-  
+
   describe "._protobuf_convert_fields_to_attributes" do
     context "when the given field's corresponding column type is :date" do
       let(:date) { Date.current }
@@ -171,7 +176,7 @@ describe Protobuf::ActiveRecord::Transformation do
       end
     end
   end
-  
+
   describe ".convert_int64_to_date" do
     let(:date) { Date.current }
     let(:int64) { date.to_time.to_i }
@@ -206,7 +211,7 @@ describe Protobuf::ActiveRecord::Transformation do
       end
     end
   end
-  
+
   describe "#attributes_from_proto" do
     it "gets attributes from the given protobuf message" do
       User.should_receive(:attributes_from_proto).with(proto)
