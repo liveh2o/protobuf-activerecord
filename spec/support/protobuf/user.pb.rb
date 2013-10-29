@@ -10,6 +10,7 @@ require 'protobuf/message'
 class UserMessage < ::Protobuf::Message; end
 class UserSearchMessage < ::Protobuf::Message; end
 
+
 ##
 # Message Fields
 #
@@ -18,6 +19,7 @@ class UserMessage
   optional ::Protobuf::Field::StringField, :name, 2
   optional ::Protobuf::Field::StringField, :email, 3
   optional ::Protobuf::Field::StringField, :email_domain, 4, :deprecated => true
+  optional ::Protobuf::Field::StringField, :password, 5
 end
 
 class UserSearchMessage
