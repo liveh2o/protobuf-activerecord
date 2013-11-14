@@ -52,7 +52,7 @@ describe Protobuf::ActiveRecord::Transformation do
       end
 
       it "converts the given value to a DateTime object of the same value" do
-        User._protobuf_convert_fields_to_attributes(:foo_datetime, value).should be_within(1).of(datetime)
+        User._protobuf_convert_fields_to_attributes(:foo_datetime, value).must_be_close_to datetime, 1
       end
     end
 
@@ -67,7 +67,7 @@ describe Protobuf::ActiveRecord::Transformation do
       end
 
       it "converts the given value to a Time object of the same value" do
-        User._protobuf_convert_fields_to_attributes(:foo_time, value).should be_within(1).of(time)
+        User._protobuf_convert_fields_to_attributes(:foo_time, value).must_be_close_to time, 1
       end
     end
 
@@ -82,7 +82,7 @@ describe Protobuf::ActiveRecord::Transformation do
       end
 
       it "converts the given value to a Time object of the same value" do
-        User._protobuf_convert_fields_to_attributes(:foo_timestamp, value).should be_within(1).of(time)
+        User._protobuf_convert_fields_to_attributes(:foo_timestamp, value).must_be_close_to time, 1
       end
     end
 
@@ -207,7 +207,7 @@ describe Protobuf::ActiveRecord::Transformation do
 
     it "initializes a new Time object from the value" do
       Timecop.freeze(Time.current) do
-        User.convert_int64_to_time(int64).should be_within(1).of(time)
+        User.convert_int64_to_time(int64).must_be_close_to time, 1
       end
     end
   end
