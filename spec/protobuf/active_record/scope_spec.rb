@@ -121,7 +121,7 @@ describe Protobuf::ActiveRecord::Scope do
         end
 
         proto = TheMessage.new(:the_enum_value => TheEnum::VALUE)
-        User.parse_search_values(proto, :the_enum_value)[0].should be 1
+        User.parse_search_values(proto, :the_enum_value)[0].must_equal 1
       end
     end
   end
