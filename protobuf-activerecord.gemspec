@@ -29,10 +29,10 @@ Gem::Specification.new do |gem|
   # Development dependencies
   #
   gem.add_development_dependency "rake"
-  gem.add_development_dependency "rspec"
-  gem.add_development_dependency "rspec-pride"
   gem.add_development_dependency "pry-nav"
   gem.add_development_dependency "simplecov"
   gem.add_development_dependency "sqlite3"
   gem.add_development_dependency "timecop"
+  gem.add_development_dependency "minitest"
+  gem.add_development_dependency "minitest-spec-context"
 end

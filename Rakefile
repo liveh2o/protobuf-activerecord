@@ -1,11 +1,14 @@
 require 'bundler/gem_tasks'
-require 'rspec/core/rake_task'
+require 'rake/testtask'
 
 desc "Run specs"
-RSpec::Core::RakeTask.new(:spec)
+Rake::TestTask.new do |t|
+    t.libs << "spec"
+    t.pattern = "spec/**/*_spec.rb"
+end
 
 desc "Run specs (default)"
-task :default => :spec
+task :default => :test
 
 desc "Remove protobuf definitions that have been compiled"
 task :clean do
