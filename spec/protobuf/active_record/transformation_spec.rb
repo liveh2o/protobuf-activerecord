@@ -14,7 +14,7 @@ describe Protobuf::ActiveRecord::Transformation do
 
     it "filters repeated fields" do
       attribute_fields = User._filter_attribute_fields(proto)
-      attribute_fields.has_key?(:tags).should be_false
+      attribute_fields.has_key?(:tags).must_equal false
     end
 
     it "includes attributes that aren't fields, but have attribute transformers" do

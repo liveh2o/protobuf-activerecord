@@ -43,7 +43,7 @@ describe Protobuf::ActiveRecord::Columns do
 
       context "when the column type is not :date" do
         it "is false" do
-          User._protobuf_date_column?(:bar_date).should be_false
+          User._protobuf_date_column?(:bar_date).must_equal false
         end
       end
     end
@@ -59,7 +59,7 @@ describe Protobuf::ActiveRecord::Columns do
 
       context "when the column type is not :datetime" do
         it "is false" do
-          User._protobuf_datetime_column?(:bar_datetime).should be_false
+          User._protobuf_datetime_column?(:bar_datetime).must_equal false
         end
       end
     end
@@ -75,7 +75,7 @@ describe Protobuf::ActiveRecord::Columns do
 
       context "when the column type is not :time" do
         it "is false" do
-          User._protobuf_time_column?(:bar_time).should be_false
+          User._protobuf_time_column?(:bar_time).must_equal false
         end
       end
     end
@@ -91,7 +91,7 @@ describe Protobuf::ActiveRecord::Columns do
 
       context "when the column type is not :timestamp" do
         it "is false" do
-          User._protobuf_timestamp_column?(:bar_timestamp).should be_false
+          User._protobuf_timestamp_column?(:bar_timestamp).must_equal false
         end
       end
     end
