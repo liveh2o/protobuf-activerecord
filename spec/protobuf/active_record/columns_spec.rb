@@ -30,7 +30,7 @@ describe Protobuf::ActiveRecord::Columns do
 
   context "column type predicates" do
     before { User.stubs(:_protobuf_column_types).returns(Hash.new) }
-    after { User.unstubs(:_protobuf_column_types) }
+    after { User.unstub(:_protobuf_column_types) }
 
     describe "._protobuf_date_column?" do
       before { User._protobuf_column_types[:date] = [ :foo_date ] }
