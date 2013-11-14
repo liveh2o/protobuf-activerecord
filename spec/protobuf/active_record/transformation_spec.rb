@@ -48,7 +48,7 @@ describe Protobuf::ActiveRecord::Transformation do
       before { User.stubs(:_protobuf_datetime_column?).returns(true) }
 
       it "converts the given value to a DateTime object" do
-        User._protobuf_convert_fields_to_attributes(:foo_datetime, value).should be_a(DateTime)
+        User._protobuf_convert_fields_to_attributes(:foo_datetime, value).must_be_instance_of(DateTime)
       end
 
       it "converts the given value to a DateTime object of the same value" do
@@ -63,7 +63,7 @@ describe Protobuf::ActiveRecord::Transformation do
       before { User.stubs(:_protobuf_time_column?).returns(true) }
 
       it "converts the given value to a Time object" do
-        User._protobuf_convert_fields_to_attributes(:foo_time, value).should be_a(Time)
+        User._protobuf_convert_fields_to_attributes(:foo_time, value).must_be_instance_of(Time)
       end
 
       it "converts the given value to a Time object of the same value" do
@@ -78,7 +78,7 @@ describe Protobuf::ActiveRecord::Transformation do
       before { User.stubs(:_protobuf_timestamp_column?).returns(true) }
 
       it "converts the given value to a Time object" do
-        User._protobuf_convert_fields_to_attributes(:foo_time, value).should be_a(Time)
+        User._protobuf_convert_fields_to_attributes(:foo_time, value).must_be_instance_of(Time)
       end
 
       it "converts the given value to a Time object of the same value" do
