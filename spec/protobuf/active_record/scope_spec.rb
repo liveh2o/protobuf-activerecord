@@ -92,7 +92,7 @@ describe Protobuf::ActiveRecord::Scope do
       let(:proto) { UserSearchMessage.new(:guid => ["foo"]) }
 
       context "and the parser responds to :to_sym" do
-        let(:parser) { double('parser', :to_sym => :parser_to_sym) }
+        let(:parser) { stub('parser', :to_sym => :parser_to_sym) }
 
         it "passes the value to the parser" do
           User.expects(:parser_to_sym).with([ "foo" ])
@@ -101,7 +101,7 @@ describe Protobuf::ActiveRecord::Scope do
       end
 
       context "and the parser does not respond to :to_sym" do
-        let(:parser) { double('parser') }
+        let(:parser) { stub('parser') }
 
         it "passes the value to the parser" do
           parser.expects(:call).with(["foo"])
