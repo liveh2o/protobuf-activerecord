@@ -159,7 +159,7 @@ describe Protobuf::ActiveRecord::Transformation do
 
     context "when the given transformer is not callable" do
       it "raises an exception" do
-        expect { User.attribute_from_proto :name, nil }.to raise_exception(Protobuf::ActiveRecord::AttributeTransformerError)
+        proc { User.attribute_from_proto :name, nil }.must_raise(Protobuf::ActiveRecord::AttributeTransformerError)
       end
     end
 

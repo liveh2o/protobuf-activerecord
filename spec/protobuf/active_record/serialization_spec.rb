@@ -76,7 +76,7 @@ describe Protobuf::ActiveRecord::Serialization do
 
     context "when the given converter is not callable" do
       it "raises an exception" do
-        expect { User.field_from_record :name, nil }.to raise_exception(Protobuf::ActiveRecord::FieldTransformerError)
+        proc { User.field_from_record :name, nil }.must_raise(Protobuf::ActiveRecord::FieldTransformerError)
       end
     end
 
@@ -253,7 +253,7 @@ describe Protobuf::ActiveRecord::Serialization do
         let(:user) { UnconfiguredUser.new }
 
         it "raises an exception" do
-          expect { user.to_proto }.to raise_exception(Protobuf::ActiveRecord::MessageNotDefined)
+          proc { user.to_proto }.must_raise(Protobuf::ActiveRecord::MessageNotDefined)
         end
       end
     end
