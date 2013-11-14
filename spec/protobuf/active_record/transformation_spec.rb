@@ -20,12 +20,12 @@ describe Protobuf::ActiveRecord::Transformation do
     it "includes attributes that aren't fields, but have attribute transformers" do
       User.stub(:_protobuf_attribute_transformers).and_return({ :account_id => :fetch_account_id })
       attribute_fields = User._filter_attribute_fields(proto)
-      attribute_fields.has_key?(:account_id).should be_true
+      attribute_fields.has_key?(:account_id).must_equal true
     end
 
     it "includes fields that aren't attributes, but have attribute transformers" do
       attribute_fields = User._filter_attribute_fields(proto)
-      attribute_fields.has_key?(:password).should be_true
+      attribute_fields.has_key?(:password).must_equal true
     end
   end
 

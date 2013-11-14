@@ -35,12 +35,12 @@ describe Protobuf::ActiveRecord::Persistence do
 
     it "accepts a protobuf message" do
       user.assign_attributes(proto)
-      user.changed?.should be_true
+      user.changed?.must_equal true
     end
 
     it "accepts a hash" do
       user.assign_attributes(user_attributes)
-      user.changed?.should be_true
+      user.changed?.must_equal true
     end
   end
 

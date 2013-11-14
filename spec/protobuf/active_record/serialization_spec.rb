@@ -232,7 +232,7 @@ describe Protobuf::ActiveRecord::Serialization do
       context "given options with :include" do
         it "adds the given field to the list of serialized fields" do
           fields = user.fields_from_record(:include => :token)
-          fields.include?(:token).should be_true
+          fields.include?(:token).must_equal true
         end
       end
     end

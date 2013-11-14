@@ -37,7 +37,7 @@ describe Protobuf::ActiveRecord::Columns do
 
       context "when the column type is :date" do
         it "is true" do
-          User._protobuf_date_column?(:foo_date).should be_true
+          User._protobuf_date_column?(:foo_date).must_equal true
         end
       end
 
@@ -53,7 +53,7 @@ describe Protobuf::ActiveRecord::Columns do
 
       context "when the column type is :datetime" do
         it "is true" do
-          User._protobuf_datetime_column?(:foo_datetime).should be_true
+          User._protobuf_datetime_column?(:foo_datetime).must_equal true
         end
       end
 
@@ -69,7 +69,7 @@ describe Protobuf::ActiveRecord::Columns do
 
       context "when the column type is :time" do
         it "is true" do
-          User._protobuf_time_column?(:foo_time).should be_true
+          User._protobuf_time_column?(:foo_time).must_equal true
         end
       end
 
@@ -85,7 +85,7 @@ describe Protobuf::ActiveRecord::Columns do
 
       context "when the column type is :timestamp" do
         it "is true" do
-          User._protobuf_timestamp_column?(:foo_timestamp).should be_true
+          User._protobuf_timestamp_column?(:foo_timestamp).must_equal true
         end
       end
 
