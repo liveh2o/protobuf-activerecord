@@ -9,7 +9,7 @@ describe Protobuf::ActiveRecord::Transformation do
   describe "._filter_attribute_fields" do
     it "includes fields that have values" do
       attribute_fields = User._filter_attribute_fields(proto)
-      attribute_fields[:email].should eq proto_hash[:email]
+      attribute_fields[:email].must_equal proto_hash[:email]
     end
 
     it "filters repeated fields" do
@@ -37,7 +37,7 @@ describe Protobuf::ActiveRecord::Transformation do
       before { User.stub(:_protobuf_date_column?).and_return(true) }
 
       it "converts the given value to a Date object" do
-        User._protobuf_convert_fields_to_attributes(:foo_date, value).should eq date
+        User._protobuf_convert_fields_to_attributes(:foo_date, value).must_equal date
       end
     end
 
@@ -90,7 +90,7 @@ describe Protobuf::ActiveRecord::Transformation do
       let(:value) { "Foo" }
 
       it "returns the given value" do
-        User._protobuf_convert_fields_to_attributes(:foo, value).should eq value
+        User._protobuf_convert_fields_to_attributes(:foo, value).must_equal value
       end
     end
   end
@@ -99,7 +99,7 @@ describe Protobuf::ActiveRecord::Transformation do
     context "when a transformer is defined for the attribute" do
       it "transforms the field value" do
         attribute_fields = User.attributes_from_proto(proto)
-        attribute_fields[:first_name].should eq user_attributes[:first_name]
+        attribute_fields[:first_name].must_equal user_attributes[:first_name]
       end
     end
 
@@ -113,7 +113,7 @@ describe Protobuf::ActiveRecord::Transformation do
 
       it "does not set the attribute" do
         attribute_fields = User.attributes_from_proto(proto)
-        attribute_fields.should eq user_attributes
+        attribute_fields.must_equal user_attributes
       end
     end
 
@@ -127,7 +127,7 @@ describe Protobuf::ActiveRecord::Transformation do
 
       it "sets the attribute" do
         attribute_fields = User.attributes_from_proto(proto)
-        attribute_fields.should eq user_attributes.merge(:account_id => 1)
+        attribute_fields.must_equal user_attributes.merge(:account_id => 1)
       end
     end
 
@@ -140,7 +140,7 @@ describe Protobuf::ActiveRecord::Transformation do
 
       it "converts the field value" do
         attribute_fields = User.attributes_from_proto(proto)
-        attribute_fields.should eq user_attributes
+        attribute_fields.must_equal user_attributes
       end
     end
   end
@@ -183,7 +183,7 @@ describe Protobuf::ActiveRecord::Transformation do
 
     it "initializes a new Date object from the value" do
       Timecop.freeze(Date.current) do
-        User.convert_int64_to_date(int64).should eq date
+        User.convert_int64_to_date(int64).must_equal date
       end
     end
   end
@@ -196,7 +196,7 @@ describe Protobuf::ActiveRecord::Transformation do
       Timecop.freeze(DateTime.current) do
         expected_datetime = Time.at(datetime.to_i)
         converted_datetime = User.convert_int64_to_datetime(int64)
-        converted_datetime.should eq expected_datetime
+        converted_datetime.must_equal expected_datetime
       end
     end
   end

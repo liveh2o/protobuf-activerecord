@@ -19,11 +19,11 @@ describe Protobuf::ActiveRecord::Columns do
       }
 
       it "maps columns by name" do
-        User._protobuf_columns.should eq expected_column_names
+        User._protobuf_columns.must_equal expected_column_names
       end
 
       it "maps column names by column type" do
-        User._protobuf_column_types.should eq expected_column_types
+        User._protobuf_column_types.must_equal expected_column_types
       end
     end
   end

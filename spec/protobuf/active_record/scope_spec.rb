@@ -21,11 +21,11 @@ describe Protobuf::ActiveRecord::Scope do
 
     it "builds scopes for searchable fields" do
       User.stub(:searchable_fields).and_return({ :email =>  :by_email })
-      User.search_scope(request).should eq User.by_email("foo@test.co")
+      User.search_scope(request).must_equal User.by_email("foo@test.co")
     end
 
     it "is chainable" do
-      User.limit(1).search_scope(request).order(:email).should eq User.limit(1).order(:email)
+      User.limit(1).search_scope(request).order(:email).must_equal User.limit(1).order(:email)
     end
 
     context "when a searchable field does not have a value" do
@@ -33,7 +33,7 @@ describe Protobuf::ActiveRecord::Scope do
 
       it "doesn't build a scope from that field" do
         User.stub(:searchable_fields).and_return({ :email =>  :by_email })
-        User.search_scope(request).should eq User.by_email("foo@test.co")
+        User.search_scope(request).must_equal User.by_email("foo@test.co")
       end
     end
 
@@ -51,28 +51,28 @@ describe Protobuf::ActiveRecord::Scope do
     context "when :scope is not defined" do
       it "defines the given field as searchable using the `by_[:field]` as the scope" do
         User.field_scope :guid
-        User.searchable_fields[:guid].should eq :by_guid
+        User.searchable_fields[:guid].must_equal :by_guid
       end
     end
 
     context "when :scope is defined" do
       it "defines the given field as searchable using the given :scope" do
         User.field_scope :guid, :scope => :custom_scope
-        User.searchable_fields[:guid].should eq :custom_scope
+        User.searchable_fields[:guid].must_equal :custom_scope
       end
     end
 
     context "when :parser is not defined" do
       it "doesn't define the given field as parseable" do
         User.field_scope :guid
-        User.searchable_field_parsers[:guid].should eq nil
+        User.searchable_field_parsers[:guid].must_equal nil
       end
     end
 
     context "when :parser is defined" do
       it "defines the given field as parseable using the given :parser" do
         User.field_scope :guid, :parser => :parser
-        User.searchable_field_parsers[:guid].should eq :parser
+        User.searchable_field_parsers[:guid].must_equal :parser
       end
     end
   end
@@ -83,7 +83,7 @@ describe Protobuf::ActiveRecord::Scope do
       proto = UserMessage.new(:email => "the.email@test.in")
 
       User.field_scope :email
-      User.parse_search_values(proto, :email).should eq ["the.email@test.in"]
+      User.parse_search_values(proto, :email).must_equal ["the.email@test.in"]
     end
 
     context "when a field parser is defined" do

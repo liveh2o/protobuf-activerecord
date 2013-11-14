@@ -16,7 +16,7 @@ describe Protobuf::ActiveRecord::Serialization do
       before { User.stub(:_protobuf_date_column?).and_return(true) }
 
       it "converts the given value to an integer" do
-        User._protobuf_convert_attributes_to_fields(:foo_date, date).should eq integer
+        User._protobuf_convert_attributes_to_fields(:foo_date, date).must_equal integer
       end
     end
 
@@ -27,7 +27,7 @@ describe Protobuf::ActiveRecord::Serialization do
       before { User.stub(:_protobuf_datetime_column?).and_return(true) }
 
       it "converts the given value to an integer" do
-        User._protobuf_convert_attributes_to_fields(:foo_datetime, datetime).should eq integer
+        User._protobuf_convert_attributes_to_fields(:foo_datetime, datetime).must_equal integer
       end
     end
 
@@ -38,7 +38,7 @@ describe Protobuf::ActiveRecord::Serialization do
       before { User.stub(:_protobuf_time_column?).and_return(true) }
 
       it "converts the given value to an integer" do
-        User._protobuf_convert_attributes_to_fields(:foo_time, time).should eq integer
+        User._protobuf_convert_attributes_to_fields(:foo_time, time).must_equal integer
       end
     end
 
@@ -49,7 +49,7 @@ describe Protobuf::ActiveRecord::Serialization do
       before { User.stub(:_protobuf_timestamp_column?).and_return(true) }
 
       it "converts the given value to an integer" do
-        User._protobuf_convert_attributes_to_fields(:foo_timestamp, timestamp).should eq integer
+        User._protobuf_convert_attributes_to_fields(:foo_timestamp, timestamp).must_equal integer
       end
     end
 
@@ -57,7 +57,7 @@ describe Protobuf::ActiveRecord::Serialization do
       let(:value) { "Foo" }
 
       it "returns the given value" do
-        User._protobuf_convert_attributes_to_fields(:foo, value).should eq value
+        User._protobuf_convert_attributes_to_fields(:foo, value).must_equal value
       end
     end
   end
@@ -108,12 +108,12 @@ describe Protobuf::ActiveRecord::Serialization do
 
     context "given options" do
       it "merges them with protobuf field options" do
-        User._protobuf_field_options.should eq options
+        User._protobuf_field_options.must_equal options
       end
     end
 
     it "returns the protobuf message for this object" do
-      User.protobuf_message.should eq protobuf_message
+      User.protobuf_message.must_equal protobuf_message
     end
   end
 
@@ -127,27 +127,27 @@ describe Protobuf::ActiveRecord::Serialization do
       context "when options has :only" do
         it "only returns the given field(s)" do
           fields = user._filter_field_attributes(:only => :name).should
-          fields.should eq [ :name ]
+          fields.must_equal [ :name ]
         end
       end
 
       context "when options has :except" do
         it "returns all except the given field(s)" do
           fields = user._filter_field_attributes(:except => :name).should
-          fields.should eq [ :guid, :email, :email_domain, :password ]
+          fields.must_equal [ :guid, :email, :email_domain, :password ]
         end
       end
     end
 
     describe "#_filtered_fields" do
       it "returns protobuf fields" do
-        user._filtered_fields.should eq [ :guid, :name, :email, :email_domain, :password ]
+        user._filtered_fields.must_equal [ :guid, :name, :email, :email_domain, :password ]
       end
 
       context "given :deprecated => false" do
         it "filters all deprecated fields" do
           fields = user._filtered_fields(:deprecated => false).should
-          fields.should eq [ :guid, :name, :email, :password ]
+          fields.must_equal [ :guid, :name, :email, :password ]
         end
       end
     end
@@ -159,7 +159,7 @@ describe Protobuf::ActiveRecord::Serialization do
         before { User.protobuf_message(protobuf_message, options) }
 
         it "returns the class's protobuf field options" do
-          User.allocate._normalize_options({}).should eq options
+          User.allocate._normalize_options({}).must_equal options
         end
       end
 
@@ -168,7 +168,7 @@ describe Protobuf::ActiveRecord::Serialization do
 
         it "merges them with the class's protobuf field options" do
           normalized_options = User.allocate._normalize_options(options)
-          normalized_options[:only].should eq options[:only]
+          normalized_options[:only].must_equal options[:only]
         end
       end
 
@@ -177,7 +177,7 @@ describe Protobuf::ActiveRecord::Serialization do
 
         it "ensures that :except exists" do
           normalized_options = User.allocate._normalize_options(options)
-          normalized_options[:except].should eq []
+          normalized_options[:except].must_equal []
         end
       end
 
@@ -188,7 +188,7 @@ describe Protobuf::ActiveRecord::Serialization do
 
         it "ensures that :only exists" do
           normalized_options = User.allocate._normalize_options(options)
-          normalized_options[:only].should eq []
+          normalized_options[:only].must_equal []
         end
       end
     end
@@ -212,7 +212,7 @@ describe Protobuf::ActiveRecord::Serialization do
         }
 
         it "gets the field from the transformer" do
-          user.fields_from_record.should eq fields_from_record
+          user.fields_from_record.must_equal fields_from_record
         end
       end
 
@@ -220,7 +220,7 @@ describe Protobuf::ActiveRecord::Serialization do
         let(:fields_from_record) { { :guid => user.guid, :name => user.name, :email => user.email, :email_domain => nil, :password => nil } }
 
         it "returns a hash of protobuf fields that this object has getters for" do
-          user.fields_from_record.should eq fields_from_record
+          user.fields_from_record.must_equal fields_from_record
         end
 
         it "converts attributes values for protobuf messages" do
@@ -245,7 +245,7 @@ describe Protobuf::ActiveRecord::Serialization do
         before { user.stub(:fields_from_record).and_return(proto_hash) }
 
         it "intializes a new protobuf message with attributes from #to_proto_hash" do
-          user.to_proto.should eq proto
+          user.to_proto.must_equal proto
         end
       end
 
