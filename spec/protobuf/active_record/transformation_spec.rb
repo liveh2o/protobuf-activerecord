@@ -18,7 +18,7 @@ describe Protobuf::ActiveRecord::Transformation do
     end
 
     it "includes attributes that aren't fields, but have attribute transformers" do
-      User.stub(:_protobuf_attribute_transformers).and_return({ :account_id => :fetch_account_id })
+      User.stubs(:_protobuf_attribute_transformers).returns({ :account_id => :fetch_account_id })
       attribute_fields = User._filter_attribute_fields(proto)
       attribute_fields.has_key?(:account_id).must_equal true
     end
@@ -34,7 +34,7 @@ describe Protobuf::ActiveRecord::Transformation do
       let(:date) { Date.current }
       let(:value) { date.to_time.to_i }
 
-      before { User.stub(:_protobuf_date_column?).and_return(true) }
+      before { User.stubs(:_protobuf_date_column?).returns(true) }
 
       it "converts the given value to a Date object" do
         User._protobuf_convert_fields_to_attributes(:foo_date, value).must_equal date
@@ -45,7 +45,7 @@ describe Protobuf::ActiveRecord::Transformation do
       let(:datetime) { DateTime.current }
       let(:value) { datetime.to_i }
 
-      before { User.stub(:_protobuf_datetime_column?).and_return(true) }
+      before { User.stubs(:_protobuf_datetime_column?).returns(true) }
 
       it "converts the given value to a DateTime object" do
         User._protobuf_convert_fields_to_attributes(:foo_datetime, value).should be_a(DateTime)
@@ -60,7 +60,7 @@ describe Protobuf::ActiveRecord::Transformation do
       let(:time) { Time.current }
       let(:value) { time.to_i }
 
-      before { User.stub(:_protobuf_time_column?).and_return(true) }
+      before { User.stubs(:_protobuf_time_column?).returns(true) }
 
       it "converts the given value to a Time object" do
         User._protobuf_convert_fields_to_attributes(:foo_time, value).should be_a(Time)
@@ -75,7 +75,7 @@ describe Protobuf::ActiveRecord::Transformation do
       let(:time) { Time.current }
       let(:value) { time.to_i }
 
-      before { User.stub(:_protobuf_timestamp_column?).and_return(true) }
+      before { User.stubs(:_protobuf_timestamp_column?).returns(true) }
 
       it "converts the given value to a Time object" do
         User._protobuf_convert_fields_to_attributes(:foo_time, value).should be_a(Time)
@@ -106,7 +106,7 @@ describe Protobuf::ActiveRecord::Transformation do
     context "when a transformer is a callable that returns nil" do
       before do
         transformers = User._protobuf_attribute_transformers
-        User.stub(:_protobuf_attribute_transformers).and_return(
+        User.stubs(:_protobuf_attribute_transformers).returns(
           {:account_id => lambda { |proto| nil }}.merge(transformers)
         )
       end
@@ -120,7 +120,7 @@ describe Protobuf::ActiveRecord::Transformation do
     context "when a transformer is a callable that returns a value" do
       before do
         transformers = User._protobuf_attribute_transformers
-        User.stub(:_protobuf_attribute_transformers).and_return(
+        User.stubs(:_protobuf_attribute_transformers).returns(
           {:account_id => lambda { |proto| 1 }}.merge(transformers)
         )
       end
@@ -133,7 +133,7 @@ describe Protobuf::ActiveRecord::Transformation do
 
     context "when a transformer is not defined for the attribute" do
       before {
-        User.stub(:_protobuf_convert_fields_to_attributes) do |key, value|
+        User.stubs(:_protobuf_convert_fields_to_attributes) do |key, value|
           value
         end
       }
@@ -167,7 +167,7 @@ describe Protobuf::ActiveRecord::Transformation do
       let(:callable) { lambda { |proto| nil } }
 
       before {
-        User.stub(:_protobuf_attribute_transformers).and_return(Hash.new)
+        User.stubs(:_protobuf_attribute_transformers).returns(Hash.new)
         User.attribute_from_proto :account_id, callable
       }
 

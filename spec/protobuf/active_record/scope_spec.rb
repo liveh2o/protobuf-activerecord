@@ -16,11 +16,11 @@ describe Protobuf::ActiveRecord::Scope do
     let(:request) { UserSearchMessage.new(:guid => ["foo"], :email => ["foo@test.co"]) }
 
     before {
-      User.stub(:searchable_field_parsers).and_return({ :email => proc { |val| val } })
+      User.stubs(:searchable_field_parsers).returns({ :email => proc { |val| val } })
     }
 
     it "builds scopes for searchable fields" do
-      User.stub(:searchable_fields).and_return({ :email =>  :by_email })
+      User.stubs(:searchable_fields).returns({ :email =>  :by_email })
       User.search_scope(request).must_equal User.by_email("foo@test.co")
     end
 
@@ -32,7 +32,7 @@ describe Protobuf::ActiveRecord::Scope do
       let(:request) { UserSearchMessage.new(:email => ["foo@test.co"]) }
 
       it "doesn't build a scope from that field" do
-        User.stub(:searchable_fields).and_return({ :email =>  :by_email })
+        User.stubs(:searchable_fields).returns({ :email =>  :by_email })
         User.search_scope(request).must_equal User.by_email("foo@test.co")
       end
     end
@@ -41,7 +41,7 @@ describe Protobuf::ActiveRecord::Scope do
       let(:request) { UserSearchMessage.new(:email => ["foo@test.co"]) }
 
       it "raises an exception" do
-        User.stub(:searchable_fields).and_return({ :email =>  :by_hullabaloo })
+        User.stubs(:searchable_fields).returns({ :email =>  :by_hullabaloo })
         expect { User.search_scope(request) }.to raise_exception(/Undefined scope :by_hullabaloo/)
       end
     end

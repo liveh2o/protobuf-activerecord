@@ -13,7 +13,7 @@ describe Protobuf::ActiveRecord::Serialization do
       let(:date) { Date.current }
       let(:integer) { date.to_time.to_i }
 
-      before { User.stub(:_protobuf_date_column?).and_return(true) }
+      before { User.stubs(:_protobuf_date_column?).returns(true) }
 
       it "converts the given value to an integer" do
         User._protobuf_convert_attributes_to_fields(:foo_date, date).must_equal integer
@@ -24,7 +24,7 @@ describe Protobuf::ActiveRecord::Serialization do
       let(:datetime) { DateTime.current }
       let(:integer) { datetime.to_time.to_i }
 
-      before { User.stub(:_protobuf_datetime_column?).and_return(true) }
+      before { User.stubs(:_protobuf_datetime_column?).returns(true) }
 
       it "converts the given value to an integer" do
         User._protobuf_convert_attributes_to_fields(:foo_datetime, datetime).must_equal integer
@@ -35,7 +35,7 @@ describe Protobuf::ActiveRecord::Serialization do
       let(:time) { Time.current }
       let(:integer) { time.to_time.to_i }
 
-      before { User.stub(:_protobuf_time_column?).and_return(true) }
+      before { User.stubs(:_protobuf_time_column?).returns(true) }
 
       it "converts the given value to an integer" do
         User._protobuf_convert_attributes_to_fields(:foo_time, time).must_equal integer
@@ -46,7 +46,7 @@ describe Protobuf::ActiveRecord::Serialization do
       let(:timestamp) { Time.current }
       let(:integer) { timestamp.to_time.to_i }
 
-      before { User.stub(:_protobuf_timestamp_column?).and_return(true) }
+      before { User.stubs(:_protobuf_timestamp_column?).returns(true) }
 
       it "converts the given value to an integer" do
         User._protobuf_convert_attributes_to_fields(:foo_timestamp, timestamp).must_equal integer
@@ -84,7 +84,7 @@ describe Protobuf::ActiveRecord::Serialization do
       let(:callable) { lambda { |proto| nil } }
 
       before {
-        User.stub(:_protobuf_field_transformers).and_return(Hash.new)
+        User.stubs(:_protobuf_field_transformers).returns(Hash.new)
         User.field_from_record :account_id, callable
       }
 
@@ -208,7 +208,7 @@ describe Protobuf::ActiveRecord::Serialization do
         let(:transformer) { { :email_domain => lambda { |record| record.email.split('@').last } } }
 
         before {
-          User.stub(:_protobuf_field_transformers).and_return(transformer)
+          User.stubs(:_protobuf_field_transformers).returns(transformer)
         }
 
         it "gets the field from the transformer" do
@@ -224,7 +224,7 @@ describe Protobuf::ActiveRecord::Serialization do
         end
 
         it "converts attributes values for protobuf messages" do
-          user.stub(:_protobuf_convert_attributes_to_fields)
+          user.stubs(:_protobuf_convert_attributes_to_fields)
           user.fields_from_record
         end
       end
@@ -242,7 +242,7 @@ describe Protobuf::ActiveRecord::Serialization do
         let(:proto) { protobuf_message.new(proto_hash) }
         let(:proto_hash) { { :name => "foo" } }
 
-        before { user.stub(:fields_from_record).and_return(proto_hash) }
+        before { user.stubs(:fields_from_record).returns(proto_hash) }
 
         it "intializes a new protobuf message with attributes from #to_proto_hash" do
           user.to_proto.must_equal proto
