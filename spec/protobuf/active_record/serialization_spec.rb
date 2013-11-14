@@ -69,7 +69,7 @@ describe Protobuf::ActiveRecord::Serialization do
       before { User.field_from_record :first_name, :extract_first_name }
 
       it "creates a callable method object from the converter" do
-        User.should_receive(:extract_first_name)
+        User.expects(:extract_first_name)
         User._protobuf_field_transformers[:first_name].call(1)
       end
     end

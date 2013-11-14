@@ -152,7 +152,7 @@ describe Protobuf::ActiveRecord::Transformation do
       before { User.attribute_from_proto :first_name, :extract_first_name }
 
       it "creates a callable method object from the converter" do
-        User.should_receive(:extract_first_name)
+        User.expects(:extract_first_name)
         User._protobuf_attribute_transformers[:first_name].call(1)
       end
     end
@@ -214,7 +214,7 @@ describe Protobuf::ActiveRecord::Transformation do
 
   describe "#attributes_from_proto" do
     it "gets attributes from the given protobuf message" do
-      User.should_receive(:attributes_from_proto).with(proto)
+      User.expects(:attributes_from_proto).with(proto)
       user.attributes_from_proto(proto)
     end
   end

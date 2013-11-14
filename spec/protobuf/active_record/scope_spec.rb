@@ -95,7 +95,7 @@ describe Protobuf::ActiveRecord::Scope do
         let(:parser) { double('parser', :to_sym => :parser_to_sym) }
 
         it "passes the value to the parser" do
-          User.should_receive(:parser_to_sym).with([ "foo" ])
+          User.expects(:parser_to_sym).with([ "foo" ])
           User.parse_search_values(proto, :guid)
         end
       end
@@ -104,7 +104,7 @@ describe Protobuf::ActiveRecord::Scope do
         let(:parser) { double('parser') }
 
         it "passes the value to the parser" do
-          parser.should_receive(:call).with(["foo"])
+          parser.expects(:call).with(["foo"])
           User.parse_search_values(proto, :guid)
         end
       end

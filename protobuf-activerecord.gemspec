@@ -35,4 +35,5 @@ Gem::Specification.new do |gem|
   gem.add_development_dependency "timecop"
   gem.add_development_dependency "minitest"
   gem.add_development_dependency "minitest-spec-context"
+  gem.add_development_dependency "mocha"
 end

@@ -4,6 +4,8 @@ require 'bundler'
 require 'minitest/spec'
 require 'minitest/autorun'
 
+require 'mocha'
+
 require 'simplecov'
 SimpleCov.start do
   add_filter '/spec/'

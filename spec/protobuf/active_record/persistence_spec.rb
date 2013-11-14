@@ -8,24 +8,24 @@ describe Protobuf::ActiveRecord::Persistence do
 
   describe ".create" do
     it "accepts a protobuf message" do
-      User.any_instance.should_receive(:save)
+      User.any_instance.expects(:save)
       User.create(proto)
     end
 
     it "accepts a hash" do
-      User.any_instance.should_receive(:save)
+      User.any_instance.expects(:save)
       User.create(user_attributes)
     end
   end
 
   describe ".create!" do
     it "accepts a protobuf message" do
-      User.any_instance.should_receive(:save!)
+      User.any_instance.expects(:save!)
       User.create!(proto)
     end
 
     it "accepts a hash" do
-      User.any_instance.should_receive(:save!)
+      User.any_instance.expects(:save!)
       User.create!(user_attributes)
     end
   end
@@ -46,24 +46,24 @@ describe Protobuf::ActiveRecord::Persistence do
 
   describe "#update_attributes" do
     it "accepts a protobuf message" do
-      User.any_instance.should_receive(:save)
+      User.any_instance.expects(:save)
       user.update_attributes(proto)
     end
 
     it "accepts a hash" do
-      User.any_instance.should_receive(:save)
+      User.any_instance.expects(:save)
       user.update_attributes(user_attributes)
     end
   end
 
   describe "#update_attributes!" do
     it "accepts a protobuf message" do
-      User.any_instance.should_receive(:save!)
+      User.any_instance.expects(:save!)
       user.update_attributes!(proto)
     end
 
     it "accepts a hash" do
-      User.any_instance.should_receive(:save!)
+      User.any_instance.expects(:save!)
       user.update_attributes!(user_attributes)
     end
   end
