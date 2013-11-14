@@ -4,7 +4,7 @@ require 'bundler'
 require 'minitest/spec'
 require 'minitest/autorun'
 
-require 'mocha'
+require 'mocha/setup'
 
 require 'simplecov'
 SimpleCov.start do
