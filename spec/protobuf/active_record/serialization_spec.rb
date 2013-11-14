@@ -102,7 +102,7 @@ describe Protobuf::ActiveRecord::Serialization do
 
     context "given a value" do
       it "defines #to_proto" do
-        User.allocate.should respond_to :to_proto
+        User.allocate.must_respond_to :to_proto
       end
     end
 
