@@ -126,14 +126,14 @@ describe Protobuf::ActiveRecord::Serialization do
     describe "#_filter_field_attributes" do
       context "when options has :only" do
         it "only returns the given field(s)" do
-          fields = user._filter_field_attributes(:only => :name).should
+          fields = user._filter_field_attributes(:only => :name)
           fields.must_equal [ :name ]
         end
       end
 
       context "when options has :except" do
         it "returns all except the given field(s)" do
-          fields = user._filter_field_attributes(:except => :name).should
+          fields = user._filter_field_attributes(:except => :name)
           fields.must_equal [ :guid, :email, :email_domain, :password ]
         end
       end
@@ -146,7 +146,7 @@ describe Protobuf::ActiveRecord::Serialization do
 
       context "given :deprecated => false" do
         it "filters all deprecated fields" do
-          fields = user._filtered_fields(:deprecated => false).should
+          fields = user._filtered_fields(:deprecated => false)
           fields.must_equal [ :guid, :name, :email, :password ]
         end
       end
