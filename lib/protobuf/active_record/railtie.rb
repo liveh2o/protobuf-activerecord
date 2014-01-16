@@ -4,10 +4,8 @@ module Protobuf
       config.protobuf_active_record = Protobuf::ActiveRecord.config
 
       ActiveSupport.on_load(:active_record) do
-        if Protobuf::ActiveRecord.config.autoload
-          on_inherit do
-            include Protobuf::ActiveRecord::Model
-          end
+        on_inherit do
+          include Protobuf::ActiveRecord::Model if Protobuf::ActiveRecord.config.autoload
         end
       end
     end
