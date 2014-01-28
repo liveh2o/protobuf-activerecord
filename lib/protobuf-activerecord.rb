@@ -13,6 +13,7 @@ end
 
 require 'protobuf/active_record/config'
 require 'protobuf/active_record/model'
+require 'protobuf/active_record/service_filters'
 require 'protobuf/active_record/version'
 
 module Protobuf
