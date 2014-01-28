@@ -10,7 +10,9 @@ module Protobuf
       end
 
       ActiveSupport.on_load(:protobuf_rpc_service) do
-        include Protobuf::ActiveRecord::ServiceFilters
+        on_inherit do
+          include Protobuf::ActiveRecord::ServiceFilters
+        end
       end
     end
   end
