@@ -10,9 +10,8 @@ module Protobuf
       end
 
       ActiveSupport.on_load(:protobuf_rpc_service) do
-        on_inherit do
-          include Protobuf::ActiveRecord::ServiceFilters
-        end
+        Protobuf::Rpc.middleware.insert_after Protobuf::Rpc::Middleware::Logger, Middleware::ConnectionManagement
+        Protobuf::Rpc.middleware.insert_after Middleware::ConnectionManagement, Middleware::QueryCache
       end
     end
   end
