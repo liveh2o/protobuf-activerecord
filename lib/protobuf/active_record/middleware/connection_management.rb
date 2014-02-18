@@ -1,7 +1,7 @@
 module Protobuf
   module ActiveRecord
     module Middleware
-      module ConnectionManagement
+      class ConnectionManagement
         def initialize(app)
           @app = app
         end

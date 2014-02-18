@@ -1,7 +1,7 @@
 module Protobuf
   module ActiveRecord
     module Middleware
-      module QueryCache
+      class QueryCache
         def initialize(app)
           @app = app
         end
