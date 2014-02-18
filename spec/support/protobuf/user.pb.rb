@@ -15,15 +15,15 @@ class UserSearchMessage < ::Protobuf::Message; end
 # Message Fields
 #
 class UserMessage
-  optional ::Protobuf::Field::StringField, :guid, 1
-  optional ::Protobuf::Field::StringField, :name, 2
-  optional ::Protobuf::Field::StringField, :email, 3
-  optional ::Protobuf::Field::StringField, :email_domain, 4, :deprecated => true
-  optional ::Protobuf::Field::StringField, :password, 5
+  optional :string, :guid, 1
+  optional :string, :name, 2
+  optional :string, :email, 3
+  optional :string, :email_domain, 4, :deprecated => true
+  optional :string, :password, 5
 end
 
 class UserSearchMessage
-  repeated ::Protobuf::Field::StringField, :guid, 1
-  repeated ::Protobuf::Field::StringField, :email, 2
+  repeated :string, :guid, 1
+  repeated :string, :email, 2
 end
 
