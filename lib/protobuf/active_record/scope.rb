@@ -74,7 +74,7 @@ module Protobuf
           end
 
           values = [ value ].flatten
-          values.map!(&:to_i) if proto.get_field_by_name(field).enum?
+          values.map!(&:to_i) if proto.class.get_field(field, true).enum?
           values
         end
 

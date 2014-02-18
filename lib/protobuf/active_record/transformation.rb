@@ -28,7 +28,7 @@ module Protobuf
         def _filter_attribute_fields(proto)
           fields = proto.to_hash
           fields.select! do |key, value|
-            field = proto.get_field_by_name(key) || proto.get_ext_field_by_name(key)
+            field = proto.class.get_field(key, true)
             proto.has_field?(key) && !field.repeated?
           end
 
