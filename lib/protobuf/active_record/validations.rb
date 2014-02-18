@@ -30,7 +30,7 @@ module Protobuf
           raise ArgumentError, ":with must be specified" if enumerable.nil?
 
           if enumerable < ::Protobuf::Enum
-            options[:in] = enumerable.values.values.map(&:value)
+            options[:in] = enumerable.all_tags
           end
 
           args << options
