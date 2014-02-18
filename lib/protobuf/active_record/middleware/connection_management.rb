@@ -7,13 +7,9 @@ module Protobuf
         end
 
         def call(env)
-          env = @app.call(env)
+          @app.call(env)
+        ensure
           ActiveRecord::Base.clear_active_connections!
-
-          env
-        rescue
-          ActiveRecord::Base.clear_active_connections!
-          raise
         end
       end
     end

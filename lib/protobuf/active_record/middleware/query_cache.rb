@@ -11,13 +11,9 @@ module Protobuf
           connection_id = ActiveRecord::Base.connection_id
           ActiveRecord::Base.connection.enable_query_cache!
 
-          env = @app.call(env)
+          @app.call(env)
+        ensure
           restore_query_cache_settings(connection_id, enabled)
-
-          env
-        rescue
-          restore_query_cache_settings(connection_id, enabled)
-          raise
         end
 
       private
