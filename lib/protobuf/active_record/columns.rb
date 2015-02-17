@@ -39,20 +39,22 @@ module Protobuf
         # Map out the columns for future reference on type conversion
         # :nodoc:
         def _protobuf_map_columns(force = false)
-          return unless table_exists?
+          ::Thread.exclusive do
+            @_protobuf_mapped_columns = false if force
 
-          @_protobuf_mapped_columns = false if force
-          return if _protobuf_mapped_columns?
+            return unless table_exists?
+            return if _protobuf_mapped_columns?
 
-          @_protobuf_columns = {}
-          @_protobuf_column_types = Hash.new { |h,k| h[k] = [] }
+            @_protobuf_columns = {}
+            @_protobuf_column_types = Hash.new { |h,k| h[k] = [] }
 
-          columns.map do |column|
-            @_protobuf_columns[column.name.to_sym] = column
-            @_protobuf_column_types[column.type.to_sym] << column.name.to_sym
+            columns.map do |column|
+              @_protobuf_columns[column.name.to_sym] = column
+              @_protobuf_column_types[column.type.to_sym] << column.name.to_sym
+            end
+
+            @_protobuf_mapped_columns = true
           end
-
-          @_protobuf_mapped_columns = true
         end
 
         def _protobuf_mapped_columns?
