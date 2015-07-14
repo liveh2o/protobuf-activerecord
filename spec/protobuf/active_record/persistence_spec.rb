@@ -8,24 +8,24 @@ describe Protobuf::ActiveRecord::Persistence do
 
   describe ".create" do
     it "accepts a protobuf message" do
-      User.any_instance.should_receive(:save)
+      expect_any_instance_of(User).to receive(:save)
       User.create(proto)
     end
 
     it "accepts a hash" do
-      User.any_instance.should_receive(:save)
+      expect_any_instance_of(User).to receive(:save)
       User.create(user_attributes)
     end
   end
 
   describe ".create!" do
     it "accepts a protobuf message" do
-      User.any_instance.should_receive(:save!)
+      expect_any_instance_of(User).to receive(:save!)
       User.create!(proto)
     end
 
     it "accepts a hash" do
-      User.any_instance.should_receive(:save!)
+      expect_any_instance_of(User).to receive(:save!)
       User.create!(user_attributes)
     end
   end
@@ -35,35 +35,35 @@ describe Protobuf::ActiveRecord::Persistence do
 
     it "accepts a protobuf message" do
       user.assign_attributes(proto)
-      user.changed?.should be_true
+      expect(user.changed?).to be true
     end
 
     it "accepts a hash" do
       user.assign_attributes(user_attributes)
-      user.changed?.should be_true
+      expect(user.changed?).to be true
     end
   end
 
   describe "#update_attributes" do
     it "accepts a protobuf message" do
-      User.any_instance.should_receive(:save)
+      expect_any_instance_of(User).to receive(:save)
       user.update_attributes(proto)
     end
 
     it "accepts a hash" do
-      User.any_instance.should_receive(:save)
+      expect_any_instance_of(User).to receive(:save)
       user.update_attributes(user_attributes)
     end
   end
 
   describe "#update_attributes!" do
     it "accepts a protobuf message" do
-      User.any_instance.should_receive(:save!)
+      expect_any_instance_of(User).to receive(:save!)
       user.update_attributes!(proto)
     end
 
     it "accepts a hash" do
-      User.any_instance.should_receive(:save!)
+      expect_any_instance_of(User).to receive(:save!)
       user.update_attributes!(user_attributes)
     end
   end
