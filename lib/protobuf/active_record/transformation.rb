@@ -1,5 +1,6 @@
 require 'active_support/concern'
 require 'heredity/inheritable_class_instance_variables'
+require 'protobuf/active_record/transformer'
 
 module Protobuf
   module ActiveRecord
@@ -93,20 +94,27 @@ module Protobuf
         #     # Do some blocky stuff...
         #   end
         #
-        def attribute_from_proto(attribute, transformer = nil, &block)
-          transformer ||= block
+        #   attribute_from_proto :status, lambda { |proto| nil }, :nullify_on => :status
+        #   attribute_from_proto :status, :nullify_on => :status do |proto|
+        #     nil
+        #   end
+        #
+        def attribute_from_proto(attribute, *args, &block)
+          options = args.extract_options!
+          transformation = args.first || block
 
-          if transformer.is_a?(Symbol)
-            callable = lambda { |value| self.__send__(transformer, value) }
+          if transformation.is_a?(Symbol)
+            callable = lambda { |value| self.__send__(transformation, value) }
           else
-            callable = transformer
+            callable = transformation
           end
 
           unless callable.respond_to?(:call)
             raise AttributeTransformerError
           end
 
-          _protobuf_attribute_transformers[attribute.to_sym] = callable
+          transformer = ::Protobuf::ActiveRecord::Transformer.new(callable, options)
+          _protobuf_attribute_transformers[attribute.to_sym] = transformer
         end
 
 
@@ -120,13 +128,21 @@ module Protobuf
 
           attributes = attribute_fields.inject({}) do |hash, (key, value)|
             if _protobuf_attribute_transformers.has_key?(key)
-              attribute = _protobuf_attribute_transformers[key].call(proto)
+              transformer = _protobuf_attribute_transformers[key]
+              attribute = transformer.call(proto)
               hash[key] = attribute unless attribute.nil?
+              hash[key] = nil if transformer.nullify?(proto)
             else
               hash[key] = _protobuf_convert_fields_to_attributes(key, value)
             end
 
             hash
+          end
+
+          return attributes unless proto.field?(:nullify) && proto.nullify.is_a?(Array)
+
+          proto.nullify.each do |attribute_name|
+            attributes[attribute_name.to_sym] = nil if attribute_names.include?(attribute_name.to_s)
           end
 
           attributes
