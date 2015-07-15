@@ -91,16 +91,6 @@ describe Protobuf::ActiveRecord::Scope do
 
       let(:proto) { UserSearchMessage.new(:guid => ["foo"]) }
 
-      context "and the parser responds to :to_sym" do
-        let(:parser) { double('parser', :to_sym => :parser_to_sym) }
-
-        it "passes the value to the parser", :pending => 'invalid test?' do
-          expect(User).to receive(:parser_to_sym).with([ "foo" ])
-          User.parse_search_values(proto, :guid)
-          fail
-        end
-      end
-
       context "and the parser does not respond to :to_sym" do
         let(:parser) { double('parser') }
 
