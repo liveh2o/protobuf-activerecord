@@ -13,10 +13,10 @@ describe Protobuf::ActiveRecord::Serialization do
       let(:date) { Date.current }
       let(:integer) { date.to_time.to_i }
 
-      before { User.stub(:_protobuf_date_column?).and_return(true) }
+      before { allow(User).to receive(:_protobuf_date_column?).and_return(true) }
 
       it "converts the given value to an integer" do
-        User._protobuf_convert_attributes_to_fields(:foo_date, date).should eq integer
+        expect(User._protobuf_convert_attributes_to_fields(:foo_date, date)).to eq integer
       end
     end
 
@@ -24,10 +24,10 @@ describe Protobuf::ActiveRecord::Serialization do
       let(:datetime) { DateTime.current }
       let(:integer) { datetime.to_time.to_i }
 
-      before { User.stub(:_protobuf_datetime_column?).and_return(true) }
+      before { allow(User).to receive(:_protobuf_datetime_column?).and_return(true) }
 
       it "converts the given value to an integer" do
-        User._protobuf_convert_attributes_to_fields(:foo_datetime, datetime).should eq integer
+        expect(User._protobuf_convert_attributes_to_fields(:foo_datetime, datetime)).to eq integer
       end
     end
 
@@ -35,10 +35,10 @@ describe Protobuf::ActiveRecord::Serialization do
       let(:time) { Time.current }
       let(:integer) { time.to_time.to_i }
 
-      before { User.stub(:_protobuf_time_column?).and_return(true) }
+      before { allow(User).to receive(:_protobuf_time_column?).and_return(true) }
 
       it "converts the given value to an integer" do
-        User._protobuf_convert_attributes_to_fields(:foo_time, time).should eq integer
+        expect(User._protobuf_convert_attributes_to_fields(:foo_time, time)).to eq integer
       end
     end
 
@@ -46,10 +46,10 @@ describe Protobuf::ActiveRecord::Serialization do
       let(:timestamp) { Time.current }
       let(:integer) { timestamp.to_time.to_i }
 
-      before { User.stub(:_protobuf_timestamp_column?).and_return(true) }
+      before { allow(User).to receive(:_protobuf_timestamp_column?).and_return(true) }
 
       it "converts the given value to an integer" do
-        User._protobuf_convert_attributes_to_fields(:foo_timestamp, timestamp).should eq integer
+        expect(User._protobuf_convert_attributes_to_fields(:foo_timestamp, timestamp)).to eq integer
       end
     end
 
@@ -57,7 +57,7 @@ describe Protobuf::ActiveRecord::Serialization do
       let(:value) { "Foo" }
 
       it "returns the given value" do
-        User._protobuf_convert_attributes_to_fields(:foo, value).should eq value
+        expect(User._protobuf_convert_attributes_to_fields(:foo, value)).to eq value
       end
     end
   end
@@ -69,7 +69,7 @@ describe Protobuf::ActiveRecord::Serialization do
       before { User.field_from_record :first_name, :extract_first_name }
 
       it "creates a callable method object from the converter" do
-        User.should_receive(:extract_first_name)
+        expect(User).to receive(:extract_first_name)
         User._protobuf_field_transformers[:first_name].call(1)
       end
     end
@@ -84,12 +84,13 @@ describe Protobuf::ActiveRecord::Serialization do
       let(:callable) { lambda { |proto| nil } }
 
       before {
-        User.stub(:_protobuf_field_transformers).and_return(Hash.new)
+        allow(User).to receive(:_protobuf_field_transformers).and_return(Hash.new)
         User.field_from_record :account_id, callable
       }
 
-      it "adds the given converter to the list of protobuf field transformers" do
+      it "adds the given converter to the list of protobuf field transformers", :pending => 'missing expectation?' do
         User._protobuf_field_transformers[:account_id] = callable
+        fail
       end
     end
   end
@@ -102,18 +103,18 @@ describe Protobuf::ActiveRecord::Serialization do
 
     context "given a value" do
       it "defines #to_proto" do
-        User.allocate.should respond_to :to_proto
+        expect(User.allocate).to respond_to :to_proto
       end
     end
 
     context "given options" do
       it "merges them with protobuf field options" do
-        User._protobuf_field_options.should eq options
+        expect(User._protobuf_field_options).to eq options
       end
     end
 
     it "returns the protobuf message for this object" do
-      User.protobuf_message.should eq protobuf_message
+      expect(User.protobuf_message).to eq protobuf_message
     end
   end
 
@@ -126,28 +127,28 @@ describe Protobuf::ActiveRecord::Serialization do
     describe "#_filter_field_attributes" do
       context "when options has :only" do
         it "only returns the given field(s)" do
-          fields = user._filter_field_attributes(:only => :name).should
-          fields.should eq [ :name ]
+          fields = user._filter_field_attributes(:only => :name)
+          expect(fields).to eq [ :name ]
         end
       end
 
       context "when options has :except" do
         it "returns all except the given field(s)" do
-          fields = user._filter_field_attributes(:except => :name).should
-          fields.should eq [ :guid, :email, :email_domain, :password ]
+          fields = user._filter_field_attributes(:except => :name)
+          expect(fields).to eq [ :guid, :email, :email_domain, :password ]
         end
       end
     end
 
     describe "#_filtered_fields" do
       it "returns protobuf fields" do
-        user._filtered_fields.should eq [ :guid, :name, :email, :email_domain, :password ]
+        expect(user._filtered_fields).to eq [ :guid, :name, :email, :email_domain, :password ]
       end
 
       context "given :deprecated => false" do
         it "filters all deprecated fields" do
-          fields = user._filtered_fields(:deprecated => false).should
-          fields.should eq [ :guid, :name, :email, :password ]
+          fields = user._filtered_fields(:deprecated => false)
+          expect(fields).to eq [ :guid, :name, :email, :password ]
         end
       end
     end
@@ -159,7 +160,7 @@ describe Protobuf::ActiveRecord::Serialization do
         before { User.protobuf_message(protobuf_message, options) }
 
         it "returns the class's protobuf field options" do
-          User.allocate._normalize_options({}).should eq options
+          expect(User.allocate._normalize_options({})).to eq options
         end
       end
 
@@ -168,7 +169,7 @@ describe Protobuf::ActiveRecord::Serialization do
 
         it "merges them with the class's protobuf field options" do
           normalized_options = User.allocate._normalize_options(options)
-          normalized_options[:only].should eq options[:only]
+          expect(normalized_options[:only]).to eq options[:only]
         end
       end
 
@@ -177,7 +178,7 @@ describe Protobuf::ActiveRecord::Serialization do
 
         it "ensures that :except exists" do
           normalized_options = User.allocate._normalize_options(options)
-          normalized_options[:except].should eq []
+          expect(normalized_options[:except]).to eq []
         end
       end
 
@@ -188,7 +189,7 @@ describe Protobuf::ActiveRecord::Serialization do
 
         it "ensures that :only exists" do
           normalized_options = User.allocate._normalize_options(options)
-          normalized_options[:only].should eq []
+          expect(normalized_options[:only]).to eq []
         end
       end
     end
@@ -208,11 +209,11 @@ describe Protobuf::ActiveRecord::Serialization do
         let(:transformer) { { :email_domain => lambda { |record| record.email.split('@').last } } }
 
         before {
-          User.stub(:_protobuf_field_transformers).and_return(transformer)
+          allow(User).to receive(:_protobuf_field_transformers).and_return(transformer)
         }
 
         it "gets the field from the transformer" do
-          user.fields_from_record.should eq fields_from_record
+          expect(user.fields_from_record).to eq fields_from_record
         end
       end
 
@@ -220,11 +221,11 @@ describe Protobuf::ActiveRecord::Serialization do
         let(:fields_from_record) { { :guid => user.guid, :name => user.name, :email => user.email, :email_domain => nil, :password => nil } }
 
         it "returns a hash of protobuf fields that this object has getters for" do
-          user.fields_from_record.should eq fields_from_record
+          expect(user.fields_from_record).to eq fields_from_record
         end
 
         it "converts attributes values for protobuf messages" do
-          user.stub(:_protobuf_convert_attributes_to_fields)
+          expect(user).to receive(:_protobuf_convert_attributes_to_fields).at_least(:once)
           user.fields_from_record
         end
       end
@@ -232,7 +233,7 @@ describe Protobuf::ActiveRecord::Serialization do
       context "given options with :include" do
         it "adds the given field to the list of serialized fields" do
           fields = user.fields_from_record(:include => :token)
-          fields.include?(:token).should be_true
+          expect(fields).to include(:token)
         end
       end
     end
@@ -242,10 +243,10 @@ describe Protobuf::ActiveRecord::Serialization do
         let(:proto) { protobuf_message.new(proto_hash) }
         let(:proto_hash) { { :name => "foo" } }
 
-        before { user.stub(:fields_from_record).and_return(proto_hash) }
+        before { allow(user).to receive(:fields_from_record).and_return(proto_hash) }
 
         it "intializes a new protobuf message with attributes from #to_proto_hash" do
-          user.to_proto.should eq proto
+          expect(user.to_proto).to eq proto
         end
       end
 

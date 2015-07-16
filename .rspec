@@ -1,3 +1,4 @@
 --colour
---format RSpec::Pride
+--require rspec/pride
+--format PrideFormatter
 --order rand
