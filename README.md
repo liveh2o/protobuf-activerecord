@@ -155,6 +155,38 @@ class User < ActiveRecord::Base
   attribute_from_proto :account_id, lambda { |protobuf_message| # Some custom transformation... }
 end
 ```
+
+### Setting attributes to nil
+
+The protocol buffers specification does not allow for the transport of 'null' or 'nil' values for a field.  In fact, in order to keep messages small and lightweight this is desireable behavior.  Fields are that are not set to a value will not be sent over the wire, but we cannot assume given a message has an absent value for a field that we should set the our attributes to nil.
+
+In order to solve this problem, Protobuf::ActiveRecord has a convention that tells it when to set an attribute to nil.  A message must define a repeated string field named 'nullify'.  If an attribute has the same name as an element in the 'nullify' field, this attribute will be set to nil.
+
+Example:
+```
+message UserMessage {
+  optional string name = 1;
+  repeated string nullify = 2;
+}
+
+```
+```ruby
+m = UserMessage.new(:nullify => [:name])
+# When Protobuf::ActiveRecord maps this message, it will set the name attribute to nil overwriting any value that is set.
+```
+
+For attribute transformers, the field name will not match the attribute name so we need to give the attribute transformer a hint to instruct it on how to nullify a given attribute.  When declaring an attribute transformer, you can specify a :nullify_on option.  This indicates for the given attribute, if the value of 'nullify_on' is present in the nullify field, set this attribute to nil.
+
+Example:
+```Ruby
+class User < ActiveRecord::Base
+  # When 'account_guid' is present in the nullify array, our 'account_id' attribute will be set to nil
+  attribute_from_proto :account_id, :nullify_on => :account_guid do
+    # transform
+  end
+end
+```
+
 #### Searching
 
 Protobuf Active Record's `search_scope` method takes the protobuf message and builds ARel scopes from it.
