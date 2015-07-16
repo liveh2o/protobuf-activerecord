@@ -101,16 +101,13 @@ module Protobuf
         #
         def attribute_from_proto(attribute, *args, &block)
           options = args.extract_options!
-          transformation = args.first || block
+          symbol_or_block = args.first || block
 
-          if transformation.is_a?(Symbol)
-            callable = lambda { |value| self.__send__(transformation, value) }
+          if symbol_or_block.is_a?(Symbol)
+            callable = lambda { |value| self.__send__(symbol_or_block, value) }
           else
-            callable = transformation
-          end
-
-          unless callable.respond_to?(:call)
-            raise AttributeTransformerError
+            raise AttributeTransformerError unless symbol_or_block.respond_to?(:call)
+            callable = symbol_or_block
           end
 
           transformer = ::Protobuf::ActiveRecord::Transformer.new(callable, options)
