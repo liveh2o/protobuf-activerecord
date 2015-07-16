@@ -12,6 +12,9 @@ require 'support/db'
 require 'support/models'
 require 'support/protobuf'
 
+# Silence protobuf's logger
+::Protobuf::Logging.logger.level = ::Logger::FATAL
+
 RSpec.configure do |config|
   # Turn deprecation warnings into errors with full backtrace.
   config.raise_errors_for_deprecations!

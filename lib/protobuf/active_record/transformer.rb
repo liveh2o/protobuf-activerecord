@@ -14,8 +14,12 @@ module Protobuf
 
       def nullify?(proto)
         return false unless options[:nullify_on]
+        if proto.field?(:nullify) && proto.nullify.is_a?(Array)
+          ::Protobuf::Logging.logger.warn "Message: #{proto.class} is not compatible with :nullify_on option"
+          return false
+        end
 
-        proto.field?(:nullify) && proto.nullify.include?(options[:nullify_on].to_s)
+        proto.nullify.include?(options[:nullify_on].to_s)
       end
     end
   end
