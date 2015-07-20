@@ -135,20 +135,20 @@ describe Protobuf::ActiveRecord::Serialization do
       context "when options has :except" do
         it "returns all except the given field(s)" do
           fields = user._filter_field_attributes(:except => :name)
-          expect(fields).to eq [ :guid, :email, :email_domain, :password ]
+          expect(fields).to eq [ :guid, :email, :email_domain, :password, :nullify ]
         end
       end
     end
 
     describe "#_filtered_fields" do
       it "returns protobuf fields" do
-        expect(user._filtered_fields).to eq [ :guid, :name, :email, :email_domain, :password ]
+        expect(user._filtered_fields).to eq [ :guid, :name, :email, :email_domain, :password, :nullify ]
       end
 
       context "given :deprecated => false" do
         it "filters all deprecated fields" do
           fields = user._filtered_fields(:deprecated => false)
-          expect(fields).to eq [ :guid, :name, :email, :password ]
+          expect(fields).to eq [ :guid, :name, :email, :password, :nullify ]
         end
       end
     end
@@ -205,7 +205,7 @@ describe Protobuf::ActiveRecord::Serialization do
       }
 
       context "when a transformer is defined for the field" do
-        let(:fields_from_record) { { :guid => user.guid, :name => user.name, :email => user.email, :email_domain => 'test.co', :password => nil } }
+        let(:fields_from_record) { { :guid => user.guid, :name => user.name, :email => user.email, :email_domain => 'test.co', :password => nil, :nullify => nil } }
         let(:transformer) { { :email_domain => lambda { |record| record.email.split('@').last } } }
 
         before {
@@ -218,7 +218,7 @@ describe Protobuf::ActiveRecord::Serialization do
       end
 
       context "when a transformer is not defined for the field" do
-        let(:fields_from_record) { { :guid => user.guid, :name => user.name, :email => user.email, :email_domain => nil, :password => nil } }
+        let(:fields_from_record) { { :guid => user.guid, :name => user.name, :email => user.email, :email_domain => nil, :password => nil, :nullify => nil } }
 
         it "returns a hash of protobuf fields that this object has getters for" do
           expect(user.fields_from_record).to eq fields_from_record

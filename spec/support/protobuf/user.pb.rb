@@ -20,6 +20,7 @@ class UserMessage
   optional :string, :email, 3
   optional :string, :email_domain, 4, :deprecated => true
   optional :string, :password, 5
+  repeated :string, :nullify, 6
 end
 
 class UserSearchMessage

@@ -96,6 +96,9 @@ describe Protobuf::ActiveRecord::Transformation do
   end
 
   describe ".attributes_from_proto" do
+    let(:callable) { lambda { |proto| 1 } }
+    let(:transformer) { ::Protobuf::ActiveRecord::Transformer.new(callable) }
+
     context "when a transformer is defined for the attribute" do
       it "transforms the field value" do
         attribute_fields = User.attributes_from_proto(proto)
@@ -104,10 +107,12 @@ describe Protobuf::ActiveRecord::Transformation do
     end
 
     context "when a transformer is a callable that returns nil" do
+      let(:callable) { lambda { |proto| nil } }
+
       before do
         transformers = User._protobuf_attribute_transformers
         allow(User).to receive(:_protobuf_attribute_transformers).and_return(
-          {:account_id => lambda { |proto| nil }}.merge(transformers)
+          {:account_id => transformer}.merge(transformers)
         )
       end
 
@@ -117,11 +122,29 @@ describe Protobuf::ActiveRecord::Transformation do
       end
     end
 
+    context 'when the transformer has a nullify_on option' do
+      let(:callable) { lambda { |proto| nil } }
+      let(:transformer) { ::Protobuf::ActiveRecord::Transformer.new(callable, :nullify_on => :account_id) }
+      let(:proto_hash) { { :name => 'foo bar', :email => 'foo@test.co', :nullify => [:account_id] } }
+
+      before do
+        transformers = User._protobuf_attribute_transformers
+        allow(User).to receive(:_protobuf_attribute_transformers).and_return(
+          {:account_id => transformer}.merge(transformers)
+        )
+      end
+
+      it "does not set the attribute" do
+        attribute_fields = User.attributes_from_proto(proto)
+        expect(attribute_fields).to include(:account_id => nil)
+      end
+    end
+
     context "when a transformer is a callable that returns a value" do
       before do
         transformers = User._protobuf_attribute_transformers
         allow(User).to receive(:_protobuf_attribute_transformers).and_return(
-          {:account_id => lambda { |proto| 1 }}.merge(transformers)
+          {:account_id => transformer}.merge(transformers)
         )
       end
 
