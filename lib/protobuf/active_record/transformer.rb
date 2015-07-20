@@ -14,11 +14,6 @@ module Protobuf
 
       def nullify?(proto)
         return false unless options[:nullify_on]
-        field = proto.class.get_field(:nullify)
-        unless field && field.is_a?(::Protobuf::Field::StringField) && field.rule == :repeated
-          ::Protobuf::Logging.logger.warn "Message: #{proto.class} is not compatible with :nullify_on option"
-          return false
-        end
         return false unless proto.field?(:nullify) && proto.nullify.is_a?(Array)
 
         proto.nullify.include?(options[:nullify_on].to_s)
