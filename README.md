@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.org/liveh2o/protobuf-activerecord.svg?branch=master)](https://travis-ci.org/liveh2o/protobuf-activerecord)
+
 # Protobuf ActiveRecord
 
 Protobuf Active Record provides the ability to create and update Active Record objects from protobuf messages and to serialize Active Record objects to protobuf messages.
