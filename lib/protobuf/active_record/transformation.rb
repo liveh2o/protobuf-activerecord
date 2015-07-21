@@ -110,6 +110,13 @@ module Protobuf
             callable = symbol_or_block
           end
 
+          if options[:nullify_on]
+            field = protobuf_message.get_field(:nullify)
+            unless field && field.is_a?(::Protobuf::Field::StringField) && field.repeated?
+              ::Protobuf::Logging.logger.warn "Message: #{protobuf_message} is not compatible with :nullify_on option"
+            end
+          end
+
           transformer = ::Protobuf::ActiveRecord::Transformer.new(callable, options)
           _protobuf_attribute_transformers[attribute.to_sym] = transformer
         end
