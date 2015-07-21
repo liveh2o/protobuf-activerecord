@@ -150,6 +150,13 @@ describe Protobuf::ActiveRecord::Serialization do
           fields = user._filtered_fields(:deprecated => false)
           expect(fields).to eq [ :guid, :name, :email, :password, :nullify ]
         end
+
+        context 'and :include => :email_domain' do
+          it 'includes deprecated fields that have been explicitly specified' do
+            fields = user._filtered_fields(:deprecated => false, :include => :email_domain)
+            expect(fields).to match_array([ :guid, :name, :email, :email_domain, :password, :nullify ])
+          end
+        end
       end
     end
 

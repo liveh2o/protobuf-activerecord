@@ -150,10 +150,14 @@ module Protobuf
 
         fields = self.class.protobuf_message.all_fields.map do |field|
           next if field.nil?
-          next if exclude_deprecated && field.deprecated?
+          next if field.deprecated? && exclude_deprecated
+
           field.name.to_sym
         end
+        fields += [ options.fetch(:include, nil) ]
+        fields.flatten!
         fields.compact!
+        fields.uniq!
 
         fields
       end
