@@ -3,5 +3,6 @@ language: ruby
 rvm:
   - 2.2.2
   - jruby
+sudo: false
 # uncomment this line if your project needs to run something other than `rake`:
 # script: bundle exec rspec spec
