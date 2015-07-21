@@ -131,6 +131,15 @@ class User < ActiveRecord::Base
 end
 ```
 
+On the chance you want to exclude deprecated fields, but also include a specfic one, simply pass the `:include` option:
+
+```Ruby
+class User < ActiveRecord::Base
+  # Passing :deprecated => false configures Protobuf Active Record to exclude deprecated fields.
+  protobuf_message :user_message, :deprecated => false, :include => :a_specific_deprecated_field
+end
+```
+
 ### Field transformers
 
 Field transformers are used when serializing objects to protobuf messages. Regular field mapping and conversions will be handled out of the box, but for those times when fields don't map directly to attributes or custom behavior is needed, use `field_from_record` method.
