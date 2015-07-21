@@ -1,3 +1,4 @@
+[![Gem Version](https://badge.fury.io/rb/protobuf-activerecord.svg)](http://badge.fury.io/rb/protobuf-activerecord)
 [![Build Status](https://travis-ci.org/liveh2o/protobuf-activerecord.svg?branch=master)](https://travis-ci.org/liveh2o/protobuf-activerecord)
 
 # Protobuf ActiveRecord
