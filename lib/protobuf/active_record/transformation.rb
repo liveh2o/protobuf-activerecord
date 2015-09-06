@@ -30,7 +30,7 @@ module Protobuf
           fields = proto.to_hash
           fields.select! do |key, value|
             field = proto.class.get_field(key, true)
-            proto.has_field?(key) && !field.repeated?
+            proto.field?(key) && !field.repeated?
           end
 
           filtered_attributes = _filtered_attributes + _protobuf_nested_attributes

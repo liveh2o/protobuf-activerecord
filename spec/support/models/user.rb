@@ -11,7 +11,7 @@ class User < ActiveRecord::Base
   attribute_from_proto :password, lambda { |proto| proto.password! }
 
   def self.extract_first_name(proto)
-    if proto.has_field?(:name)
+    if proto.field?(:name)
       names = proto.name.split(" ")
       first_name = names.first
     end
@@ -20,7 +20,7 @@ class User < ActiveRecord::Base
   end
 
   def self.extract_last_name(proto)
-    if proto.has_field?(:name)
+    if proto.field?(:name)
       names = proto.name.split(" ")
       names.shift # Drop the first name
       last_name = names.join(" ")
