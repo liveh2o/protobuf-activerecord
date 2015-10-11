@@ -12,7 +12,7 @@ describe Protobuf::ActiveRecord::Columns do
 
       let(:expected_column_types) {
         User.columns.inject({}) do |hash, column|
-          hash[column.type.to_sym] ||= []
+          hash[column.type.to_sym] ||= ::Set.new
           hash[column.type.to_sym] << column.name.to_sym
           hash
         end
