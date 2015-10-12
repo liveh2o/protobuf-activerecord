@@ -1,3 +1,4 @@
+require 'set'
 require 'active_support/concern'
 
 module Protobuf
@@ -46,7 +47,7 @@ module Protobuf
             return if _protobuf_mapped_columns?
 
             @_protobuf_columns = {}
-            @_protobuf_column_types = Hash.new { |h,k| h[k] = [] }
+            @_protobuf_column_types = ::Hash.new { |h,k| h[k] = ::Set.new }
 
             columns.map do |column|
               @_protobuf_columns[column.name.to_sym] = column
