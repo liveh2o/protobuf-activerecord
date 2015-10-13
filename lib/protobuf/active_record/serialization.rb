@@ -18,7 +18,7 @@ module Protobuf
       end
 
       module ClassMethods
-        # :nodoc:
+
         def _protobuf_convert_attributes_to_fields(key, value)
           return value if value.nil?
 
@@ -131,33 +131,54 @@ module Protobuf
 
           @protobuf_message
         end
+
+        # :nodoc:
+        def _deprecated_fields
+          return @_deprecated_fields if @_deprecated_fields
+          @_deprecated_fields = protobuf_message.all_fields.map do |field|
+            next if field.nil?
+            next unless field.deprecated?
+            field.name.to_sym
+          end
+          @_deprecated_fields.flatten!
+          @_deprecated_fields.compact!
+          @_deprecated_fields.uniq!
+
+          @_deprecated_fields
+        end
+
+        # :nodoc:
+        def _protobuf_fields
+          fields = protobuf_message.all_fields.map do |field|
+            next if field.nil?
+            field.name.to_sym
+          end
+          fields.flatten!
+          fields.compact!
+          fields.uniq!
+
+          fields
+        end
+
+        # :nodoc:
+        def _mapped_protobuf_fields
+          return @_mapped_protobuf_fields if @_mapped_protobuf_fields
+          @_mapped_protobuf_fields = _protobuf_fields.select do |field|
+            _protobuf_field_transformers.key?(field) || instance_methods.include?(field)
+          end
+          @_mapped_protobuf_fields
+        end
       end
 
       # :nodoc:
       def _filter_field_attributes(options = {})
         options = _normalize_options(options)
 
-        fields = _filtered_fields(options)
+        fields = self.class._mapped_protobuf_fields
         fields &= [ options[:only] ].flatten if options[:only].present?
         fields -= [ options[:except] ].flatten if options[:except].present?
-
-        fields
-      end
-
-      # :nodoc:
-      def _filtered_fields(options = {})
-        exclude_deprecated = ! options.fetch(:deprecated, true)
-
-        fields = self.class.protobuf_message.all_fields.map do |field|
-          next if field.nil?
-          next if field.deprecated? && exclude_deprecated
-
-          field.name.to_sym
-        end
-        fields += [ options.fetch(:include, nil) ]
-        fields.flatten!
-        fields.compact!
-        fields.uniq!
+        fields -= self.class._deprecated_fields if options[:deprecated] == false
+        fields += [ options[:include] ].flatten if options[:include].present?
 
         fields
       end
@@ -183,16 +204,12 @@ module Protobuf
       #
       def fields_from_record(options = {})
         field_attributes = _filter_field_attributes(options)
-        field_attributes += [ options.fetch(:include, []) ]
-        field_attributes.flatten!
-        field_attributes.compact!
-        field_attributes.uniq!
 
         field_attributes = field_attributes.inject({}) do |hash, field|
-          if _protobuf_field_transformers.has_key?(field)
+          if _protobuf_field_transformers.key?(field)
             hash[field] = _protobuf_field_transformers[field].call(self)
           else
-            value = respond_to?(field) ? __send__(field) : nil
+            value = __send__(field)
             hash[field] = _protobuf_convert_attributes_to_fields(field, value)
           end
           hash
