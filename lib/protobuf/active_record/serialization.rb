@@ -23,17 +23,17 @@ module Protobuf
         def _protobuf_convert_attributes_to_fields(key, value)
           case
           when value.nil? then
-            return value
+            value
           when _protobuf_date_column?(key) then
-            return value.to_time.to_i
+            value.to_time.to_i
           when _protobuf_datetime_column?(key) then
-            return value.to_i
+            value.to_i
           when _protobuf_time_column?(key) then
-            return value.to_i
+            value.to_i
           when _protobuf_timestamp_column?(key) then
-            return value.to_i
+            value.to_i
           else
-            return value
+            value
           end
         end
 
