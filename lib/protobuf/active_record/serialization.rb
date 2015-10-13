@@ -1,4 +1,5 @@
-'active_support/concerns'
+require 'set'
+require 'active_support/concern'
 
 module Protobuf
   module ActiveRecord
@@ -20,22 +21,20 @@ module Protobuf
       module ClassMethods
         # :nodoc:
         def _protobuf_convert_attributes_to_fields(key, value)
-          return value if value.nil?
-
-          value = case
-                  when _protobuf_date_column?(key) then
-                    value.to_time.to_i
-                  when _protobuf_datetime_column?(key) then
-                    value.to_i
-                  when _protobuf_time_column?(key) then
-                    value.to_i
-                  when _protobuf_timestamp_column?(key) then
-                    value.to_i
-                  else
-                    value
-                  end
-
-          return value
+          case
+          when value.nil? then
+            return value
+          when _protobuf_date_column?(key) then
+            return value.to_time.to_i
+          when _protobuf_datetime_column?(key) then
+            return value.to_i
+          when _protobuf_time_column?(key) then
+            return value.to_i
+          when _protobuf_timestamp_column?(key) then
+            return value.to_i
+          else
+            return value
+          end
         end
 
         def _protobuf_field_options
@@ -44,6 +43,36 @@ module Protobuf
 
         def _protobuf_field_transformers
           @_protobuf_field_transformers ||= {}
+        end
+
+        def _protobuf_instance_respond_to_from_cache?(key)
+          _protobuf_respond_to_cache.include?(key)
+        end
+
+        def _protobuf_message_deprecated_fields
+          @_protobuf_message_deprecated_fields ||= begin
+            self.protobuf_message.all_fields.map do |field|
+              next if field.nil?
+              next unless field.deprecated?
+
+              field.name.to_sym
+            end
+          end
+        end
+
+        def _protobuf_message_non_deprecated_fields
+          @_protobuf_message_non_deprecated_fields ||= begin
+            self.protobuf_message.all_fields.map do |field|
+              next if field.nil?
+              next if field.deprecated?
+
+              field.name.to_sym
+            end
+          end
+        end
+
+        def _protobuf_respond_to_cache
+          @_protobuf_respond_to_cache ||= ::Set.new
         end
 
         # Define a field transformation from a record. Accepts a Symbol,
@@ -146,16 +175,12 @@ module Protobuf
 
       # :nodoc:
       def _filtered_fields(options = {})
-        exclude_deprecated = ! options.fetch(:deprecated, true)
+        include_deprecated = options.fetch(:deprecated, true)
 
-        fields = self.class.protobuf_message.all_fields.map do |field|
-          next if field.nil?
-          next if field.deprecated? && exclude_deprecated
-
-          field.name.to_sym
-        end
-        fields += [ options.fetch(:include, nil) ]
-        fields.flatten!
+        fields = []
+        fields.concat(self.class._protobuf_message_non_deprecated_fields)
+        fields.concat(self.class._protobuf_message_deprecated_fields) if include_deprecated
+        fields.concat([options[:include]].flatten) if options[:include].present?
         fields.compact!
         fields.uniq!
 
@@ -182,23 +207,39 @@ module Protobuf
       #   fields_from_record(:except => :email_domain, :deprecated => false)
       #
       def fields_from_record(options = {})
+        hash = {}
         field_attributes = _filter_field_attributes(options)
-        field_attributes += [ options.fetch(:include, []) ]
-        field_attributes.flatten!
-        field_attributes.compact!
-        field_attributes.uniq!
 
-        field_attributes = field_attributes.inject({}) do |hash, field|
-          if _protobuf_field_transformers.has_key?(field)
-            hash[field] = _protobuf_field_transformers[field].call(self)
-          else
-            value = respond_to?(field) ? __send__(field) : nil
-            hash[field] = _protobuf_convert_attributes_to_fields(field, value)
-          end
-          hash
+        # Already flattened / compacted / uniqued ... unless we must include
+        if options[:include].present?
+          field_attributes.concat([ options[:include] ].flatten)
+          field_attributes.compact!
+          field_attributes.uniq!
         end
 
-        field_attributes
+        attribute_number = 0
+        limit = field_attributes.size
+
+        # One of the very few places the diff between each/while can make a difference
+        # in terms of optimization (`while` is slightly faster as no block carried through)
+        while attribute_number < limit
+          field = field_attributes[attribute_number]
+          hash[field] = case
+                        when _protobuf_field_transformers.has_key?(field) then
+                          _protobuf_field_transformers[field].call(self)
+                        when self.class._protobuf_instance_respond_to_from_cache?(field) then
+                          _protobuf_convert_attributes_to_fields(field, __send__(field))
+                        when respond_to?(field) then
+                          self.class._protobuf_respond_to_cache << field
+                          _protobuf_convert_attributes_to_fields(field, __send__(field))
+                        else
+                          nil
+                        end
+
+          attribute_number += 1
+        end
+
+        hash
       end
 
       # :nodoc:
