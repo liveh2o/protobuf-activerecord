@@ -10,8 +10,8 @@ describe Protobuf::ActiveRecord::Serialization do
 
   describe "._protobuf_convert_attributes_to_fields" do
     context "when the column type is :date" do
-      let(:date) { Date.current }
-      let(:integer) { date.to_time.to_i }
+      let(:date) { Date.new(2015, 10, 1) }
+      let(:integer) { 1_443_657_600 }
 
       before { allow(User).to receive(:_protobuf_date_column?).and_return(true) }
 
