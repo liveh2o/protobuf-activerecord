@@ -25,7 +25,7 @@ module Protobuf
           when value.nil? then
             value
           when _protobuf_date_column?(key) then
-            value.to_time.to_i
+            value.to_time(:utc).to_i
           when _protobuf_datetime_column?(key) then
             value.to_i
           when _protobuf_time_column?(key) then
