@@ -40,8 +40,7 @@ module Protobuf
 
         # :nodoc:
         def _protobuf_date_column?(key)
-          column_types = _protobuf_column_types[:date]
-          !column_types.nil? && column_types.include?(key)
+          _protobuf_column_types[:date].include?(key)
         end
 
         # :nodoc:
@@ -51,8 +50,7 @@ module Protobuf
 
         # :nodoc:
         def _protobuf_datetime_column?(key)
-          column_types = _protobuf_column_types[:datetime]
-          !column_types.nil? && column_types.include?(key)
+          _protobuf_column_types[:datetime].include?(key)
         end
 
         # Map out the columns for future reference on type conversion
@@ -89,14 +87,12 @@ module Protobuf
 
         # :nodoc:
         def _protobuf_time_column?(key)
-          column_types = _protobuf_column_types[:time]
-          !column_types.nil? && column_types.include?(key)
+          _protobuf_column_types[:time].include?(key)
         end
 
         # :nodoc:
         def _protobuf_timestamp_column?(key)
-          column_types = _protobuf_column_types[:timestamp]
-          !column_types.nil? && column_types.include?(key)
+          _protobuf_column_types[:timestamp].include?(key)
         end
       end
     end
