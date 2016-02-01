@@ -1,10 +1,13 @@
 require 'set'
 require 'active_support/concern'
+require 'thread'
 
 module Protobuf
   module ActiveRecord
     module Columns
       extend ::ActiveSupport::Concern
+
+      COLUMN_TYPE_MAP_MUTEX = ::Mutex.new
 
       included do
         include ::Heredity
@@ -40,7 +43,7 @@ module Protobuf
         # Map out the columns for future reference on type conversion
         # :nodoc:
         def _protobuf_map_columns(force = false)
-          ::Thread.exclusive do
+          COLUMN_TYPE_MAP_MUTEX.synchronize do
             @_protobuf_mapped_columns = false if force
 
             return unless table_exists?
