@@ -22,9 +22,9 @@ module Protobuf
         # :nodoc:
         def _protobuf_convert_attributes_to_fields(key, value)
           return value unless _protobuf_date_datetime_time_or_timestamp_column?(key)
-          return value.to_time(:utc).to_i if _protobuf_date_column?(key)
+          return value.to_i unless _protobuf_date_column?(key)
 
-          value.to_i
+          value.to_time(:utc).to_i
         end
 
         def _protobuf_field_options
