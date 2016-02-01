@@ -59,21 +59,18 @@ module Protobuf
 
         # :nodoc:
         def _protobuf_convert_fields_to_attributes(key, value)
-          return value if value.nil?
+          return nil if value.nil?
+          return value unless _protobuf_date_datetime_time_or_timestamp_column?(key)
 
           value = case
-                  when !_protobuf_date_datetime_time_or_timestamp_column?(key) then
-                    value
-                  when _protobuf_date_column?(key) then
-                    convert_int64_to_date(value)
                   when _protobuf_datetime_column?(key) then
                     convert_int64_to_datetime(value)
-                  when _protobuf_time_column?(key) then
-                    convert_int64_to_time(value)
                   when _protobuf_timestamp_column?(key) then
                     convert_int64_to_time(value)
-                  else
-                    value
+                  when _protobuf_time_column?(key) then
+                    convert_int64_to_time(value)
+                  when _protobuf_date_column?(key) then
+                    convert_int64_to_date(value)
                   end
 
           return value
