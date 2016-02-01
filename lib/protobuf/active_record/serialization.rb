@@ -21,20 +21,10 @@ module Protobuf
       module ClassMethods
         # :nodoc:
         def _protobuf_convert_attributes_to_fields(key, value)
-          case
-          when value.nil? then
-            value
-          when _protobuf_date_column?(key) then
-            value.to_time(:utc).to_i
-          when _protobuf_datetime_column?(key) then
-            value.to_i
-          when _protobuf_time_column?(key) then
-            value.to_i
-          when _protobuf_timestamp_column?(key) then
-            value.to_i
-          else
-            value
-          end
+          return value unless _protobuf_date_datetime_time_or_timestamp_column?(key)
+          return value.to_time(:utc).to_i if _protobuf_date_column?(key)
+
+          value.to_i
         end
 
         def _protobuf_field_options

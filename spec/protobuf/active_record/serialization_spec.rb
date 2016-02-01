@@ -13,7 +13,10 @@ describe Protobuf::ActiveRecord::Serialization do
       let(:date) { Date.new(2015, 10, 1) }
       let(:integer) { 1_443_657_600 }
 
-      before { allow(User).to receive(:_protobuf_date_column?).and_return(true) }
+      before {
+        allow(User).to receive(:_protobuf_date_datetime_time_or_timestamp_column?).and_return(true)
+        allow(User).to receive(:_protobuf_date_column?).and_return(true)
+      }
 
       it "converts the given value to an integer" do
         expect(User._protobuf_convert_attributes_to_fields(:foo_date, date)).to eq integer
@@ -24,7 +27,10 @@ describe Protobuf::ActiveRecord::Serialization do
       let(:datetime) { DateTime.current }
       let(:integer) { datetime.to_time.to_i }
 
-      before { allow(User).to receive(:_protobuf_datetime_column?).and_return(true) }
+      before {
+        allow(User).to receive(:_protobuf_date_datetime_time_or_timestamp_column?).and_return(true)
+        allow(User).to receive(:_protobuf_datetime_column?).and_return(true)
+      }
 
       it "converts the given value to an integer" do
         expect(User._protobuf_convert_attributes_to_fields(:foo_datetime, datetime)).to eq integer
@@ -35,7 +41,10 @@ describe Protobuf::ActiveRecord::Serialization do
       let(:time) { Time.current }
       let(:integer) { time.to_time.to_i }
 
-      before { allow(User).to receive(:_protobuf_time_column?).and_return(true) }
+      before {
+        allow(User).to receive(:_protobuf_date_datetime_time_or_timestamp_column?).and_return(true)
+        allow(User).to receive(:_protobuf_time_column?).and_return(true)
+      }
 
       it "converts the given value to an integer" do
         expect(User._protobuf_convert_attributes_to_fields(:foo_time, time)).to eq integer
@@ -46,7 +55,10 @@ describe Protobuf::ActiveRecord::Serialization do
       let(:timestamp) { Time.current }
       let(:integer) { timestamp.to_time.to_i }
 
-      before { allow(User).to receive(:_protobuf_timestamp_column?).and_return(true) }
+      before {
+        allow(User).to receive(:_protobuf_date_datetime_time_or_timestamp_column?).and_return(true)
+        allow(User).to receive(:_protobuf_timestamp_column?).and_return(true)
+      }
 
       it "converts the given value to an integer" do
         expect(User._protobuf_convert_attributes_to_fields(:foo_timestamp, timestamp)).to eq integer
