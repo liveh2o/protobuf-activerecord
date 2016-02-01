@@ -8,12 +8,14 @@ module Protobuf
 
       included do
         class << self
-          attr_writer :_protobuf_field_transformers,
+          attr_writer :_protobuf_field_symbol_transformers,
+                      :_protobuf_field_transformers,
                       :_protobuf_field_options,
                       :protobuf_message
         end
 
         private :_protobuf_convert_attributes_to_fields
+        private :_protobuf_field_symbol_transformers
         private :_protobuf_field_transformers
         private :_protobuf_message
       end
@@ -29,6 +31,10 @@ module Protobuf
 
         def _protobuf_field_options
           @_protobuf_field_options ||= {}
+        end
+
+        def _protobuf_field_symbol_transformers
+          @_protobuf_field_symbol_transformers ||= {}
         end
 
         def _protobuf_field_transformers
@@ -83,14 +89,13 @@ module Protobuf
         #   end
         #
         def field_from_record(field, transformer = nil, &block)
-          transformer ||= block
-
           if transformer.is_a?(Symbol)
-            callable = lambda { |value| self.__send__(transformer, value) }
-          else
-            callable = transformer
+            _protobuf_field_symbol_transformers[field] = transformer
+            return
           end
 
+          transformer ||= block
+          callable = transformer
           unless callable.respond_to?(:call)
             raise FieldTransformerError
           end
@@ -215,6 +220,8 @@ module Protobuf
         while attribute_number < limit
           field = field_attributes[attribute_number]
           hash[field] = case
+                        when _protobuf_field_symbol_transformers.has_key?(field) then
+                          self.__send__(_protobuf_field_symbol_transformers[field], self)
                         when _protobuf_field_transformers.has_key?(field) then
                           _protobuf_field_transformers[field].call(self)
                         when self.class._protobuf_instance_respond_to_from_cache?(field) then
@@ -235,6 +242,11 @@ module Protobuf
       # :nodoc:
       def _protobuf_convert_attributes_to_fields(field, value)
         self.class._protobuf_convert_attributes_to_fields(field, value)
+      end
+
+      # :nodoc:
+      def _protobuf_field_symbol_transformers
+        self.class._protobuf_field_symbol_transformers
       end
 
       # :nodoc:

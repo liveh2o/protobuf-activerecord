@@ -76,13 +76,10 @@ describe Protobuf::ActiveRecord::Serialization do
 
   describe ".field_from_record" do
     context "when the given converter is a symbol" do
-      let(:callable) { lambda { |value| User.__send__(:extract_first_name) } }
-
       before { User.field_from_record :first_name, :extract_first_name }
 
-      it "creates a callable method object from the converter" do
-        expect(User).to receive(:extract_first_name)
-        User._protobuf_field_transformers[:first_name].call(1)
+      it "creates a symbol transformer from the converter" do
+        expect(User._protobuf_field_symbol_transformers[:first_name]).to eq :extract_first_name
       end
     end
 
