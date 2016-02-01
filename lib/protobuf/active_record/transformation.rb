@@ -62,6 +62,8 @@ module Protobuf
           return value if value.nil?
 
           value = case
+                  when !_protobuf_date_datetime_time_or_timestamp_column?(key) then
+                    value
                   when _protobuf_date_column?(key) then
                     convert_int64_to_date(value)
                   when _protobuf_datetime_column?(key) then
