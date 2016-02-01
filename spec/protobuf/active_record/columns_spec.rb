@@ -23,7 +23,9 @@ describe Protobuf::ActiveRecord::Columns do
       end
 
       it "maps column names by column type" do
-        expect(User._protobuf_column_types).to eq expected_column_types
+        expected_column_types.each do |expected_column_type, value|
+          expect(User._protobuf_column_types).to include expected_column_type => value
+        end
       end
     end
   end

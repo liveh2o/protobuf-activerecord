@@ -34,7 +34,10 @@ describe Protobuf::ActiveRecord::Transformation do
       let(:date) { Date.current }
       let(:value) { date.to_time.to_i }
 
-      before { allow(User).to receive(:_protobuf_date_column?).and_return(true) }
+      before {
+        allow(User).to receive(:_protobuf_date_datetime_time_or_timestamp_column?).and_return(true)
+        allow(User).to receive(:_protobuf_date_column?).and_return(true)
+      }
 
       it "converts the given value to a Date object" do
         expect(User._protobuf_convert_fields_to_attributes(:foo_date, value)).to eq date
@@ -45,7 +48,10 @@ describe Protobuf::ActiveRecord::Transformation do
       let(:datetime) { DateTime.current }
       let(:value) { datetime.to_i }
 
-      before { allow(User).to receive(:_protobuf_datetime_column?).and_return(true) }
+      before {
+        allow(User).to receive(:_protobuf_date_datetime_time_or_timestamp_column?).and_return(true)
+        allow(User).to receive(:_protobuf_datetime_column?).and_return(true)
+      }
 
       it "converts the given value to a DateTime object" do
         expect(User._protobuf_convert_fields_to_attributes(:foo_datetime, value)).to be_a(DateTime)
@@ -60,7 +66,10 @@ describe Protobuf::ActiveRecord::Transformation do
       let(:time) { Time.current }
       let(:value) { time.to_i }
 
-      before { allow(User).to receive(:_protobuf_time_column?).and_return(true) }
+      before {
+        allow(User).to receive(:_protobuf_date_datetime_time_or_timestamp_column?).and_return(true)
+        allow(User).to receive(:_protobuf_time_column?).and_return(true)
+      }
 
       it "converts the given value to a Time object" do
         expect(User._protobuf_convert_fields_to_attributes(:foo_time, value)).to be_a(Time)
@@ -75,7 +84,10 @@ describe Protobuf::ActiveRecord::Transformation do
       let(:time) { Time.current }
       let(:value) { time.to_i }
 
-      before { allow(User).to receive(:_protobuf_timestamp_column?).and_return(true) }
+      before {
+        allow(User).to receive(:_protobuf_date_datetime_time_or_timestamp_column?).and_return(true)
+        allow(User).to receive(:_protobuf_timestamp_column?).and_return(true)
+      }
 
       it "converts the given value to a Time object" do
         expect(User._protobuf_convert_fields_to_attributes(:foo_time, value)).to be_a(Time)
