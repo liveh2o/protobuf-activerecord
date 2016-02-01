@@ -222,7 +222,7 @@ module Protobuf
           field = field_attributes[attribute_number]
           hash[field] = case
                         when _protobuf_field_symbol_transformers.has_key?(field) then
-                          self.__send__(_protobuf_field_symbol_transformers[field], self)
+                          self.class.__send__(_protobuf_field_symbol_transformers[field], self)
                         when _protobuf_field_transformers.has_key?(field) then
                           _protobuf_field_transformers[field].call(self)
                         when self.class._protobuf_instance_respond_to_from_cache?(field) then
