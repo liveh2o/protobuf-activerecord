@@ -1,3 +1,5 @@
+require "thread"
+
 module Protobuf
   module ActiveRecord
     module Middleware
