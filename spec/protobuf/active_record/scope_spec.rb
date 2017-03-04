@@ -42,7 +42,7 @@ describe Protobuf::ActiveRecord::Scope do
 
       it "raises an exception" do
         allow(User).to receive(:searchable_fields).and_return({ :email =>  :by_hullabaloo })
-        expect { User.search_scope(request) }.to raise_exception(/Undefined scope :by_hullabaloo/)
+        expect { User.search_scope(request) }.to raise_exception(/undefined method .*by_hullabaloo/i)
       end
     end
   end
