@@ -95,10 +95,6 @@ module Protobuf
           searchable_fields.each do |field, scope_name|
             next unless proto.respond_to_and_has_and_present?(field)
 
-            unless self.respond_to?(scope_name)
-              raise SearchScopeError, "Undefined scope :#{scope_name}."
-            end
-
             search_values = parse_search_values(proto, field)
             search_relation = search_relation.__send__(scope_name, *search_values)
           end
