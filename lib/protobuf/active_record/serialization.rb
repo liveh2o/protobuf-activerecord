@@ -156,6 +156,73 @@ module Protobuf
 
           @protobuf_message
         end
+
+        def _protobuf_write_convert_to_fields_method(field)
+          is_datetime_time_or_timestamp_column = _protobuf_date_datetime_time_or_timestamp_column?(field)
+          is_date_column = _protobuf_date_column?(field)
+
+          if is_datetime_time_or_timestamp_column
+            if is_date_column
+              self.class_eval <<-RUBY, __FILE__, __LINE__ + 1
+                def _protobuf_active_record_serialize_#{field}
+                  value = #{field}
+                  return nil if value.nil?
+
+                  value.to_time(:utc).to_i
+                end
+              RUBY
+            else
+              self.class_eval <<-RUBY, __FILE__, __LINE__ + 1
+                def _protobuf_active_record_serialize_#{field}
+                  value = #{field}
+                  return nil if value.nil?
+
+                  value.to_i
+                end
+              RUBY
+            end
+          else
+            self.class_eval <<-RUBY, __FILE__, __LINE__ + 1
+              def _protobuf_active_record_serialize_#{field}
+                #{field}
+              end
+            RUBY
+          end
+        end
+
+        def _protobuf_write_field_transformer_method(field)
+          self.class_eval <<-RUBY, __FILE__, __LINE__ + 1
+            def _protobuf_active_record_serialize_#{field}
+              self.class._protobuf_field_transformers[:#{field}].call(self)
+            end
+          RUBY
+        end
+
+        def _protobuf_write_nil_method(field)
+          self.class_eval <<-RUBY, __FILE__, __LINE__ + 1
+            def _protobuf_active_record_serialize_#{field}
+              nil
+            end
+          RUBY
+        end
+
+        def _protobuf_write_symbol_transformer_method(field)
+          transformer_method = _protobuf_field_symbol_transformers[field]
+
+          if self.instance_methods.include?(transformer_method)
+            self.class_eval <<-RUBY, __FILE__, __LINE__ + 1
+              def _protobuf_active_record_serialize_#{field}
+                #{transformer_method}
+              end
+            RUBY
+          else
+            self.class_eval <<-RUBY, __FILE__, __LINE__ + 1
+              def _protobuf_active_record_serialize_#{field}
+                self.class.__send__(#{transformer_method}, self)
+              end
+            RUBY
+          end
+        end
       end
 
       # :nodoc:
@@ -220,19 +287,25 @@ module Protobuf
         # in terms of optimization (`while` is slightly faster as no block carried through)
         while attribute_number < limit
           field = field_attributes[attribute_number]
-          hash[field] = case
-                        when _protobuf_field_symbol_transformers.has_key?(field) then
-                          self.class.__send__(_protobuf_field_symbol_transformers[field], self)
-                        when _protobuf_field_transformers.has_key?(field) then
-                          _protobuf_field_transformers[field].call(self)
-                        when self.class._protobuf_instance_respond_to_from_cache?(field) then
-                          _protobuf_convert_attributes_to_fields(field, __send__(field))
-                        when respond_to?(field) then
-                          self.class._protobuf_respond_to_cache << field
-                          _protobuf_convert_attributes_to_fields(field, __send__(field))
-                        else
-                          nil
-                        end
+
+          begin
+            hash[field] = __send__("_protobuf_active_record_serialize_#{field}")
+          rescue NoMethodError => error
+            raise unless error.message =~ /_protobuf_active_record_serialize/i
+
+            case
+            when _protobuf_field_symbol_transformers.has_key?(field) then
+              self.class._protobuf_write_symbol_transformer_method(field)
+            when _protobuf_field_transformers.has_key?(field) then
+              self.class._protobuf_write_field_transformer_method(field)
+            when respond_to?(field) then
+              self.class._protobuf_write_convert_to_fields_method(field)
+            else
+              self.class._protobuf_write_nil_method(field)
+            end
+
+            hash[field] = __send__("_protobuf_active_record_serialize_#{field}")
+          end
 
           attribute_number += 1
         end

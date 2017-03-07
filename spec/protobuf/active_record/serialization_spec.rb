@@ -239,11 +239,6 @@ describe Protobuf::ActiveRecord::Serialization do
         it "returns a hash of protobuf fields that this object has getters for" do
           expect(user.fields_from_record).to eq fields_from_record
         end
-
-        it "converts attributes values for protobuf messages" do
-          expect(user).to receive(:_protobuf_convert_attributes_to_fields).at_least(:once)
-          user.fields_from_record
-        end
       end
 
       context "given options with :include" do
