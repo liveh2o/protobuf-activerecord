@@ -222,11 +222,6 @@ describe Protobuf::ActiveRecord::Serialization do
 
       context "when a transformer is defined for the field" do
         let(:fields_from_record) { { :guid => user.guid, :name => user.name, :email => user.email, :email_domain => 'test.co', :password => nil, :nullify => nil } }
-        let(:transformer) { { :email_domain => lambda { |record| record.email.split('@').last } } }
-
-        before {
-          allow(User).to receive(:_protobuf_field_transformers).and_return(transformer)
-        }
 
         it "gets the field from the transformer" do
           expect(user.fields_from_record).to eq fields_from_record
@@ -235,6 +230,10 @@ describe Protobuf::ActiveRecord::Serialization do
 
       context "when a transformer is not defined for the field" do
         let(:fields_from_record) { { :guid => user.guid, :name => user.name, :email => user.email, :email_domain => nil, :password => nil, :nullify => nil } }
+
+        before {
+          allow(user).to receive(:_protobuf_active_record_serialize_email_domain).and_return(nil)
+        }
 
         it "returns a hash of protobuf fields that this object has getters for" do
           expect(user.fields_from_record).to eq fields_from_record
