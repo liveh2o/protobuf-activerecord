@@ -42,10 +42,6 @@ module Protobuf
           @_protobuf_field_transformers ||= {}
         end
 
-        def _protobuf_instance_respond_to_from_cache?(key)
-          _protobuf_respond_to_cache.include?(key)
-        end
-
         def _protobuf_message_deprecated_fields
           @_protobuf_message_deprecated_fields ||= begin
             self.protobuf_message.all_fields.map do |field|
@@ -66,10 +62,6 @@ module Protobuf
               field.name.to_sym
             end
           end
-        end
-
-        def _protobuf_respond_to_cache
-          @_protobuf_respond_to_cache ||= ::Set.new
         end
 
         # Define a field transformation from a record. Accepts a Symbol,
