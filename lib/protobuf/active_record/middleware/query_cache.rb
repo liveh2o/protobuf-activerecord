@@ -11,7 +11,7 @@ module Protobuf
         end
 
         def call(env)
-          connection = ::Thread.current[CURRENT_CONNECTION] = ::Activerecord::Base.connection
+          connection = ::Thread.current[CURRENT_CONNECTION] = ::ActiveRecord::Base.connection
           enabled = connection.query_cache_enabled
           connection.enable_query_cache!
 
