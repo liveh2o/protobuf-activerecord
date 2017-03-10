@@ -12,8 +12,10 @@ module Protobuf
             START_MUTEX.synchronize do
               return if timed_task_started.true?
 
-              timed_task = ::Concurrent::TimerTask.new(:execution_interval => ::Protobuf::ActiveRecord.config.async_execution_interval,
-                                                       :timeout_interval => ::Protobuf::ActiveRecord.config.async_timeout_interval) do
+              timed_task = ::Concurrent::TimerTask.new(
+                             :execution_interval => ::Protobuf::ActiveRecord.config.connection_reaping_interval,
+                             :timeout_interval => ::Protobuf::ActiveRecord.config.connection_reaping_timeout_interval) do
+
                 ::ActiveRecord::Base.clear_active_connections!
               end
 

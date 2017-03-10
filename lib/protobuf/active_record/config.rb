@@ -5,8 +5,8 @@ module Protobuf
         super
 
         self[:autoload] = true
-        self[:async_execution_interval] = 6
-        self[:async_timeout_interval] = 5
+        self[:connection_reaping_interval] = 6
+        self[:connection_reaping_timeout_interval] = 5
       end
     end
   end
