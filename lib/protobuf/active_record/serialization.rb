@@ -211,7 +211,7 @@ module Protobuf
             else
               self.class_eval <<-RUBY, __FILE__, __LINE__ + 1
                 def _protobuf_active_record_serialize_#{field}
-                  self.class.__send__(#{transformer_method}, self)
+                  self.class.__send__(:#{transformer_method}, self)
                 end
               RUBY
             end
