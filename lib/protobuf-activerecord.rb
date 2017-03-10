@@ -13,6 +13,7 @@ end
 
 require 'protobuf/active_record/config'
 require 'protobuf/active_record/middleware/connection_management'
+require 'protobuf/active_record/middleware/connection_management_async'
 require 'protobuf/active_record/middleware/query_cache'
 require 'protobuf/active_record/model'
 require 'protobuf/active_record/version'
