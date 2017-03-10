@@ -201,12 +201,20 @@ module Protobuf
         def _protobuf_write_symbol_transformer_method(field)
           transformer_method = _protobuf_field_symbol_transformers[field]
 
-          if self.methods.include?(transformer_method)
-            self.class_eval <<-RUBY, __FILE__, __LINE__ + 1
-              def _protobuf_active_record_serialize_#{field}
-                self.class.#{transformer_method}(self)
-              end
-            RUBY
+          if self.respond_to?(transformer_method, true)
+            if self.respond_to?(transformer_method, false)
+              self.class_eval <<-RUBY, __FILE__, __LINE__ + 1
+                def _protobuf_active_record_serialize_#{field}
+                  self.class.#{transformer_method}(self)
+                end
+              RUBY
+            else
+              self.class_eval <<-RUBY, __FILE__, __LINE__ + 1
+                def _protobuf_active_record_serialize_#{field}
+                  self.class.__send__(#{transformer_method}, self)
+                end
+              RUBY
+            end
           else
             self.class_eval <<-RUBY, __FILE__, __LINE__ + 1
               def _protobuf_active_record_serialize_#{field}
