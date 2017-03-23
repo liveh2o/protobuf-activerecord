@@ -14,22 +14,12 @@ module Protobuf
                       :protobuf_message
         end
 
-        private :_protobuf_convert_attributes_to_fields
         private :_protobuf_field_symbol_transformers
         private :_protobuf_field_transformers
         private :_protobuf_message
       end
 
       module ClassMethods
-        # :nodoc:
-        def _protobuf_convert_attributes_to_fields(key, value)
-          return value unless _protobuf_date_datetime_time_or_timestamp_column?(key)
-          return nil if value.nil?
-          return value.to_i unless _protobuf_date_column?(key)
-
-          value.to_time(:utc).to_i
-        end
-
         def _protobuf_field_options
           @_protobuf_field_options ||= {}
         end
@@ -311,11 +301,6 @@ module Protobuf
         end
 
         hash
-      end
-
-      # :nodoc:
-      def _protobuf_convert_attributes_to_fields(field, value)
-        self.class._protobuf_convert_attributes_to_fields(field, value)
       end
 
       # :nodoc:
