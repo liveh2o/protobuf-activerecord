@@ -10,7 +10,7 @@ module Protobuf
       end
 
       ActiveSupport.on_load(:protobuf_rpc_service) do
-        Protobuf::Rpc.middleware.insert_after Protobuf::Rpc::Middleware::Logger, Middleware::ConnectionManagement
+        Protobuf::Rpc.middleware.insert_after Protobuf::Rpc::Middleware::Logger, Middleware::ConnectionManagementAsync
         Protobuf::Rpc.middleware.insert_after Middleware::ConnectionManagementAsync, Middleware::QueryCache
       end
     end
