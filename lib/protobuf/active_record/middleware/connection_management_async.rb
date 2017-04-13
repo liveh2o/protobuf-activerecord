@@ -39,7 +39,9 @@ module Protobuf
 
         def call(env)
           def call(env)
-            @app.call(env)
+            ::ActiveRecord::Base.connection_pool.with_connection do
+              @app.call(env)
+            end
           end
 
           self.class.start_timed_task!
