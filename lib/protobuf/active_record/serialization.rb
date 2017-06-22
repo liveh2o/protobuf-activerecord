@@ -151,6 +151,8 @@ module Protobuf
                   return nil if value.nil?
 
                   value.to_time(:utc).to_i
+                rescue NameError # Has happened when field is not on model or ignored from db
+                  return nil
                 end
               RUBY
             else
@@ -160,6 +162,8 @@ module Protobuf
                   return nil if value.nil?
 
                   value.to_i
+                rescue NameError # Has happened when field is not on model or ignored from db
+                  return nil
                 end
               RUBY
             end
@@ -167,6 +171,8 @@ module Protobuf
             self.class_eval <<-RUBY, __FILE__, __LINE__ + 1
               def _protobuf_active_record_serialize_#{field}
                 #{field}
+              rescue NameError # Has happened when field is not on model or ignored from db
+                return nil
               end
             RUBY
           end
