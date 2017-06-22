@@ -166,6 +166,7 @@ describe Protobuf::ActiveRecord::Serialization do
         let(:fields_from_record) { { :guid => user.guid, :name => user.name, :email => user.email, :email_domain => nil, :password => nil, :nullify => nil } }
 
         before {
+          user.to_proto
           allow(user).to receive(:_protobuf_active_record_serialize_email_domain).and_return(nil)
         }
 
