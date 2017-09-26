@@ -10,6 +10,13 @@ ActiveRecord::Base.connection.tables.each do |table|
 end
 
 ActiveRecord::Schema.define(:version => 1) do
+  create_table :photos do |t|
+    t.string :url
+    t.integer :user_id
+
+    t.timestamps null: false
+  end
+
   create_table :users do |t|
     t.string :guid
     t.string :first_name
@@ -17,6 +24,6 @@ ActiveRecord::Schema.define(:version => 1) do
     t.string :email
     t.integer :account_id
 
-    t.timestamps
+    t.timestamps null: false
   end
 end

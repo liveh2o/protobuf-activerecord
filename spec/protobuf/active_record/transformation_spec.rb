@@ -201,14 +201,11 @@ describe Protobuf::ActiveRecord::Transformation do
     context "when the given transformer is callable" do
       let(:callable) { lambda { |proto| nil } }
 
-      before {
-        allow(User).to receive(:_protobuf_attribute_transformers).and_return(Hash.new)
-        User.attribute_from_proto :account_id, callable
-      }
+      before { allow(User).to receive(:_protobuf_attribute_transformers).and_return(Hash.new) }
 
-      it "adds the given converter to the list of protobuf field transformers", :pending => 'missing expectation?' do
-        User._protobuf_attribute_transformers[:account_id] = callable
-        fail
+      it "adds the given converter to the list of protobuf field transformers" do
+        User.attribute_from_proto :account_id, callable
+        expect(User._protobuf_attribute_transformers[:account_id].callable).to eq callable
       end
     end
   end

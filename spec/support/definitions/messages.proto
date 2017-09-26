@@ -1,3 +1,8 @@
+message PhotoMessage {
+  optional string url       = 1;
+  optional int64  user_guid = 2;
+}
+
 message UserMessage {
   optional string guid         = 1;
   optional string name         = 2;
@@ -5,6 +10,7 @@ message UserMessage {
   optional string email_domain = 4 [deprecated = true];
   optional string password     = 5;
   repeated string nullify      = 6;
+  repeated PhotoMessage photos = 7;
 }
 
 message UserSearchMessage {

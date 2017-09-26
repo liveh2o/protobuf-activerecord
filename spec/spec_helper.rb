@@ -1,19 +1,19 @@
-require 'rubygems'
-require 'bundler'
+require "rubygems"
+require "bundler"
 
-require 'simplecov'
+require "simplecov"
 SimpleCov.start do
-  add_filter '/spec/'
+  add_filter "/spec/"
 end
 
 Bundler.require(:default, :development, :test)
 
-require 'support/db'
-require 'support/models'
-require 'support/protobuf'
+require "support/db"
+require "support/models"
+require "support/protobuf/messages.pb"
 
-# Silence protobuf's logger
-::Protobuf::Logging.logger.level = ::Logger::FATAL
+# Silence protobuf"s logger
+Protobuf::Logging.logger.level = ::Logger::FATAL
 
 RSpec.configure do |config|
   # Turn deprecation warnings into errors with full backtrace.

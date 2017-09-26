@@ -9,7 +9,7 @@ describe Protobuf::ActiveRecord::Serialization do
   let(:protobuf_message) { UserMessage }
 
   describe ".field_from_record" do
-    context "when the given converter is a symbol" do
+    context "when the given transformer is a symbol" do
       before { User.field_from_record :first_name, :extract_first_name }
 
       it "creates a symbol transformer from the converter" do
@@ -17,7 +17,7 @@ describe Protobuf::ActiveRecord::Serialization do
       end
     end
 
-    context "when the given converter is not callable" do
+    context "when the given transformer is not callable" do
       it "raises an exception" do
         expect { User.field_from_record :name, nil }.to raise_exception(Protobuf::ActiveRecord::FieldTransformerError)
       end
@@ -31,9 +31,8 @@ describe Protobuf::ActiveRecord::Serialization do
         User.field_from_record :account_id, callable
       }
 
-      it "adds the given converter to the list of protobuf field transformers", :pending => 'missing expectation?' do
-        User._protobuf_field_transformers[:account_id] = callable
-        fail
+      it "adds the given converter to the list of protobuf field transformers" do
+        expect(User._protobuf_field_transformers[:account_id]).to eq(callable)
       end
     end
   end
@@ -78,26 +77,26 @@ describe Protobuf::ActiveRecord::Serialization do
       context "when options has :except" do
         it "returns all except the given field(s)" do
           fields = user._filter_field_attributes(:except => :name)
-          expect(fields).to match_array([ :guid, :email, :email_domain, :password, :nullify ])
+          expect(fields).to match_array([ :guid, :email, :email_domain, :password, :nullify, :photos ])
         end
       end
     end
 
     describe "#_filtered_fields" do
       it "returns protobuf fields" do
-        expect(user._filtered_fields).to match_array([ :guid, :name, :email, :email_domain, :password, :nullify ])
+        expect(user._filtered_fields).to match_array([ :guid, :name, :email, :email_domain, :password, :nullify, :photos ])
       end
 
       context "given :deprecated => false" do
         it "filters all deprecated fields" do
           fields = user._filtered_fields(:deprecated => false)
-          expect(fields).to match_array([ :guid, :name, :email, :password, :nullify ])
+          expect(fields).to match_array([ :guid, :name, :email, :password, :nullify, :photos ])
         end
 
         context 'and :include => :email_domain' do
           it 'includes deprecated fields that have been explicitly specified' do
             fields = user._filtered_fields(:deprecated => false, :include => :email_domain)
-            expect(fields).to match_array([ :guid, :name, :email, :email_domain, :password, :nullify ])
+            expect(fields).to match_array([ :guid, :name, :email, :email_domain, :password, :nullify, :photos ])
           end
         end
       end
@@ -155,23 +154,8 @@ describe Protobuf::ActiveRecord::Serialization do
       }
 
       context "when a transformer is defined for the field" do
-        let(:fields_from_record) { { :guid => user.guid, :name => user.name, :email => user.email, :email_domain => 'test.co', :password => nil, :nullify => nil } }
-
         it "gets the field from the transformer" do
-          expect(user.fields_from_record).to eq fields_from_record
-        end
-      end
-
-      context "when a transformer is not defined for the field" do
-        let(:fields_from_record) { { :guid => user.guid, :name => user.name, :email => user.email, :email_domain => nil, :password => nil, :nullify => nil } }
-
-        before {
-          user.to_proto
-          allow(user).to receive(:_protobuf_active_record_serialize_email_domain).and_return(nil)
-        }
-
-        it "returns a hash of protobuf fields that this object has getters for" do
-          expect(user.fields_from_record).to eq fields_from_record
+          expect(user.fields_from_record[:email_domain]).to eq('test.co')
         end
       end
 

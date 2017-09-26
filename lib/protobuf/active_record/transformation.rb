@@ -33,18 +33,28 @@ module Protobuf
             proto.field?(key) && !field.repeated?
           end
 
-          filtered_attributes = _filtered_attributes + _protobuf_nested_attributes
-          filtered_attributes += _protobuf_attribute_transformers.keys
+          filtered_attributes = _filtered_attributes + _protobuf_attribute_transformers.keys
 
           attribute_fields = filtered_attributes.inject({}) do |hash, column_name|
             symbolized_column = column_name.to_sym
 
-            if fields.has_key?(symbolized_column) ||
-              _protobuf_attribute_transformers.has_key?(symbolized_column)
+            if fields.has_key?(symbolized_column) || _protobuf_attribute_transformers.has_key?(symbolized_column)
               hash[symbolized_column] = fields[symbolized_column]
             end
 
             hash
+          end
+
+          _protobuf_nested_attributes.each do |attribute_name|
+            nested_attribute_name = "#{attribute_name}_attributes".to_sym
+            value = if proto.has_field?(nested_attribute_name)
+                      proto.__send__(nested_attribute_name)
+                    elsif proto.has_field?(attribute_name)
+                      proto.__send__(attribute_name)
+                    end
+
+            next unless value
+            attribute_fields[nested_attribute_name] = value
           end
 
           attribute_fields
