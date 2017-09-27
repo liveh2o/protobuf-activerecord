@@ -139,6 +139,16 @@ module Protobuf
           @protobuf_message
         end
 
+        def _protobuf_write_collection_assocation_method(field)
+          self.class_eval <<-RUBY, __FILE__, __LINE__ + 1
+            def _protobuf_active_record_serialize_#{field}
+              value = #{field}.to_a # Terminate the association
+            rescue NameError # Has happened when field is not on model or ignored from db
+              return nil
+            end
+          RUBY
+        end
+
         def _protobuf_write_convert_to_fields_method(field)
           is_datetime_time_or_timestamp_column = _protobuf_date_datetime_time_or_timestamp_column?(field)
           is_date_column = _protobuf_date_column?(field)
@@ -247,6 +257,14 @@ module Protobuf
       end
 
       # :nodoc:
+      def _is_collection_association?(field)
+        reflection = self.class.reflect_on_association(field)
+        return false unless reflection
+
+        reflection.macro == :has_many
+      end
+
+      # :nodoc:
       def _normalize_options(options)
         options ||= {}
         options[:only] ||= [] if options.fetch(:except, false)
@@ -295,7 +313,11 @@ module Protobuf
             when _protobuf_field_transformers.has_key?(field) then
               self.class._protobuf_write_field_transformer_method(field)
             when respond_to?(field) then
-              self.class._protobuf_write_convert_to_fields_method(field)
+              if _is_collection_association?(field)
+                self.class._protobuf_write_collection_assocation_method(field)
+              else
+                self.class._protobuf_write_convert_to_fields_method(field)
+              end
             else
               self.class._protobuf_write_nil_method(field)
             end

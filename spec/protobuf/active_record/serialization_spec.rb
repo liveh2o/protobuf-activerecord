@@ -165,6 +165,15 @@ describe Protobuf::ActiveRecord::Serialization do
           expect(fields).to include(:token)
         end
       end
+
+      context "when a field is a collection association" do
+        let(:user) { User.create(attributes) }
+
+        it "terminates the association proxy" do
+          fields = user.fields_from_record(:include => :photos)
+          expect(fields[:photos]).to be_an(Array)
+        end
+      end
     end
 
     describe "#to_proto" do
