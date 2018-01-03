@@ -38,5 +38,13 @@ module Protobuf
     # Raised by `field_scope` when given scope is not defined.
     class SearchScopeError < ProtobufActiveRecordError
     end
+
+    # Raised by `upsert_scope` when a given scope is not defined
+    class UpsertScopeError < ProtobufActiveRecordError
+    end
+
+    # Raised by `for_upsert` when no valid upsert_scopes are found
+    class UpsertNotFoundError < ProtobufActiveRecordError
+    end
   end
 end
