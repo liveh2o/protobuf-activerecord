@@ -255,6 +255,34 @@ User.limit(10).search_scope(request)
 
 Protobuf Active Record also provides some aliases for the `search_scope` method in the event that you'd like something a little more descriptive: `by_fields` and `scope_from_proto` are all aliases of `search_scope`.
 
+#### Upsert
+
+Protobuf Active Record provides the ability to create a new record, or update an existing record if an existing record is found. This is implemented using Active Record's `first_or_initialize` method.
+
+```Ruby
+class User < ActiveRecord::Base
+  scope :by_guid, lambda { |*values| where(:guid => values) }
+  scope :by_first_name, lambda { |*values| where(:first_name => values) }
+  scope :by_last_name, lambda { |*values| where(:last_name => values) }
+
+  field_scope :guid
+  field_scope :first_name
+  field_scope :last_name
+
+  upsert_key :guid
+  upsert_key :first_name, :last_name
+end
+
+@user = User.for_upsert(request)
+```
+
+Note: An upsert_key should only be defined on a field or set of fields that have a unique constraint
+
+Note: All fields used in an upsert key must also have a field_scope defined
+
+If multiple upsert_keys match the request, the first matching upsert key will be used, in order of declaration. In the typical use-case where upsert keys have corresponding unique constraints the results should be equivalent regardless of order.
+
+
 ## Contributing
 
 1. Fork it
