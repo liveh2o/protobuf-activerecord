@@ -9,6 +9,7 @@ describe Protobuf::ActiveRecord::Scope do
   after do
     User.instance_variable_set("@_searchable_field_parsers", @field_parsers)
     User.instance_variable_set("@_searchable_fields", @fields)
+    User.instance_variable_set("@_upsert_keys", [])
   end
 
 
@@ -78,7 +79,6 @@ describe Protobuf::ActiveRecord::Scope do
   end
 
   describe ".parse_search_values" do
-
     it "converts single values to collections" do
       proto = UserMessage.new(:email => "the.email@test.in")
 
@@ -113,6 +113,89 @@ describe Protobuf::ActiveRecord::Scope do
 
         proto = TheMessage.new(:the_enum_value => TheEnum::VALUE)
         expect(User.parse_search_values(proto, :the_enum_value)[0]).to be 1
+      end
+    end
+  end
+
+  describe ".upsert_key" do
+    it "adds the fields to the upsert_keys" do
+      ::User.field_scope(:guid)
+      ::User.upsert_key(:guid)
+      expect(::User.upsert_keys).to eq([[:guid]])
+    end
+
+    context "no field_scope defined" do
+      it "raises an error" do
+        expect { ::User.upsert_key(:foobar) }.to raise_error(::Protobuf::ActiveRecord::UpsertScopeError)
+      end
+    end
+  end
+
+  describe ".for_upsert" do
+    let(:guid) { "USR-1" }
+    let(:proto) { ::UserMessage.new(:guid => guid) }
+
+    before do
+      ::User.delete_all
+      ::User.field_scope(:guid)
+      ::User.upsert_key(:guid)
+    end
+
+    context "no matching upsert keys" do
+      let(:proto) { ::UserMessage.new }
+
+      it "raises an error" do
+        expect { ::User.for_upsert(proto) }.to raise_error(::Protobuf::ActiveRecord::UpsertNotFoundError)
+      end
+    end
+
+    context "no existing records" do
+      it "returns a new record" do
+        record = ::User.for_upsert(proto)
+        expect(record.new_record?).to be true
+      end
+    end
+
+    context "existing record" do
+      before { ::User.create(:guid => guid) }
+      after { ::User.delete_all }
+
+      it "returns the existing record" do
+        record = ::User.for_upsert(proto)
+        expect(record.new_record?).to be false
+      end
+    end
+  end
+
+  describe ".upsert" do
+    let(:guid) { "USR-1" }
+    let(:proto) { ::UserMessage.new(:guid => guid, :email => "bar") }
+
+    before do
+      ::User.delete_all
+      ::User.field_scope(:guid)
+      ::User.upsert_key(:guid)
+    end
+
+    context "no existing records" do
+      it "creates a new record" do
+        ::User.upsert(proto)
+        expect(::User.count).to eq(1)
+      end
+    end
+
+    context "existing record" do
+      before { ::User.create(:guid => guid, :email => "foo") }
+      after { ::User.delete_all }
+
+      it "updates the existing record" do
+        ::User.upsert(proto)
+        expect(::User.first.email).to eq("bar")
+      end
+
+      it "returns true when valid" do
+        result = ::User.upsert(proto)
+        expect(result).to be true
       end
     end
   end

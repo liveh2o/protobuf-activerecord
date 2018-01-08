@@ -111,6 +111,80 @@ module Protobuf
         def searchable_field_parsers
           @_searchable_field_parsers ||= {}
         end
+
+        # Defines a scope that is eligible for upsert. The scope will be
+        # used to initialize a record with first_or_initialize. An upsert scope
+        # declariation must specify one or more fields that are required to
+        # be present on the request and also must have a field_scope defined.
+        #
+        # If multiple upsert scopes are specified, they will be searched in
+        # the order they are declared for the first valid scope.
+        #
+        # Examples:
+        #
+        #   class User < ActiveRecord::Base
+        #     scope :by_guid, lambda { |*guids| where(:guid => guids) }
+        #     scope :by_external_guid, lambda { |*external_guids|
+        #       where(:external_guid => exteranl_guids)
+        #     }
+        #     scope :by_client_guid, lambda { |*client_guids|
+        #       joins(:client).where(
+        #         :clients => { :guid => client_guids }
+        #        )
+        #     }
+        #
+        #     field_scope :guid
+        #     field_scope :client_guid
+        #     field_scope :external_guid
+        #
+        #     upsert_scope :external_guid, :client_guid
+        #     upsert_scope :guid
+        #
+        #   end
+        #
+        def upsert_key(*fields)
+          fields = fields.flatten
+
+          fields.each do |field|
+            fail UpsertScopeError unless searchable_fields[field].present?
+          end
+
+          upsert_keys << fields
+        end
+
+        def upsert_keys
+          @_upsert_keys ||= []
+        end
+
+        def for_upsert(proto)
+          valid_upsert = upsert_keys.find do |upsert_key|
+            upsert_key.all? do |field|
+              proto.respond_to_and_has_and_present?(field)
+            end
+          end
+
+          fail UpsertNotFoundError unless valid_upsert.present?
+
+          upsert_scope = model_scope
+          valid_upsert.each do |field|
+            value = proto.__send__(field)
+            upsert_scope = upsert_scope.__send__(searchable_fields[field], value)
+          end
+
+          upsert_scope.first_or_initialize
+        end
+
+        def upsert(proto)
+          record = for_upsert(proto)
+          record.assign_attributes(proto)
+          record.save
+        end
+
+        def upsert!(proto)
+          record = for_upsert(proto)
+          record.assign_attributes(proto)
+          record.save!
+        end
       end
     end
   end
