@@ -171,7 +171,9 @@ module Protobuf
             upsert_scope = upsert_scope.__send__(searchable_fields[field], value)
           end
 
-          upsert_scope.first_or_initialize
+          record = upsert_scope.first_or_initialize
+          record.assign_attributes(proto)
+          record
         end
       end
     end
