@@ -282,6 +282,25 @@ Note: All fields used in an upsert key must also have a field_scope defined
 
 If multiple upsert_keys match the request, the first matching upsert key will be used, in order of declaration. In the typical use-case where upsert keys have corresponding unique constraints the results should be equivalent regardless of order.
 
+Protobuf Active Record provides several methods for invoking an upsert.
+
+The first approach is to use the `for_upsert` method to look up a record.
+
+```Ruby
+  @user = User.for_upsert(proto)
+```
+
+Alternatively, you can use `upsert` to look up the record and perform the persistence in the same call.
+
+```Ruby
+  # Example
+  User.upsert(proto)
+
+  # This is equivalent to
+  user = User.for_upsert(proto)
+  user.assign_attributes(proto)
+  user.save
+```
 
 ## Contributing
 
