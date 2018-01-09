@@ -178,12 +178,14 @@ module Protobuf
           record = for_upsert(proto)
           record.assign_attributes(proto)
           record.save
+          record
         end
 
         def upsert!(proto)
           record = for_upsert(proto)
           record.assign_attributes(proto)
           record.save!
+          record
         end
       end
     end

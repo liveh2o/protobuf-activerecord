@@ -193,9 +193,9 @@ describe Protobuf::ActiveRecord::Scope do
         expect(::User.first.email).to eq("bar")
       end
 
-      it "returns true when valid" do
+      it "returns a user" do
         result = ::User.upsert(proto)
-        expect(result).to be true
+        expect(result).to be_a(::User)
       end
     end
   end
