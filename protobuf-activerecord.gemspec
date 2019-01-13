@@ -30,6 +30,7 @@ Gem::Specification.new do |spec|
   ##
   # Development dependencies
   #
+  spec.add_development_dependency "benchmark-ips"
   spec.add_development_dependency "rake"
   spec.add_development_dependency "rspec", ">= 3.3.0"
   spec.add_development_dependency "rspec-pride", ">= 3.1.0"
