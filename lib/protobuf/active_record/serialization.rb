@@ -166,7 +166,12 @@ module Protobuf
 
           def call(selph)
             value = selph.__send__(@field)
-            value&.to_time(:utc)&.to_i
+
+            if value
+              value.to_time(:utc).to_i
+            else
+              nil
+            end
           rescue NameError # Has happened when field is not on model or ignored from db
             return nil
           end
@@ -179,7 +184,12 @@ module Protobuf
 
           def call(selph)
             value = selph.__send__(@field)
-            value&.to_i
+
+            if value
+              value.to_i
+            else
+              nil
+            end
           rescue NameError # Has happened when field is not on model or ignored from db
             return nil
           end
@@ -217,10 +227,9 @@ module Protobuf
         end
 
         class NilMethodCaller
-          def initialize(*args)
-          end
+          def initialize; end
 
-          def call(*args)
+          def call(selph)
             nil
           end
         end
