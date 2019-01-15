@@ -20,6 +20,10 @@ module Protobuf
       end
 
       module ClassMethods
+        def _protobuf_field_objects
+          @_protobuf_field_objects ||= {}
+        end
+
         def _protobuf_field_options
           @_protobuf_field_options ||= {}
         end
@@ -139,95 +143,114 @@ module Protobuf
           @protobuf_message
         end
 
-        def _protobuf_write_collection_assocation_method(field)
-          self.class_eval <<-RUBY, __FILE__, __LINE__ + 1
-            def _protobuf_active_record_serialize_#{field}
-              value = #{field}.to_a # Terminate the association
-            rescue NameError # Has happened when field is not on model or ignored from db
-              return nil
-            end
-          RUBY
+        class CollectionAssociationCaller
+          def initialize(method_name)
+            @method_name = method_name
+          end
+
+          def call(selph)
+            selph.__send__(@method_name).to_a
+          rescue NameError # Has happened when field is not on model or ignored from db
+            return nil
+          end
         end
 
-        def _protobuf_write_convert_to_fields_method(field)
+        def _protobuf_collection_association_object(field)
+          CollectionAssociationCaller.new(field)
+        end
+
+        class DateCaller
+          def initialize(field)
+            @field = field
+          end
+
+          def call(selph)
+            value = selph.__send__(@field)
+
+            if value
+              value.to_time(:utc).to_i
+            else
+              nil
+            end
+          rescue NameError # Has happened when field is not on model or ignored from db
+            return nil
+          end
+        end
+
+        class DateTimeCaller
+          def initialize(field)
+            @field = field
+          end
+
+          def call(selph)
+            value = selph.__send__(@field)
+
+            if value
+              value.to_i
+            else
+              nil
+            end
+          rescue NameError # Has happened when field is not on model or ignored from db
+            return nil
+          end
+        end
+
+        class NoConversionCaller
+          def initialize(field)
+            @field = field
+          end
+
+          def call(selph)
+            selph.__send__(@field)
+          rescue NameError # Has happened when field is not on model or ignored from db
+            return nil
+          end
+        end
+
+        def _protobuf_convert_to_fields_object(field)
           is_datetime_time_or_timestamp_column = _protobuf_date_datetime_time_or_timestamp_column?(field)
           is_date_column = _protobuf_date_column?(field)
 
           if is_datetime_time_or_timestamp_column
             if is_date_column
-              self.class_eval <<-RUBY, __FILE__, __LINE__ + 1
-                def _protobuf_active_record_serialize_#{field}
-                  value = #{field}
-                  return nil if value.nil?
-
-                  value.to_time(:utc).to_i
-                rescue NameError # Has happened when field is not on model or ignored from db
-                  return nil
-                end
-              RUBY
+              DateCaller.new(field)
             else
-              self.class_eval <<-RUBY, __FILE__, __LINE__ + 1
-                def _protobuf_active_record_serialize_#{field}
-                  value = #{field}
-                  return nil if value.nil?
-
-                  value.to_i
-                rescue NameError # Has happened when field is not on model or ignored from db
-                  return nil
-                end
-              RUBY
+              DateTimeCaller.new(field)
             end
           else
-            self.class_eval <<-RUBY, __FILE__, __LINE__ + 1
-              def _protobuf_active_record_serialize_#{field}
-                #{field}
-              rescue NameError # Has happened when field is not on model or ignored from db
-                return nil
-              end
-            RUBY
+            NoConversionCaller.new(field)
           end
         end
 
-        def _protobuf_write_field_transformer_method(field)
-          self.class_eval <<-RUBY, __FILE__, __LINE__ + 1
-            def _protobuf_active_record_serialize_#{field}
-              self.class._protobuf_field_transformers[:#{field}].call(self)
-            end
-          RUBY
+        def _protobuf_field_transformer_object(field)
+          _protobuf_field_transformers[field]
         end
 
-        def _protobuf_write_nil_method(field)
-          self.class_eval <<-RUBY, __FILE__, __LINE__ + 1
-            def _protobuf_active_record_serialize_#{field}
-              nil
-            end
-          RUBY
-        end
+        class NilMethodCaller
+          def initialize; end
 
-        def _protobuf_write_symbol_transformer_method(field)
-          transformer_method = _protobuf_field_symbol_transformers[field]
-
-          if self.respond_to?(transformer_method, true)
-            if self.respond_to?(transformer_method, false)
-              self.class_eval <<-RUBY, __FILE__, __LINE__ + 1
-                def _protobuf_active_record_serialize_#{field}
-                  self.class.#{transformer_method}(self)
-                end
-              RUBY
-            else
-              self.class_eval <<-RUBY, __FILE__, __LINE__ + 1
-                def _protobuf_active_record_serialize_#{field}
-                  self.class.__send__(:#{transformer_method}, self)
-                end
-              RUBY
-            end
-          else
-            self.class_eval <<-RUBY, __FILE__, __LINE__ + 1
-              def _protobuf_active_record_serialize_#{field}
-                #{transformer_method}
-              end
-            RUBY
+          def call(selph)
+            nil
           end
+        end
+
+        def _protobuf_nil_object(field)
+          NilMethodCaller.new
+        end
+
+        class FieldSymbolTransformerCaller
+          def initialize(instance_class, method_name)
+            @instance_class = instance_class
+            @method_name = method_name
+          end
+
+          def call(selph)
+            @instance_class.__send__(@method_name, selph)
+          end
+        end
+
+        def _protobuf_symbol_transformer_object(field)
+          FieldSymbolTransformerCaller.new(self, _protobuf_symbol_transformer_object[field])
         end
       end
 
@@ -301,34 +324,32 @@ module Protobuf
         # in terms of optimization (`while` is slightly faster as no block carried through)
         while attribute_number < limit
           field = field_attributes[attribute_number]
-
-          begin
-            hash[field] = __send__("_protobuf_active_record_serialize_#{field}")
-          rescue NoMethodError => error
-            raise unless error.message =~ /_protobuf_active_record_serialize/i
-
-            case
-            when _protobuf_field_symbol_transformers.has_key?(field) then
-              self.class._protobuf_write_symbol_transformer_method(field)
-            when _protobuf_field_transformers.has_key?(field) then
-              self.class._protobuf_write_field_transformer_method(field)
-            when respond_to?(field) then
-              if _is_collection_association?(field)
-                self.class._protobuf_write_collection_assocation_method(field)
-              else
-                self.class._protobuf_write_convert_to_fields_method(field)
-              end
-            else
-              self.class._protobuf_write_nil_method(field)
-            end
-
-            hash[field] = __send__("_protobuf_active_record_serialize_#{field}")
-          end
-
+          field_object = _protobuf_field_objects(field)
+          hash[field] = field_object.call(self)
           attribute_number += 1
         end
 
         hash
+      end
+
+      # :nodoc:
+      def _protobuf_field_objects(field)
+        self.class._protobuf_field_objects[field] ||= begin
+          case
+          when _protobuf_field_symbol_transformers.has_key?(field) then
+            self.class._protobuf_symbol_transformer_object(field)
+          when _protobuf_field_transformers.has_key?(field) then
+            self.class._protobuf_field_transformer_object(field)
+          when respond_to?(field) then
+            if _is_collection_association?(field)
+              self.class._protobuf_collection_association_object(field)
+            else
+              self.class._protobuf_convert_to_fields_object(field)
+            end
+          else
+            self.class._protobuf_nil_object(field)
+          end
+        end
       end
 
       # :nodoc:
