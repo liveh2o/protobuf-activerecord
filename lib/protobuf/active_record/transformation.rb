@@ -47,9 +47,9 @@ module Protobuf
 
           _protobuf_nested_attributes.each do |attribute_name|
             nested_attribute_name = "#{attribute_name}_attributes".to_sym
-            value = if proto.has_field?(nested_attribute_name)
+            value = if proto.field?(nested_attribute_name)
                       proto.__send__(nested_attribute_name)
-                    elsif proto.has_field?(attribute_name)
+                    elsif proto.field?(attribute_name)
                       proto.__send__(attribute_name)
                     end
 
