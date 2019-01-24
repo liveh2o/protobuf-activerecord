@@ -1,4 +1,5 @@
 require "bundler/gem_tasks"
+require "protobuf/tasks"
 require "rspec/core/rake_task"
 
 desc "Run specs"
@@ -15,6 +16,5 @@ end
 
 desc "Compile spec/support protobuf definitions"
 task :compile, [] => :clean do
-  cmd = "protoc --ruby_out=spec/support/protobuf --proto_path=spec/support/definitions spec/support/definitions/*.proto"
-  sh(cmd)
+  ::Rake::Task["protobuf:compile"].invoke("", "spec/support/definitions", "spec/support/protobuf")
 end
