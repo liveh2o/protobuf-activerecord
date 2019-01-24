@@ -1,4 +1,4 @@
-require 'active_support/concern'
+require "active_support/concern"
 
 module Protobuf
   module ActiveRecord
@@ -22,7 +22,7 @@ module Protobuf
           end
         end
 
-        def fetch_field_alias_from_record(attribute, field_aliasd)
+        def fetch_field_alias_from_record(attribute, _field_aliasd)
           lambda do |record|
             value = record.__send__(field_alias)
 

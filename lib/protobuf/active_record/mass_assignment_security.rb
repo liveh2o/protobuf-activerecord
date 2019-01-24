@@ -1,6 +1,6 @@
-require 'active_support/concern'
-require 'protobuf/active_record/mass_assignment_security/persistence'
-require 'protobuf/active_record/mass_assignment_security/transformation'
+require "active_support/concern"
+require "protobuf/active_record/mass_assignment_security/persistence"
+require "protobuf/active_record/mass_assignment_security/transformation"
 
 module Protobuf
   module ActiveRecord

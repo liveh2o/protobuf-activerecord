@@ -12,10 +12,11 @@ module Protobuf
             START_MUTEX.synchronize do
               return if timed_task_started.true?
 
-              timed_task = ::Concurrent::TimerTask.new(
-                             :execution_interval => ::Protobuf::ActiveRecord.config.connection_reaping_interval,
-                             :timeout_interval => ::Protobuf::ActiveRecord.config.connection_reaping_timeout_interval) do
-
+              args = {
+                :execution_interval => ::Protobuf::ActiveRecord.config.connection_reaping_interval,
+                :timeout_interval => ::Protobuf::ActiveRecord.config.connection_reaping_timeout_interval
+              }
+              timed_task = ::Concurrent::TimerTask.new(args) do
                 ::ActiveRecord::Base.clear_active_connections!
               end
 
@@ -37,6 +38,8 @@ module Protobuf
           @app = app
         end
 
+        # rubocop:disable Lint/DuplicateMethods
+        # rubocop:disable Lint/NestedMethodDefinition
         def call(env)
           def call(env)
             ::ActiveRecord::Base.connection_pool.with_connection do
@@ -47,6 +50,8 @@ module Protobuf
           self.class.start_timed_task!
           call(env)
         end
+        # rubocop:enable Lint/NestedMethodDefinition
+        # rubocop:enable Lint/DuplicateMethods
 
         timed_task_started
       end

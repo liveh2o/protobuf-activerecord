@@ -1,4 +1,4 @@
-require 'spec_helper'
+require "spec_helper"
 
 describe Protobuf::ActiveRecord::Columns do
   describe "._protobuf_map_columns" do
@@ -31,10 +31,10 @@ describe Protobuf::ActiveRecord::Columns do
   end
 
   context "column type predicates" do
-    before { allow(User).to receive(:_protobuf_column_types).and_return(Hash.new) }
+    before { allow(User).to receive(:_protobuf_column_types).and_return({}) }
 
     describe "._protobuf_date_column?" do
-      before { User._protobuf_column_types[:date] = [ :foo_date ] }
+      before { User._protobuf_column_types[:date] = [:foo_date] }
 
       context "when the column type is :date" do
         it "is true" do
@@ -50,7 +50,7 @@ describe Protobuf::ActiveRecord::Columns do
     end
 
     describe "._protobuf_datetime_column?" do
-      before { User._protobuf_column_types[:datetime] = [ :foo_datetime ] }
+      before { User._protobuf_column_types[:datetime] = [:foo_datetime] }
 
       context "when the column type is :datetime" do
         it "is true" do
@@ -66,7 +66,7 @@ describe Protobuf::ActiveRecord::Columns do
     end
 
     describe "._protobuf_time_column?" do
-      before { User._protobuf_column_types[:time] = [ :foo_time ] }
+      before { User._protobuf_column_types[:time] = [:foo_time] }
 
       context "when the column type is :time" do
         it "is true" do
@@ -82,7 +82,7 @@ describe Protobuf::ActiveRecord::Columns do
     end
 
     describe "._protobuf_timestamp_column?" do
-      before { User._protobuf_column_types[:timestamp] = [ :foo_timestamp ] }
+      before { User._protobuf_column_types[:timestamp] = [:foo_timestamp] }
 
       context "when the column type is :timestamp" do
         it "is true" do

@@ -1,6 +1,6 @@
-require 'active_support/concern'
-require 'heredity/inheritable_class_instance_variables'
-require 'protobuf/active_record/transformer'
+require "active_support/concern"
+require "heredity/inheritable_class_instance_variables"
+require "protobuf/active_record/transformer"
 
 module Protobuf
   module ActiveRecord
@@ -28,7 +28,7 @@ module Protobuf
         # :nodoc:
         def _filter_attribute_fields(proto)
           fields = proto.to_hash
-          fields.select! do |key, value|
+          fields.select! do |key, _value|
             field = proto.class.get_field(key, true)
             proto.field?(key) && !field.repeated?
           end
@@ -38,7 +38,7 @@ module Protobuf
           attribute_fields = filtered_attributes.inject({}) do |hash, column_name|
             symbolized_column = column_name.to_sym
 
-            if fields.has_key?(symbolized_column) || _protobuf_attribute_transformers.has_key?(symbolized_column)
+            if fields.key?(symbolized_column) || _protobuf_attribute_transformers.key?(symbolized_column)
               hash[symbolized_column] = fields[symbolized_column]
             end
 
@@ -121,7 +121,7 @@ module Protobuf
 
           if options[:nullify_on]
             field = protobuf_message.get_field(:nullify)
-            unless field && field.is_a?(::Protobuf::Field::StringField) && field.repeated?
+            unless field&.is_a?(::Protobuf::Field::StringField) && field&.repeated?
               ::Protobuf::Logging.logger.warn "Message: #{protobuf_message} is not compatible with :nullify_on option"
             end
           end
@@ -129,7 +129,6 @@ module Protobuf
           transformer = ::Protobuf::ActiveRecord::Transformer.new(callable, options)
           _protobuf_attribute_transformers[attribute.to_sym] = transformer
         end
-
 
         # Creates a hash of attributes from a given protobuf message.
         #
@@ -140,7 +139,7 @@ module Protobuf
           attribute_fields = _filter_attribute_fields(proto)
 
           attributes = attribute_fields.inject({}) do |hash, (key, value)|
-            if _protobuf_attribute_transformers.has_key?(key)
+            if _protobuf_attribute_transformers.key?(key)
               transformer = _protobuf_attribute_transformers[key]
               attribute = transformer.call(proto)
               hash[key] = attribute unless attribute.nil?

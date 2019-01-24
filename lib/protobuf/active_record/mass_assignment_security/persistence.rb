@@ -1,4 +1,4 @@
-require 'active_support/concern'
+require "active_support/concern"
 
 module Protobuf
   module ActiveRecord
@@ -8,14 +8,14 @@ module Protobuf
 
         module ClassMethods
           # :nodoc:
-          def create(attributes, options = {}, &block)
+          def create(attributes, options = {})
             attributes = attributes_from_proto(attributes) if attributes.is_a?(::Protobuf::Message)
 
             super(attributes, options)
           end
 
           # :nodoc:
-          def create!(attributes, options = {}, &block)
+          def create!(attributes, options = {})
             attributes = attributes_from_proto(attributes) if attributes.is_a?(::Protobuf::Message)
 
             super(attributes, options)

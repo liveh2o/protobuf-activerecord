@@ -1,1 +1,1 @@
-require 'support/db/setup'
+require "support/db/setup"

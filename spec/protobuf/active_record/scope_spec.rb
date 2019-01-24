@@ -1,4 +1,4 @@
-require 'spec_helper'
+require "spec_helper"
 
 describe Protobuf::ActiveRecord::Scope do
   before do
@@ -12,16 +12,15 @@ describe Protobuf::ActiveRecord::Scope do
     User.instance_variable_set("@_upsert_keys", [])
   end
 
-
   describe ".search_scope" do
     let(:request) { UserSearchMessage.new(:guid => ["foo"], :email => ["foo@test.co"]) }
 
     before {
-      allow(User).to receive(:searchable_field_parsers).and_return({ :email => proc { |val| val } })
+      allow(User).to receive(:searchable_field_parsers).and_return(:email => proc { |val| val })
     }
 
     it "builds scopes for searchable fields" do
-      allow(User).to receive(:searchable_fields).and_return({ :email =>  :by_email })
+      allow(User).to receive(:searchable_fields).and_return(:email => :by_email)
       expect(User.search_scope(request)).to eq User.by_email("foo@test.co")
     end
 
@@ -33,7 +32,7 @@ describe Protobuf::ActiveRecord::Scope do
       let(:request) { UserSearchMessage.new(:email => ["foo@test.co"]) }
 
       it "doesn't build a scope from that field" do
-        allow(User).to receive(:searchable_fields).and_return({ :email =>  :by_email })
+        allow(User).to receive(:searchable_fields).and_return(:email => :by_email)
         expect(User.search_scope(request)).to eq User.by_email("foo@test.co")
       end
     end
@@ -42,7 +41,7 @@ describe Protobuf::ActiveRecord::Scope do
       let(:request) { UserSearchMessage.new(:email => ["foo@test.co"]) }
 
       it "raises an exception" do
-        allow(User).to receive(:searchable_fields).and_return({ :email =>  :by_hullabaloo })
+        allow(User).to receive(:searchable_fields).and_return(:email => :by_hullabaloo)
         expect { User.search_scope(request) }.to raise_exception(/undefined method .*by_hullabaloo/i)
       end
     end
@@ -92,7 +91,7 @@ describe Protobuf::ActiveRecord::Scope do
       let(:proto) { UserSearchMessage.new(:guid => ["foo"]) }
 
       context "and the parser does not respond to :to_sym" do
-        let(:parser) { double('parser') }
+        let(:parser) { double("parser") }
 
         it "passes the value to the parser" do
           expect(parser).to receive(:call).with(["foo"])

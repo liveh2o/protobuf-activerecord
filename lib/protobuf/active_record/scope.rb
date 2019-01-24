@@ -1,4 +1,4 @@
-require 'active_support/concern'
+require "active_support/concern"
 
 module Protobuf
   module ActiveRecord
@@ -73,7 +73,7 @@ module Protobuf
             end
           end
 
-          values = [ value ].flatten
+          values = [value].flatten
           values.map!(&:to_i) if proto.class.get_field(field, true).enum?
           values
         end

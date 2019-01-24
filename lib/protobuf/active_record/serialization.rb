@@ -1,5 +1,5 @@
-require 'set'
-require 'active_support/concern'
+require "set"
+require "active_support/concern"
 
 module Protobuf
   module ActiveRecord
@@ -13,10 +13,6 @@ module Protobuf
                       :_protobuf_field_options,
                       :protobuf_message
         end
-
-        private :_protobuf_field_symbol_transformers
-        private :_protobuf_field_transformers
-        private :_protobuf_message
       end
 
       module ClassMethods
@@ -169,8 +165,6 @@ module Protobuf
 
             if value
               value.to_time(:utc).to_i
-            else
-              nil
             end
           rescue NameError # Has happened when field is not on model or ignored from db
             return nil
@@ -185,11 +179,7 @@ module Protobuf
           def call(selph)
             value = selph.__send__(@field)
 
-            if value
-              value.to_i
-            else
-              nil
-            end
+            value&.to_i
           rescue NameError # Has happened when field is not on model or ignored from db
             return nil
           end
@@ -227,14 +217,15 @@ module Protobuf
         end
 
         class NilMethodCaller
-          def initialize; end
+          def initialize
+          end
 
-          def call(selph)
+          def call(_selph)
             nil
           end
         end
 
-        def _protobuf_nil_object(field)
+        def _protobuf_nil_object(_field)
           NilMethodCaller.new
         end
 
@@ -259,8 +250,8 @@ module Protobuf
         options = _normalize_options(options)
 
         fields = _filtered_fields(options)
-        fields &= [ options[:only] ].flatten if options[:only].present?
-        fields -= [ options[:except] ].flatten if options[:except].present?
+        fields &= [options[:only]].flatten if options[:only].present?
+        fields -= [options[:except]].flatten if options[:except].present?
 
         fields
       end
@@ -312,7 +303,7 @@ module Protobuf
 
         # Already flattened / compacted / uniqued ... unless we must include
         if options[:include].present?
-          field_attributes.concat([ options[:include] ].flatten)
+          field_attributes.concat([options[:include]].flatten)
           field_attributes.compact!
           field_attributes.uniq!
         end
@@ -336,9 +327,9 @@ module Protobuf
       def _protobuf_field_objects(field)
         self.class._protobuf_field_objects[field] ||= begin
           case
-          when _protobuf_field_symbol_transformers.has_key?(field) then
+          when _protobuf_field_symbol_transformers.key?(field) then
             self.class._protobuf_symbol_transformer_object(field)
-          when _protobuf_field_transformers.has_key?(field) then
+          when _protobuf_field_transformers.key?(field) then
             self.class._protobuf_field_transformer_object(field)
           when respond_to?(field) then
             if _is_collection_association?(field)
@@ -369,7 +360,7 @@ module Protobuf
 
       # :nodoc:
       def to_proto(options = {})
-        raise MessageNotDefined.new(self.class) if _protobuf_message.nil?
+        raise MessageNotDefined, self.class if _protobuf_message.nil?
 
         fields = self.fields_from_record(options)
         _protobuf_message.new(fields)

@@ -1,4 +1,4 @@
-require 'spec_helper'
+require "spec_helper"
 
 # Used to test calling #to_proto when no protobuf message is configured.
 class UnconfiguredUser
@@ -24,10 +24,10 @@ describe Protobuf::ActiveRecord::Serialization do
     end
 
     context "when the given transformer is callable" do
-      let(:callable) { lambda { |proto| nil } }
+      let(:callable) { lambda { |_proto| nil } }
 
       before {
-        allow(User).to receive(:_protobuf_field_transformers).and_return(Hash.new)
+        allow(User).to receive(:_protobuf_field_transformers).and_return({})
         User.field_from_record :account_id, callable
       }
 
@@ -61,7 +61,7 @@ describe Protobuf::ActiveRecord::Serialization do
   end
 
   context "when protobuf_message is defined" do
-    let(:attributes) { Hash.new }
+    let(:attributes) { {} }
     let(:user) { User.new(attributes) }
 
     before { User.protobuf_message(protobuf_message) }
@@ -70,7 +70,7 @@ describe Protobuf::ActiveRecord::Serialization do
       context "when options has :only" do
         it "only returns the given field(s)" do
           fields = user._filter_field_attributes(:only => :name)
-          expect(fields).to eq [ :name ]
+          expect(fields).to eq [:name]
         end
       end
 
@@ -78,7 +78,7 @@ describe Protobuf::ActiveRecord::Serialization do
         it "returns all except the given field(s)" do
           fields = user._filter_field_attributes(:except => :name)
           expect(fields).to match_array(
-            [ :guid, :email, :email_domain, :password, :nullify, :photos, :created_at, :updated_at ]
+            [:guid, :email, :email_domain, :password, :nullify, :photos, :created_at, :updated_at]
           )
         end
       end
@@ -87,7 +87,7 @@ describe Protobuf::ActiveRecord::Serialization do
     describe "#_filtered_fields" do
       it "returns protobuf fields" do
         expect(user._filtered_fields).to match_array(
-          [ :guid, :name, :email, :email_domain, :password, :nullify, :photos, :created_at, :updated_at ]
+          [:guid, :name, :email, :email_domain, :password, :nullify, :photos, :created_at, :updated_at]
         )
       end
 
@@ -95,15 +95,15 @@ describe Protobuf::ActiveRecord::Serialization do
         it "filters all deprecated fields" do
           fields = user._filtered_fields(:deprecated => false)
           expect(fields).to match_array(
-            [ :guid, :name, :email, :password, :nullify, :photos, :created_at, :updated_at ]
+            [:guid, :name, :email, :password, :nullify, :photos, :created_at, :updated_at]
           )
         end
 
-        context 'and :include => :email_domain' do
-          it 'includes deprecated fields that have been explicitly specified' do
+        context "and :include => :email_domain" do
+          it "includes deprecated fields that have been explicitly specified" do
             fields = user._filtered_fields(:deprecated => false, :include => :email_domain)
             expect(fields).to match_array(
-              [ :guid, :name, :email, :email_domain, :password, :nullify, :photos, :created_at, :updated_at ]
+              [:guid, :name, :email, :email_domain, :password, :nullify, :photos, :created_at, :updated_at]
             )
           end
         end
@@ -111,7 +111,7 @@ describe Protobuf::ActiveRecord::Serialization do
     end
 
     describe "#_normalize_options" do
-      let(:options) { { :only => [ :name ] } }
+      let(:options) { { :only => [:name] } }
 
       context "given empty options" do
         before { User.protobuf_message(protobuf_message, options) }
@@ -140,7 +140,7 @@ describe Protobuf::ActiveRecord::Serialization do
       end
 
       context "given options with :except" do
-        let(:options) { { :except => [ :name ] } }
+        let(:options) { { :except => [:name] } }
 
         before { User.protobuf_message(protobuf_message, {}) }
 
@@ -163,7 +163,7 @@ describe Protobuf::ActiveRecord::Serialization do
 
       context "when a transformer is defined for the field" do
         it "gets the field from the transformer" do
-          expect(user.fields_from_record[:email_domain]).to eq('test.co')
+          expect(user.fields_from_record[:email_domain]).to eq("test.co")
         end
       end
 

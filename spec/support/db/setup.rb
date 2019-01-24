@@ -1,4 +1,4 @@
-require 'active_record'
+require "active_record"
 
 ActiveRecord::Base.establish_connection(
   :adapter => "sqlite3",
@@ -14,7 +14,7 @@ ActiveRecord::Schema.define(:version => 1) do
     t.string :url
     t.integer :user_id
 
-    t.timestamps null: false
+    t.timestamps :null => false
   end
 
   create_table :users do |t|
@@ -24,6 +24,6 @@ ActiveRecord::Schema.define(:version => 1) do
     t.string :email
     t.integer :account_id
 
-    t.timestamps null: false
+    t.timestamps :null => false
   end
 end

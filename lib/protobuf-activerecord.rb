@@ -1,22 +1,23 @@
-require 'active_record'
-require 'active_support/concern'
-require 'heredity'
-require 'protobuf'
+# rubocop:disable Naming/FileName
+require "active_record"
+require "active_support/concern"
+require "heredity"
+require "protobuf"
 
 # To support Rails 4 apps that use Mass-Assignment Security, attempt to
 # load the protected_attributes gem. If it's not present, move along...
 begin
-  require 'protected_attributes'
-rescue LoadError
+  require "protected_attributes"
+rescue LoadError # rubocop:disable Lint/HandleExceptions
   # These aren't the droids you're looking for... move along.
 end
 
-require 'protobuf/active_record/config'
-require 'protobuf/active_record/middleware/connection_management'
-require 'protobuf/active_record/middleware/connection_management_async'
-require 'protobuf/active_record/middleware/query_cache'
-require 'protobuf/active_record/model'
-require 'protobuf/active_record/version'
+require "protobuf/active_record/config"
+require "protobuf/active_record/middleware/connection_management"
+require "protobuf/active_record/middleware/connection_management_async"
+require "protobuf/active_record/middleware/query_cache"
+require "protobuf/active_record/model"
+require "protobuf/active_record/version"
 
 module Protobuf
   module ActiveRecord
@@ -29,4 +30,5 @@ module Protobuf
   end
 end
 
-require 'protobuf/active_record/railtie' if defined?(Rails)
+require "protobuf/active_record/railtie" if defined?(Rails)
+# rubocop:enable Naming/FileName

@@ -8,9 +8,7 @@ module Protobuf
         @options = options
       end
 
-      def call(proto)
-        callable.call(proto)
-      end
+      delegate :call, :to => :callable
 
       def nullify?(proto)
         return false unless options[:nullify_on]

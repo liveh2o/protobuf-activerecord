@@ -1,9 +1,9 @@
-require 'spec_helper'
+require "spec_helper"
 
 describe Protobuf::ActiveRecord::Transformation do
   let(:user) { User.new(user_attributes) }
-  let(:user_attributes) { { :first_name => 'foo', :last_name => 'bar', :email => 'foo@test.co' } }
-  let(:proto_hash) { { :name => 'foo bar', :email => 'foo@test.co' } }
+  let(:user_attributes) { { :first_name => "foo", :last_name => "bar", :email => "foo@test.co" } }
+  let(:proto_hash) { { :name => "foo bar", :email => "foo@test.co" } }
   let(:proto) { UserMessage.new(proto_hash) }
 
   describe "._filter_attribute_fields" do
@@ -14,18 +14,18 @@ describe Protobuf::ActiveRecord::Transformation do
 
     it "filters repeated fields" do
       attribute_fields = User._filter_attribute_fields(proto)
-      expect(attribute_fields.has_key?(:tags)).to be false
+      expect(attribute_fields.key?(:tags)).to be false
     end
 
     it "includes attributes that aren't fields, but have attribute transformers" do
-      allow(User).to receive(:_protobuf_attribute_transformers).and_return({ :account_id => :fetch_account_id })
+      allow(User).to receive(:_protobuf_attribute_transformers).and_return(:account_id => :fetch_account_id)
       attribute_fields = User._filter_attribute_fields(proto)
-      expect(attribute_fields.has_key?(:account_id)).to be true
+      expect(attribute_fields.key?(:account_id)).to be true
     end
 
     it "includes fields that aren't attributes, but have attribute transformers" do
       attribute_fields = User._filter_attribute_fields(proto)
-      expect(attribute_fields.has_key?(:password)).to be true
+      expect(attribute_fields.key?(:password)).to be true
     end
   end
 
@@ -108,7 +108,7 @@ describe Protobuf::ActiveRecord::Transformation do
   end
 
   describe ".attributes_from_proto" do
-    let(:callable) { lambda { |proto| 1 } }
+    let(:callable) { lambda { |_proto| 1 } }
     let(:transformer) { ::Protobuf::ActiveRecord::Transformer.new(callable) }
 
     context "when a transformer is defined for the attribute" do
@@ -119,12 +119,12 @@ describe Protobuf::ActiveRecord::Transformation do
     end
 
     context "when a transformer is a callable that returns nil" do
-      let(:callable) { lambda { |proto| nil } }
+      let(:callable) { lambda { |_proto| nil } }
 
       before do
         transformers = User._protobuf_attribute_transformers
         allow(User).to receive(:_protobuf_attribute_transformers).and_return(
-          {:account_id => transformer}.merge(transformers)
+          { :account_id => transformer }.merge(transformers)
         )
       end
 
@@ -134,15 +134,15 @@ describe Protobuf::ActiveRecord::Transformation do
       end
     end
 
-    context 'when the transformer has a nullify_on option' do
-      let(:callable) { lambda { |proto| nil } }
+    context "when the transformer has a nullify_on option" do
+      let(:callable) { lambda { |_proto| nil } }
       let(:transformer) { ::Protobuf::ActiveRecord::Transformer.new(callable, :nullify_on => :account_id) }
-      let(:proto_hash) { { :name => 'foo bar', :email => 'foo@test.co', :nullify => [:account_id] } }
+      let(:proto_hash) { { :name => "foo bar", :email => "foo@test.co", :nullify => [:account_id] } }
 
       before do
         transformers = User._protobuf_attribute_transformers
         allow(User).to receive(:_protobuf_attribute_transformers).and_return(
-          {:account_id => transformer}.merge(transformers)
+          { :account_id => transformer }.merge(transformers)
         )
       end
 
@@ -156,7 +156,7 @@ describe Protobuf::ActiveRecord::Transformation do
       before do
         transformers = User._protobuf_attribute_transformers
         allow(User).to receive(:_protobuf_attribute_transformers).and_return(
-          {:account_id => transformer}.merge(transformers)
+          { :account_id => transformer }.merge(transformers)
         )
       end
 
@@ -168,7 +168,7 @@ describe Protobuf::ActiveRecord::Transformation do
 
     context "when a transformer is not defined for the attribute" do
       before {
-        allow(User).to receive(:_protobuf_convert_fields_to_attributes) do |key, value|
+        allow(User).to receive(:_protobuf_convert_fields_to_attributes) do |_key, value|
           value
         end
       }
@@ -182,7 +182,7 @@ describe Protobuf::ActiveRecord::Transformation do
 
   describe ".attribute_from_proto" do
     context "when the given transformer is a symbol" do
-      let(:callable) { lambda { |value| User.__send__(:extract_first_name) } }
+      let(:callable) { lambda { |_value| User.__send__(:extract_first_name) } }
 
       before { User.attribute_from_proto :first_name, :extract_first_name }
 
@@ -199,9 +199,9 @@ describe Protobuf::ActiveRecord::Transformation do
     end
 
     context "when the given transformer is callable" do
-      let(:callable) { lambda { |proto| nil } }
+      let(:callable) { lambda { |_proto| nil } }
 
-      before { allow(User).to receive(:_protobuf_attribute_transformers).and_return(Hash.new) }
+      before { allow(User).to receive(:_protobuf_attribute_transformers).and_return({}) }
 
       it "adds the given converter to the list of protobuf field transformers" do
         User.attribute_from_proto :account_id, callable
