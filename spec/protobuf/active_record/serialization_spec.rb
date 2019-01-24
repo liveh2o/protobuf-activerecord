@@ -77,26 +77,34 @@ describe Protobuf::ActiveRecord::Serialization do
       context "when options has :except" do
         it "returns all except the given field(s)" do
           fields = user._filter_field_attributes(:except => :name)
-          expect(fields).to match_array([ :guid, :email, :email_domain, :password, :nullify, :photos ])
+          expect(fields).to match_array(
+            [ :guid, :email, :email_domain, :password, :nullify, :photos, :created_at, :updated_at ]
+          )
         end
       end
     end
 
     describe "#_filtered_fields" do
       it "returns protobuf fields" do
-        expect(user._filtered_fields).to match_array([ :guid, :name, :email, :email_domain, :password, :nullify, :photos ])
+        expect(user._filtered_fields).to match_array(
+          [ :guid, :name, :email, :email_domain, :password, :nullify, :photos, :created_at, :updated_at ]
+        )
       end
 
       context "given :deprecated => false" do
         it "filters all deprecated fields" do
           fields = user._filtered_fields(:deprecated => false)
-          expect(fields).to match_array([ :guid, :name, :email, :password, :nullify, :photos ])
+          expect(fields).to match_array(
+            [ :guid, :name, :email, :password, :nullify, :photos, :created_at, :updated_at ]
+          )
         end
 
         context 'and :include => :email_domain' do
           it 'includes deprecated fields that have been explicitly specified' do
             fields = user._filtered_fields(:deprecated => false, :include => :email_domain)
-            expect(fields).to match_array([ :guid, :name, :email, :email_domain, :password, :nullify, :photos ])
+            expect(fields).to match_array(
+              [ :guid, :name, :email, :email_domain, :password, :nullify, :photos, :created_at, :updated_at ]
+            )
           end
         end
       end

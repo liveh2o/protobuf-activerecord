@@ -30,6 +30,8 @@ class UserMessage
   optional :string, :password, 5
   repeated :string, :nullify, 6
   repeated ::PhotoMessage, :photos, 7
+  optional :int64, :created_at, 8
+  optional :int64, :updated_at, 9
 end
 
 class UserSearchMessage
