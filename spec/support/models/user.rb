@@ -17,6 +17,7 @@ class User < ActiveRecord::Base
   attribute_from_proto :password, lambda { |proto| proto.password! }
 
   field_from_record :email_domain, lambda { |record| record.email.split('@').last }
+  field_from_record :password, :password_transformer
 
   def self.extract_first_name(proto)
     if proto.field?(:name)
@@ -35,6 +36,11 @@ class User < ActiveRecord::Base
     end
 
     last_name
+  end
+
+  def self.password_transformer(user)
+    # Simple way to test field transformers that call methods
+    user.password
   end
 
   def token

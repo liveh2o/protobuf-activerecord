@@ -250,7 +250,7 @@ module Protobuf
         end
 
         def _protobuf_symbol_transformer_object(field)
-          FieldSymbolTransformerCaller.new(self, _protobuf_symbol_transformer_object[field])
+          FieldSymbolTransformerCaller.new(self, _protobuf_field_symbol_transformers[field])
         end
       end
 
