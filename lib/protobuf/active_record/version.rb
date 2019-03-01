@@ -1,5 +1,5 @@
 module Protobuf
   module ActiveRecord
-    VERSION = "5.0.0.beta"
+    VERSION = "5.1.0.beta"
   end
 end
