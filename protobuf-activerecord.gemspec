@@ -22,8 +22,8 @@ Gem::Specification.new do |spec|
   ##
   # Dependencies
   #
-  spec.add_dependency "activerecord", "~> 4.2"
-  spec.add_dependency "activesupport", ">= 3.2"
+  spec.add_dependency "activerecord", "~> 5.0.0"
+  spec.add_dependency "activesupport", "~> 5.0.0"
   spec.add_dependency "concurrent-ruby"
   spec.add_dependency "heredity", ">= 0.1.1"
   spec.add_dependency "protobuf", ">= 3.0"
@@ -38,6 +38,6 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency "rspec-pride", ">= 3.1.0"
   spec.add_development_dependency "pry-nav"
   spec.add_development_dependency "simplecov"
-  spec.add_development_dependency "sqlite3"
+  spec.add_development_dependency "sqlite3", "~> 1.3.6"
   spec.add_development_dependency "timecop"
 end
