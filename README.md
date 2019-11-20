@@ -158,7 +158,7 @@ end
 
 ### Attribute transformers
 
-Protobuf Active Record handles mapping protobuf message fields to object attributes, but what happens when an attribute doesn't have a matching field? Using the `attribute_from_proto` method, you can define custom attribute transformations. Simply call `attribute_from_prot`, passing it the name of the attribute and a method name or callable (lambda or proc). When creating or updating objects, the transformer will be called and passed the protobuf message.
+Protobuf Active Record handles mapping protobuf message fields to object attributes, but what happens when an attribute doesn't have a matching field? Using the `attribute_from_proto` method, you can define custom attribute transformations. Simply call `attribute_from_proto`, passing it the name of the attribute and a method name or callable (lambda or proc). When creating or updating objects, the transformer will be called and passed the protobuf message.
 
 ```Ruby
 class User < ActiveRecord::Base
