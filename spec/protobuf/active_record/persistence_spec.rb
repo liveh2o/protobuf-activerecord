@@ -67,4 +67,28 @@ describe Protobuf::ActiveRecord::Persistence do
       user.update_attributes!(user_attributes)
     end
   end
+
+  describe "#update" do
+    it "accepts a protobuf message" do
+      expect_any_instance_of(User).to receive(:save)
+      user.update(proto)
+    end
+
+    it "accepts a hash" do
+      expect_any_instance_of(User).to receive(:save)
+      user.update(user_attributes)
+    end
+  end
+
+  describe "#update!" do
+    it "accepts a protobuf message" do
+      expect_any_instance_of(User).to receive(:save!)
+      user.update!(proto)
+    end
+
+    it "accepts a hash" do
+      expect_any_instance_of(User).to receive(:save!)
+      user.update!(user_attributes)
+    end
+  end
 end
