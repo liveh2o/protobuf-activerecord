@@ -50,20 +50,6 @@ module Protobuf
 
         super(attributes)
       end
-
-      # :nodoc:
-      def update_attributes(attributes)
-        attributes = attributes_from_proto(attributes) if attributes.is_a?(::Protobuf::Message)
-
-        super(attributes)
-      end
-
-      # :nodoc:
-      def update_attributes!(attributes)
-        attributes = attributes_from_proto(attributes) if attributes.is_a?(::Protobuf::Message)
-
-        super(attributes)
-      end
     end
   end
 end
