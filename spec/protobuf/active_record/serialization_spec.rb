@@ -187,9 +187,8 @@ describe Protobuf::ActiveRecord::Serialization do
     describe "#to_proto" do
       context "when a protobuf message is configured" do
         let(:proto) { protobuf_message.new(proto_hash) }
-        let(:proto_hash) { { :name => "foo" } }
-
-        before { allow(user).to receive(:fields_from_record).and_return(proto_hash) }
+        let(:proto_hash) { { :name => "foo ", :email => "test@test.com", :email_domain => "test.com" } }
+        let(:user) { User.new(:first_name => "foo", :email => "test@test.com") }
 
         it "intializes a new protobuf message with attributes from #to_proto_hash" do
           expect(user.to_proto).to eq proto
