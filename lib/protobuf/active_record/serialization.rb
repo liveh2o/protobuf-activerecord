@@ -225,8 +225,21 @@ module Protobuf
           end
         end
 
-        def _protobuf_nil_object(_field)
-          NilMethodCaller.new
+        class NilRepeatedMethodCaller
+          def initialize
+          end
+
+          def call(_selph)
+            []
+          end
+        end
+
+        def _protobuf_nil_object(field)
+          if field == :nullify
+            NilRepeatedMethodCaller.new
+          else
+            NilMethodCaller.new
+          end
         end
 
         class FieldSymbolTransformerCaller
