@@ -26,4 +26,9 @@ ActiveRecord::Schema.define(:version => 1) do
 
     t.timestamps :null => false
   end
+
+  create_table :zeros do |t|
+    t.boolean :nullify
+    t.integer :z_saber_level
+  end
 end

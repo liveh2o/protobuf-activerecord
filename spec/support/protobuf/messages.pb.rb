@@ -12,6 +12,7 @@ require 'protobuf'
 class PhotoMessage < ::Protobuf::Message; end
 class UserMessage < ::Protobuf::Message; end
 class UserSearchMessage < ::Protobuf::Message; end
+class ZeroMessage < ::Protobuf::Message; end
 
 
 ##
@@ -37,5 +38,10 @@ end
 class UserSearchMessage
   repeated :string, :guid, 1
   repeated :string, :email, 2
+end
+
+class ZeroMessage
+  optional :bool, :nullify, 1
+  optional :int64, :z_saber_level, 2
 end
 
