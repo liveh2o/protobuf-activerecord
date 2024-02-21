@@ -38,6 +38,13 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency "rspec-pride", ">= 3.1.0"
   spec.add_development_dependency "pry-nav"
   spec.add_development_dependency "simplecov"
-  spec.add_development_dependency "sqlite3", ">= 1.4"
+
+  if ENV["PLATFORM"] == "java" || ::RUBY_PLATFORM == "java"
+    spec.platform = "java"
+    spec.add_development_dependency "activerecord-jdbcsqlite3-adapter"
+  else
+    spec.add_development_dependency "sqlite3", ">= 1.4"
+  end
+
   spec.add_development_dependency "timecop"
 end
