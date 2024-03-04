@@ -182,6 +182,21 @@ describe Protobuf::ActiveRecord::Serialization do
           expect(fields[:photos]).to be_an(Array)
         end
       end
+
+      context "when nullify is NOT an attribute" do
+        it "initializes nullify to empty array" do
+          expect(user.fields_from_record[:nullify]).to eq []
+        end
+      end
+
+      context "when nullify IS an attribute" do
+        let(:zero) { Zero.create(:nullify => true) }
+        before { Zero.protobuf_message(ZeroMessage) }
+
+        it "retains the original value" do
+          expect(zero.fields_from_record[:nullify]).to be true
+        end
+      end
     end
 
     describe "#to_proto" do

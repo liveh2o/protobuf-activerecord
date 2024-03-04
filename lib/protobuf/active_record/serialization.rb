@@ -225,6 +225,18 @@ module Protobuf
           end
         end
 
+        class EmptyNullifyCaller
+          def initialize; end
+
+          def call(_selph)
+            []
+          end
+        end
+
+        def _protobuf_empty_nullify_object(_field)
+          EmptyNullifyCaller.new
+        end
+
         def _protobuf_nil_object(_field)
           NilMethodCaller.new
         end
@@ -337,6 +349,8 @@ module Protobuf
             else
               self.class._protobuf_convert_to_fields_object(field)
             end
+          when field == :nullify
+            self.class._protobuf_empty_nullify_object(field)
           else
             self.class._protobuf_nil_object(field)
           end

@@ -21,3 +21,8 @@ message UserSearchMessage {
   repeated string guid = 1;
   repeated string email = 2;
 }
+
+message ZeroMessage {
+  bool nullify = 1;
+  int64 z_saber_level = 2;
+}
