@@ -1,7 +1,3 @@
-require:
-  # Standard's config uses custom cops, so it must be loaded
-  - standard
-
+---
 inherit_gem:
-  standard: config/base.yml
-  standard-performance: config.base.yml
+  standard: config/ruby-2.7.yml

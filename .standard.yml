@@ -1,2 +1,3 @@
-parallel: true     # default: false
-ruby_version: 3.0  # default: RUBY_VERSION
+# For available configuration options, see:
+#   https://github.com/standardrb/standard
+format: progress # default: Standard::Formatter
