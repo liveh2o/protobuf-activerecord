@@ -37,7 +37,7 @@ module Protobuf
           end
         end
 
-        super(association_name, attributes_collection)
+        super
       end
 
       # :nodoc:
@@ -47,7 +47,7 @@ module Protobuf
           attributes = reflection.klass.attributes_from_proto(attributes)
         end
 
-        super(association_name, attributes)
+        super
       end
     end
   end
