@@ -24,7 +24,7 @@ describe Protobuf::ActiveRecord::Serialization do
     end
 
     context "when the given transformer is callable" do
-      let(:callable) { lambda { |_proto| nil } }
+      let(:callable) { lambda { |_proto| } }
 
       before {
         allow(User).to receive(:_protobuf_field_transformers).and_return({})
@@ -38,7 +38,7 @@ describe Protobuf::ActiveRecord::Serialization do
   end
 
   describe ".protobuf_message" do
-    let(:options) { { :only => [] } }
+    let(:options) { {only: []} }
 
     before { User.protobuf_message(protobuf_message, options) }
     after { User.protobuf_message(protobuf_message, {}) }
@@ -69,14 +69,14 @@ describe Protobuf::ActiveRecord::Serialization do
     describe "#_filter_field_attributes" do
       context "when options has :only" do
         it "only returns the given field(s)" do
-          fields = user._filter_field_attributes(:only => :name)
+          fields = user._filter_field_attributes(only: :name)
           expect(fields).to eq [:name]
         end
       end
 
       context "when options has :except" do
         it "returns all except the given field(s)" do
-          fields = user._filter_field_attributes(:except => :name)
+          fields = user._filter_field_attributes(except: :name)
           expect(fields).to match_array(
             [:guid, :email, :email_domain, :password, :nullify, :photos, :created_at, :updated_at]
           )
@@ -93,7 +93,7 @@ describe Protobuf::ActiveRecord::Serialization do
 
       context "given :deprecated => false" do
         it "filters all deprecated fields" do
-          fields = user._filtered_fields(:deprecated => false)
+          fields = user._filtered_fields(deprecated: false)
           expect(fields).to match_array(
             [:guid, :name, :email, :password, :nullify, :photos, :created_at, :updated_at]
           )
@@ -101,7 +101,7 @@ describe Protobuf::ActiveRecord::Serialization do
 
         context "and :include => :email_domain" do
           it "includes deprecated fields that have been explicitly specified" do
-            fields = user._filtered_fields(:deprecated => false, :include => :email_domain)
+            fields = user._filtered_fields(deprecated: false, include: :email_domain)
             expect(fields).to match_array(
               [:guid, :name, :email, :email_domain, :password, :nullify, :photos, :created_at, :updated_at]
             )
@@ -111,7 +111,7 @@ describe Protobuf::ActiveRecord::Serialization do
     end
 
     describe "#_normalize_options" do
-      let(:options) { { :only => [:name] } }
+      let(:options) { {only: [:name]} }
 
       context "given empty options" do
         before { User.protobuf_message(protobuf_message, options) }
@@ -140,7 +140,7 @@ describe Protobuf::ActiveRecord::Serialization do
       end
 
       context "given options with :except" do
-        let(:options) { { :except => [:name] } }
+        let(:options) { {except: [:name]} }
 
         before { User.protobuf_message(protobuf_message, {}) }
 
@@ -154,10 +154,10 @@ describe Protobuf::ActiveRecord::Serialization do
     describe "#fields_from_record" do
       let(:attributes) {
         {
-          :guid => "foo",
-          :first_name => "bar",
-          :last_name => "baz",
-          :email => "foo@test.co"
+          guid: "foo",
+          first_name: "bar",
+          last_name: "baz",
+          email: "foo@test.co"
         }
       }
 
@@ -169,7 +169,7 @@ describe Protobuf::ActiveRecord::Serialization do
 
       context "given options with :include" do
         it "adds the given field to the list of serialized fields" do
-          fields = user.fields_from_record(:include => :token)
+          fields = user.fields_from_record(include: :token)
           expect(fields).to include(:token)
         end
       end
@@ -178,7 +178,7 @@ describe Protobuf::ActiveRecord::Serialization do
         let(:user) { User.create(attributes) }
 
         it "terminates the association proxy" do
-          fields = user.fields_from_record(:include => :photos)
+          fields = user.fields_from_record(include: :photos)
           expect(fields[:photos]).to be_an(Array)
         end
       end
@@ -187,7 +187,7 @@ describe Protobuf::ActiveRecord::Serialization do
     describe "#to_proto" do
       context "when a protobuf message is configured" do
         let(:proto) { protobuf_message.new(proto_hash) }
-        let(:proto_hash) { { :name => "foo" } }
+        let(:proto_hash) { {name: "foo"} }
 
         before { allow(user).to receive(:fields_from_record).and_return(proto_hash) }
 

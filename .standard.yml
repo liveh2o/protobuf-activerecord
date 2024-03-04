@@ -1,0 +1,2 @@
+parallel: true     # default: false
+ruby_version: 3.0  # default: RUBY_VERSION

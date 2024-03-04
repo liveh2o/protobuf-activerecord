@@ -2,8 +2,8 @@ require "spec_helper"
 
 describe Protobuf::ActiveRecord::Persistence do
   let(:user) { User.new(user_attributes) }
-  let(:user_attributes) { { :first_name => "foo", :last_name => "bar", :email => "foo@test.co" } }
-  let(:proto_hash) { { :name => "foo bar", :email => "foo@test.co" } }
+  let(:user_attributes) { {first_name: "foo", last_name: "bar", email: "foo@test.co"} }
+  let(:proto_hash) { {name: "foo bar", email: "foo@test.co"} }
   let(:proto) { UserMessage.new(proto_hash) }
 
   describe ".create" do

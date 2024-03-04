@@ -18,7 +18,7 @@ module Protobuf
             value = proto.__send__(:"#{field_alias}!")
             value ||= proto.__send__(:"#{attribute}!") if proto.respond_to?(attribute)
 
-            self._protobuf_convert_fields_to_attributes(attribute, value)
+            _protobuf_convert_fields_to_attributes(attribute, value)
           end
         end
 
@@ -26,7 +26,7 @@ module Protobuf
           lambda do |record|
             value = record.__send__(field_alias)
 
-            self._protobuf_convert_attributes_to_fields(attribute, value)
+            _protobuf_convert_attributes_to_fields(attribute, value)
           end
         end
       end

@@ -35,23 +35,21 @@ module Protobuf
 
           filtered_attributes = _filtered_attributes + _protobuf_attribute_transformers.keys
 
-          attribute_fields = filtered_attributes.inject({}) do |hash, column_name|
+          attribute_fields = filtered_attributes.each_with_object({}) do |column_name, hash|
             symbolized_column = column_name.to_sym
 
             if fields.key?(symbolized_column) || _protobuf_attribute_transformers.key?(symbolized_column)
               hash[symbolized_column] = fields[symbolized_column]
             end
-
-            hash
           end
 
           _protobuf_nested_attributes.each do |attribute_name|
-            nested_attribute_name = "#{attribute_name}_attributes".to_sym
+            nested_attribute_name = :"#{attribute_name}_attributes"
             value = if proto.field?(nested_attribute_name)
-                      proto.__send__(nested_attribute_name)
-                    elsif proto.field?(attribute_name)
-                      proto.__send__(attribute_name)
-                    end
+              proto.__send__(nested_attribute_name)
+            elsif proto.field?(attribute_name)
+              proto.__send__(attribute_name)
+            end
 
             next unless value
             attribute_fields[nested_attribute_name] = value
@@ -64,7 +62,7 @@ module Protobuf
         #
         # :nodoc:
         def _filtered_attributes
-          return self.attribute_names
+          attribute_names
         end
 
         # :nodoc:
@@ -72,18 +70,19 @@ module Protobuf
           return nil if value.nil?
           return value unless _protobuf_date_datetime_time_or_timestamp_column?(key)
 
-          value = case
-                  when _protobuf_datetime_column?(key) then
-                    convert_int64_to_datetime(value)
-                  when _protobuf_timestamp_column?(key) then
-                    convert_int64_to_time(value)
-                  when _protobuf_time_column?(key) then
-                    convert_int64_to_time(value)
-                  when _protobuf_date_column?(key) then
-                    convert_int64_to_date(value)
-                  end
+          if _protobuf_datetime_column?(key)
 
-          return value
+            convert_int64_to_datetime(value)
+          elsif _protobuf_timestamp_column?(key)
+
+            convert_int64_to_time(value)
+          elsif _protobuf_time_column?(key)
+
+            convert_int64_to_time(value)
+          elsif _protobuf_date_column?(key)
+
+            convert_int64_to_date(value)
+          end
         end
 
         # Define an attribute transformation from protobuf. Accepts a Symbol,
@@ -113,7 +112,7 @@ module Protobuf
           symbol_or_block = args.first || block
 
           if symbol_or_block.is_a?(Symbol)
-            callable = lambda { |value| self.__send__(symbol_or_block, value) }
+            callable = lambda { |value| __send__(symbol_or_block, value) }
           else
             raise AttributeTransformerError unless symbol_or_block.respond_to?(:call)
             callable = symbol_or_block
@@ -138,7 +137,7 @@ module Protobuf
         def attributes_from_proto(proto)
           attribute_fields = _filter_attribute_fields(proto)
 
-          attributes = attribute_fields.inject({}) do |hash, (key, value)|
+          attributes = attribute_fields.each_with_object({}) do |(key, value), hash|
             if _protobuf_attribute_transformers.key?(key)
               transformer = _protobuf_attribute_transformers[key]
               attribute = transformer.call(proto)
@@ -147,8 +146,6 @@ module Protobuf
             else
               hash[key] = _protobuf_convert_fields_to_attributes(key, value)
             end
-
-            hash
           end
 
           return attributes unless proto.field?(:nullify) && proto.nullify.is_a?(Array)

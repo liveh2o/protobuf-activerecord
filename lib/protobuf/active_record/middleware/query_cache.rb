@@ -1,5 +1,3 @@
-require "thread"
-
 module Protobuf
   module ActiveRecord
     module Middleware
@@ -20,7 +18,7 @@ module Protobuf
           restore_query_cache_settings(enabled)
         end
 
-      private
+        private
 
         def restore_query_cache_settings(enabled)
           ::Thread.current[CURRENT_CONNECTION].clear_query_cache

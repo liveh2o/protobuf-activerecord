@@ -4,17 +4,15 @@ describe Protobuf::ActiveRecord::Columns do
   describe "._protobuf_map_columns" do
     context "when the class has a table" do
       let(:expected_column_names) {
-        User.columns.inject({}) do |hash, column|
+        User.columns.each_with_object({}) do |column, hash|
           hash[column.name.to_sym] = column
-          hash
         end
       }
 
       let(:expected_column_types) {
-        User.columns.inject({}) do |hash, column|
+        User.columns.each_with_object({}) do |column, hash|
           hash[column.type.to_sym] ||= ::Set.new
           hash[column.type.to_sym] << column.name.to_sym
-          hash
         end
       }
 

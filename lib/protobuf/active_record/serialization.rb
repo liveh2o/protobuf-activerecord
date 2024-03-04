@@ -9,9 +9,9 @@ module Protobuf
       included do
         class << self
           attr_writer :_protobuf_field_symbol_transformers,
-                      :_protobuf_field_transformers,
-                      :_protobuf_field_options,
-                      :protobuf_message
+            :_protobuf_field_transformers,
+            :_protobuf_field_options,
+            :protobuf_message
         end
       end
 
@@ -33,24 +33,20 @@ module Protobuf
         end
 
         def _protobuf_message_deprecated_fields
-          @_protobuf_message_deprecated_fields ||= begin
-            self.protobuf_message.all_fields.map do |field|
-              next if field.nil?
-              next unless field.deprecated?
+          @_protobuf_message_deprecated_fields ||= protobuf_message.all_fields.map do |field|
+            next if field.nil?
+            next unless field.deprecated?
 
-              field.name.to_sym
-            end
+            field.name.to_sym
           end
         end
 
         def _protobuf_message_non_deprecated_fields
-          @_protobuf_message_non_deprecated_fields ||= begin
-            self.protobuf_message.all_fields.map do |field|
-              next if field.nil?
-              next if field.deprecated?
+          @_protobuf_message_non_deprecated_fields ||= protobuf_message.all_fields.map do |field|
+            next if field.nil?
+            next if field.deprecated?
 
-              field.name.to_sym
-            end
+            field.name.to_sym
           end
         end
 
@@ -147,7 +143,7 @@ module Protobuf
           def call(selph)
             selph.__send__(@method_name).to_a
           rescue NameError # Has happened when field is not on model or ignored from db
-            return nil
+            nil
           end
         end
 
@@ -167,7 +163,7 @@ module Protobuf
               value.to_time(:utc).to_i
             end
           rescue NameError # Has happened when field is not on model or ignored from db
-            return nil
+            nil
           end
         end
 
@@ -181,7 +177,7 @@ module Protobuf
 
             value&.to_i
           rescue NameError # Has happened when field is not on model or ignored from db
-            return nil
+            nil
           end
         end
 
@@ -193,7 +189,7 @@ module Protobuf
           def call(selph)
             selph.__send__(@field)
           rescue NameError # Has happened when field is not on model or ignored from db
-            return nil
+            nil
           end
         end
 
@@ -325,21 +321,21 @@ module Protobuf
 
       # :nodoc:
       def _protobuf_field_objects(field)
-        self.class._protobuf_field_objects[field] ||= begin
-          case
-          when _protobuf_field_symbol_transformers.key?(field) then
-            self.class._protobuf_symbol_transformer_object(field)
-          when _protobuf_field_transformers.key?(field) then
-            self.class._protobuf_field_transformer_object(field)
-          when respond_to?(field) then
-            if _is_collection_association?(field)
-              self.class._protobuf_collection_association_object(field)
-            else
-              self.class._protobuf_convert_to_fields_object(field)
-            end
+        self.class._protobuf_field_objects[field] ||= if _protobuf_field_symbol_transformers.key?(field)
+
+          self.class._protobuf_symbol_transformer_object(field)
+        elsif _protobuf_field_transformers.key?(field)
+
+          self.class._protobuf_field_transformer_object(field)
+        elsif respond_to?(field)
+
+          if _is_collection_association?(field)
+            self.class._protobuf_collection_association_object(field)
           else
-            self.class._protobuf_nil_object(field)
+            self.class._protobuf_convert_to_fields_object(field)
           end
+        else
+          self.class._protobuf_nil_object(field)
         end
       end
 
@@ -362,7 +358,7 @@ module Protobuf
       def to_proto(options = {})
         raise MessageNotDefined, self.class if _protobuf_message.nil?
 
-        fields = self.fields_from_record(options)
+        fields = fields_from_record(options)
         _protobuf_message.new(fields)
       end
     end

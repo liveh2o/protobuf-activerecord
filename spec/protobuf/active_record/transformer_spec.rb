@@ -2,7 +2,7 @@ require "spec_helper"
 
 describe ::Protobuf::ActiveRecord::Transformer do
   let(:callable) { lambda { |proto| proto.name } }
-  let(:proto) { ::UserMessage.new(:name => "test", :nullify => ["name"]) }
+  let(:proto) { ::UserMessage.new(name: "test", nullify: ["name"]) }
   let(:options) { {} }
 
   subject { described_class.new(callable, options) }
@@ -22,7 +22,7 @@ describe ::Protobuf::ActiveRecord::Transformer do
     end
 
     context "nullify_on name" do
-      let(:options) { { :nullify_on => :name } }
+      let(:options) { {nullify_on: :name} }
 
       context "invalid message" do
         let(:proto) { ::UserSearchMessage.new }

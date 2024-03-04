@@ -42,11 +42,11 @@ module Protobuf
         #
         def field_scope(field, options = {})
           scope_name = if options.include?(:scope)
-                         options[:scope]
-                       else
-                         # When no scope is defined, assume the scope is the field, prefixed with `by_`
-                         :"by_#{field}"
-                       end
+            options[:scope]
+          else
+            # When no scope is defined, assume the scope is the field, prefixed with `by_`
+            :"by_#{field}"
+          end
           searchable_fields[field] = scope_name
 
           searchable_field_parsers[field] = options[:parser] if options[:parser]
@@ -56,7 +56,7 @@ module Protobuf
         # use `all` instead of `scoped`.
         # :noapi:
         def model_scope
-          ::ActiveRecord::VERSION::MAJOR >= 4 ? all : scoped
+          (::ActiveRecord::VERSION::MAJOR >= 4) ? all : scoped
         end
 
         # :noapi:
@@ -66,10 +66,10 @@ module Protobuf
           if searchable_field_parsers[field]
             parser = searchable_field_parsers[field]
 
-            if parser.respond_to?(:to_sym)
-              value = self.__send__(parser.to_sym, value)
+            value = if parser.respond_to?(:to_sym)
+              __send__(parser.to_sym, value)
             else
-              value = parser.call(value)
+              parser.call(value)
             end
           end
 
@@ -99,7 +99,7 @@ module Protobuf
             search_relation = search_relation.__send__(scope_name, *search_values)
           end
 
-          return search_relation
+          search_relation
         end
 
         # :noapi:

@@ -1,5 +1,4 @@
 require "concurrent"
-require "thread"
 
 module Protobuf
   module ActiveRecord
@@ -13,8 +12,8 @@ module Protobuf
               return if timed_task_started.true?
 
               args = {
-                :execution_interval => ::Protobuf::ActiveRecord.config.connection_reaping_interval,
-                :timeout_interval => ::Protobuf::ActiveRecord.config.connection_reaping_timeout_interval
+                execution_interval: ::Protobuf::ActiveRecord.config.connection_reaping_interval,
+                timeout_interval: ::Protobuf::ActiveRecord.config.connection_reaping_timeout_interval
               }
               timed_task = ::Concurrent::TimerTask.new(args) do
                 ::ActiveRecord::Base.clear_active_connections!

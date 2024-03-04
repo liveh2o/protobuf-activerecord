@@ -1,6 +1,5 @@
 require "set"
 require "active_support/concern"
-require "thread"
 
 module Protobuf
   module ActiveRecord
@@ -14,9 +13,9 @@ module Protobuf
         include ::Heredity
 
         inheritable_attributes :_protobuf_columns,
-                               :_protobuf_column_types,
-                               :_protobuf_date_datetime_time_or_timestamp_column,
-                               :_protobuf_mapped_columns
+          :_protobuf_column_types,
+          :_protobuf_date_datetime_time_or_timestamp_column,
+          :_protobuf_mapped_columns
       end
 
       module ClassMethods
