@@ -1,6 +1,6 @@
 require "spec_helper"
 
-describe Protobuf::ActiveRecord::Transformation do
+RSpec.describe Protobuf::ActiveRecord::Transformation do
   let(:user) { User.new(user_attributes) }
   let(:user_attributes) { {first_name: "foo", last_name: "bar", email: "foo@test.co"} }
   let(:proto_hash) { {name: "foo bar", email: "foo@test.co"} }
@@ -215,7 +215,7 @@ describe Protobuf::ActiveRecord::Transformation do
     let(:int64) { date.to_time.to_i }
 
     it "initializes a new Date object from the value" do
-      Timecop.freeze(Date.current) do
+      travel_to(Date.current) do
         expect(User.convert_int64_to_date(int64)).to eq date
       end
     end
@@ -226,7 +226,7 @@ describe Protobuf::ActiveRecord::Transformation do
     let(:int64) { datetime.to_i }
 
     it "initializes a new DateTime object from the value" do
-      Timecop.freeze(DateTime.current) do
+      travel_to(DateTime.current) do
         expected_datetime = Time.at(datetime.to_i)
         converted_datetime = User.convert_int64_to_datetime(int64)
         expect(converted_datetime).to eq expected_datetime
@@ -239,7 +239,7 @@ describe Protobuf::ActiveRecord::Transformation do
     let(:int64) { time.to_time.to_i }
 
     it "initializes a new Time object from the value" do
-      Timecop.freeze(Time.current) do
+      travel_to(Time.current) do
         expect(User.convert_int64_to_time(int64)).to be_within(1).of(time)
       end
     end

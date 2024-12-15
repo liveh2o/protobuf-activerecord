@@ -8,7 +8,7 @@ class TheMessage < ::Protobuf::Message
   optional TheEnum, :the_enum_value, 1
 end
 
-describe Protobuf::ActiveRecord::Scope do
+RSpec.describe Protobuf::ActiveRecord::Scope do
   before do
     @field_parsers = User.instance_variable_get(:@_searchable_field_parsers)
     @fields = User.instance_variable_get(:@_searchable_fields)

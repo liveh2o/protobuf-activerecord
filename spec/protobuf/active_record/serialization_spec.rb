@@ -5,7 +5,7 @@ class UnconfiguredUser
   include Protobuf::ActiveRecord::Model
 end
 
-describe Protobuf::ActiveRecord::Serialization do
+RSpec.describe Protobuf::ActiveRecord::Serialization do
   let(:protobuf_message) { UserMessage }
 
   describe ".field_from_record" do

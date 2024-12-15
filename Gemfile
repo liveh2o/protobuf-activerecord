@@ -21,5 +21,3 @@ gem "rspec-pride", ">= 3.1.0"
 gem "simplecov"
 
 gem "standard", "~> 1.3"
-
-gem "timecop"
