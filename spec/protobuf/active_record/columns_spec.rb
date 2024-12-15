@@ -1,6 +1,6 @@
 require "spec_helper"
 
-describe Protobuf::ActiveRecord::Columns do
+RSpec.describe Protobuf::ActiveRecord::Columns do
   describe "._protobuf_map_columns" do
     context "when the class has a table" do
       let(:expected_column_names) {

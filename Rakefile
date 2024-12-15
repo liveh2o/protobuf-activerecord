@@ -1,9 +1,13 @@
+# frozen_string_literal: true
+
 require "bundler/gem_tasks"
-require "protobuf/tasks"
+
 require "rspec/core/rake_task"
 
 desc "Run specs"
-RSpec::Core::RakeTask.new(:spec)
+RSpec::Core::RakeTask.new(:spec) do |t|
+  t.ruby_opts = %w[-w]
+end
 
 require "standard/rake"
 
@@ -15,6 +19,8 @@ task :clean do
   FileUtils.rm(Dir.glob("spec/support/protobuf/**/*.proto"))
   puts "Cleaned"
 end
+
+require "protobuf/tasks"
 
 desc "Compile spec/support protobuf definitions"
 task :compile, [] => :clean do

@@ -1,6 +1,6 @@
 require "spec_helper"
 
-describe ::Protobuf::ActiveRecord::Transformer do
+RSpec.describe ::Protobuf::ActiveRecord::Transformer do
   let(:callable) { lambda { |proto| proto.name } }
   let(:proto) { ::UserMessage.new(name: "test", nullify: ["name"]) }
   let(:options) { {} }

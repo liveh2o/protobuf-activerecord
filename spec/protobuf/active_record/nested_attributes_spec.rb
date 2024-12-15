@@ -1,6 +1,6 @@
 require "spec_helper"
 
-describe Protobuf::ActiveRecord::NestedAttributes do
+RSpec.describe Protobuf::ActiveRecord::NestedAttributes do
   let(:user_message) {
     UserMessage.new(name: "foo bar", email: "foo@test.co", photos: [{url: "https://test.co/test.png"}])
   }
