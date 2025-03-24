@@ -9,6 +9,7 @@
 /pkg/
 /spec/reports/
 /spec/test.db
+/spec/test.db-*
 /tmp/
 
 # rspec failure tracking
