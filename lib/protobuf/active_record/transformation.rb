@@ -120,7 +120,7 @@ module Protobuf
 
           if options[:nullify_on]
             field = protobuf_message.get_field(:nullify)
-            unless field&.is_a?(::Protobuf::Field::StringField) && field&.repeated?
+            unless field&.is_a?(::Protobuf::Field::StringField) && field.repeated?
               ::Protobuf::Logging.logger.warn "Message: #{protobuf_message} is not compatible with :nullify_on option"
             end
           end
