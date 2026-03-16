@@ -11,3 +11,7 @@ since it depends on specific Rails versions.
 ## [7.0.0] – 2024-03-03
 
 - Added Rails 7.0 support
+
+## [7.1.1] – 2026-03-16
+
+- Change clear_active_connections! to include handler.

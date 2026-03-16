@@ -16,7 +16,7 @@ module Protobuf
                 timeout_interval: ::Protobuf::ActiveRecord.config.connection_reaping_timeout_interval
               }
               timed_task = ::Concurrent::TimerTask.new(args) do
-                ::ActiveRecord::Base.clear_active_connections!
+                ::ActiveRecord::Base.connection_handler.clear_active_connections!
               end
 
               timed_task.execute
