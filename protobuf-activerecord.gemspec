@@ -14,7 +14,7 @@ Gem::Specification.new do |spec|
   spec.description = "Provides the ability to create Active Record objects from Protocol Buffer messages and vice versa."
   spec.homepage = "http://github.com/liveh2o/protobuf-activerecord"
   spec.license = "MIT"
-  spec.required_ruby_version = ">= 2.7.0"
+  spec.required_ruby_version = ">= 3.1.0"
 
   spec.metadata["homepage_uri"] = spec.homepage
   spec.metadata["source_code_uri"] = spec.homepage
@@ -26,7 +26,7 @@ Gem::Specification.new do |spec|
   spec.files = IO.popen(%w[git ls-files -z], chdir: __dir__, err: IO::NULL) do |ls|
     ls.readlines("\x0", chomp: true).reject do |f|
       (f == gemspec) ||
-        f.start_with?(*%w[bin/ test/ spec/ features/ .git .github appveyor Gemfile])
+        f.start_with?(*%w[bin/ test/ spec/ features/ gemfiles/ .git .github appveyor Appraisals Gemfile])
     end
   end
   spec.bindir = "exe"
@@ -36,8 +36,8 @@ Gem::Specification.new do |spec|
   ##
   # Dependencies
   #
-  spec.add_dependency "activerecord", "~> 7.1.0"
-  spec.add_dependency "activesupport", "~> 7.1.0"
+  spec.add_dependency "activerecord", ">= 7.1", "< 7.3"
+  spec.add_dependency "activesupport", ">= 7.1", "< 7.3"
   spec.add_dependency "concurrent-ruby"
   spec.add_dependency "heredity", ">= 0.1.1"
   spec.add_dependency "protobuf", ">= 3.0"

@@ -8,6 +8,10 @@ since it depends on specific Rails versions.
 
 ## [Unreleased]
 
+- Added Rails 7.2 support; ActiveRecord/ActiveSupport dependency widened to `>= 7.1, < 7.3`.
+- Bumped minimum Ruby to 3.1 (required by Rails 7.2).
+- Added Appraisal-based test matrix for Rails 7.1 and 7.2.
+
 ## [7.0.0] – 2024-03-03
 
 - Added Rails 7.0 support

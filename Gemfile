@@ -11,6 +11,8 @@ platforms :ruby do
   gem "sqlite3", ">= 1.4"
 end
 
+gem "appraisal", "~> 2.5"
+
 gem "benchmark-ips"
 
 gem "rake", "~> 13.0"
