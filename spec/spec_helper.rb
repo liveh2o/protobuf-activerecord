@@ -16,9 +16,9 @@ require "support/protobuf/messages.pb"
 # Silence protobuf"s logger
 Protobuf::Logging.logger.level = ::Logger::FATAL
 
-# TODO: Remove this when adding Rails 8.0 support
-# Opt-in to Rails 8.0 behavior now
-ActiveSupport.to_time_preserves_timezone = true
+# TODO: Remove this when adding Rails 8.1 support
+# Opt-in to Rails 8.1 behavior now
+ActiveSupport.to_time_preserves_timezone = :zone
 
 RSpec.configure do |config|
   config.include ActiveSupport::Testing::TimeHelpers

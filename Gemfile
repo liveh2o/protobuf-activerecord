@@ -4,11 +4,12 @@ source "https://rubygems.org"
 gemspec
 
 platforms :jruby do
-  gem "activerecord-jdbcsqlite3-adapter"
+  # Pre-release is required to run tests on JRuby
+  gem "activerecord-jdbcsqlite3-adapter", ">= 80.0.pre1"
 end
 
 platforms :ruby do
-  gem "sqlite3", ">= 1.4"
+  gem "sqlite3", ">= 2.9"
 end
 
 gem "benchmark-ips"

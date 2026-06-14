@@ -8,6 +8,9 @@ since it depends on specific Rails versions.
 
 ## [Unreleased]
 
+- Added Rails 8.0 support
+- Require Ruby 3.2 or greater (to match Rails)
+
 ## [7.2.1] - 2026-06-14
 
 - Fix connection handling that was using a method deprecated in Rails 7.1
