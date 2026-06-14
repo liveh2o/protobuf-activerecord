@@ -37,7 +37,7 @@ Gem::Specification.new do |spec|
   # Dependencies
   #
   spec.add_dependency "activerecord", "~> 7.2.0"
-  spec.add_dependency "activesupport", "~> 7.2.0"
+  spec.add_dependency "activesupport", ">= 7.2", "< 8.2"
   spec.add_dependency "concurrent-ruby"
   spec.add_dependency "heredity", ">= 0.1.1"
   spec.add_dependency "protobuf", ">= 3.0"
