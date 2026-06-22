@@ -13,7 +13,7 @@ jobs:
     name: Lint (Standard)
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
       - uses: ruby/setup-ruby@v1
         with:
           ruby-version: "3.2"
@@ -28,7 +28,7 @@ jobs:
         ruby: [3.2, head, jruby-10.0, jruby-head]
     continue-on-error: ${{ endsWith(matrix.ruby, 'head') }}
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
       - uses: ruby/setup-ruby@v1
         with:
           ruby-version: ${{ matrix.ruby }}
