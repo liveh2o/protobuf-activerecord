@@ -25,7 +25,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        ruby: [3.2, head, jruby-10.0, jruby-head]
+        ruby: ["3.2", "3.3", "3.4", "4.0", head, jruby-10.0, jruby-head]
     continue-on-error: ${{ endsWith(matrix.ruby, 'head') }}
     steps:
       - uses: actions/checkout@v6
