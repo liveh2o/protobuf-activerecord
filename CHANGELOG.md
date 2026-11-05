@@ -8,6 +8,7 @@ since it depends on specific Rails versions.
 
 ## [Unreleased]
 
+- Added Rails 8.1 support
 - Added Rails 8.0 support
 - Require Ruby 3.2 or greater (to match Rails)
 

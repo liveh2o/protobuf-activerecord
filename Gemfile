@@ -5,7 +5,7 @@ gemspec
 
 platforms :jruby do
   # Pre-release is required to run tests on JRuby
-  gem "activerecord-jdbcsqlite3-adapter", ">= 80.0.pre1"
+  gem "activerecord-jdbcsqlite3-adapter", ">= 81.0.pre1"
 end
 
 platforms :ruby do
